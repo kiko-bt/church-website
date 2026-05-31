@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
+/* ── Runtime CSS variables — changed at runtime by .dark class ──────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fdfdfd;
+  --warm-bg: #f5f1e9;
+  --soft-gold: #e6d7a3;
+  --accent-gold: #c9a227;
+  --text-primary: #2d2d2d;
+  --deep-dark: #0f172a;
 }
+
+.dark {
+  --background: #0f172a;
+  --warm-bg: #1a2540;
+  --soft-gold: #3a4a6b;
+  --text-primary: #e2e8f0;
+  --deep-dark: #f8fafc;
+}
+
+/* ── @theme inline — Tailwind utilities reference CSS vars at runtime ─────────
+   Using `inline` is required so that `bg-background` compiles to
+   `background-color: var(--background)` rather than a static hex value.
+   This makes dark mode work correctly when the `.dark` class is applied. ─── */
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-warm-bg: var(--warm-bg);
+  --color-soft-gold: var(--soft-gold);
+  --color-accent-gold: var(--accent-gold);
+  --color-text-primary: var(--text-primary);
+  --color-deep-dark: var(--deep-dark);
+
+  --font-heading: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base Reset ─────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  line-height: 1.3;
+  color: var(--deep-dark);
+}
+
+/* ── Accessible focus ring ──────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Bible reading optimisation ─────────────────────────────────────────────── */
+
+.bible-text {
+  font-size: 1.0625rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
 }

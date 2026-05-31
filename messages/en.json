@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "bible": "Bible",
+    "books": "Books",
+    "sermons": "Sermons",
+    "gallery": "Gallery",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "mobileNavLabel": "Mobile navigation",
+    "mobileNavLinks": "Navigation links"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light theme",
+    "dark": "Dark theme"
+  },
+  "locale": {
+    "switchTo": "Switch language"
+  },
+  "common": {
+    "readMore": "Read more",
+    "download": "Download",
+    "search": "Search",
+    "loading": "Loading...",
+    "notFound": "Page not found",
+    "backToHome": "Back to home"
+  },
+  "home": {
+    "hero": {
+      "title": "Welcome to Our Community",
+      "subtitle": "A place of peace, prayer, and the Word of God",
+      "ctaPrimary": "Read the Bible",
+      "ctaSecondary": "Contact Us"
+    },
+    "scripture": {
+      "label": "Verse of the Day",
+      "verse": "Be still, and know that I am God",
+      "reference": "Psalm 46:10"
+    },
+    "welcome": {
+      "title": "About Us",
+      "body": "The Church of the Gospel of Christ in Bitola is a place where people find peace, hope, and community in Christ. You are welcome to join us.",
+      "cta": "Read more"
+    },
+    "cta": {
+      "title": "Join Us",
+      "body": "Every Sunday we welcome you with open hearts. Write to us or come visit.",
+      "button": "Contact Us"
+    }
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Learn about our community"
+  },
+  "bible": {
+    "title": "Bible",
+    "oldTestament": "Old Testament",
+    "newTestament": "New Testament",
+    "chapter": "Chapter",
+    "verse": "Verse",
+    "breadcrumb": "Bible",
+    "searchPlaceholder": "Search Bible verses...",
+    "noResults": "No results found for your search.",
+    "selectBook": "Select a book",
+    "selectChapter": "Select a chapter",
+    "notFound": {
+      "book": "Book not found.",
+      "chapter": "Chapter not found."
+    },
+    "aria": {
+      "chapters": "Book chapters",
+      "breadcrumb": "Breadcrumb navigation"
+    }
+  },
+  "sermons": {
+    "title": "Sermons",
+    "by": "Preacher",
+    "date": "Date",
+    "listen": "Listen",
+    "watch": "Watch"
+  },
+  "books": {
+    "title": "Books",
+    "downloadPdf": "Download PDF",
+    "by": "Author"
+  },
+  "gallery": {
+    "title": "Gallery"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "name": "Your Name",
+    "email": "Email Address",
+    "message": "Message",
+    "send": "Send Message",
+    "success": "Message sent successfully.",
+    "error": "Something went wrong. Please try again.",
+    "validation": {
+      "nameMin": "Name must be at least 2 characters.",
+      "nameMax": "Name is too long.",
+      "emailInvalid": "Please enter a valid email address.",
+      "messageMin": "Message must be at least 10 characters.",
+      "messageMax": "Message is too long."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved.",
+    "tagline": "A place of peace and God's Word"
+  }
+}

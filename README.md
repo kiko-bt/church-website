@@ -1,36 +1,224 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Црква Христово Евангелие - Битола
 
-## Getting Started
+Official website for the Church of the Gospel of Christ, Bitola, North Macedonia.
 
-First, run the development server:
+---
+
+## What This Project Does
+
+A content-driven church website where a non-technical administrator (preacher) manages all content through **Sanity CMS** — sermons, books, gallery images, and church settings — without touching code.
+
+Key modules:
+
+| Module | Data Source | Rendering |
+|---|---|---|
+| Bible (text) | Local JSON | SSG |
+| Bible (PDFs) | Sanity | SSG |
+| Sermons | Sanity | SSG |
+| Books / PDFs | Sanity | SSG |
+| Gallery | Sanity | SSG |
+| Contact form | Server Action + Resend | — |
+| Church settings | Sanity | SSG |
+
+---
+
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4 |
+| UI Components | shadcn/ui |
+| CMS | Sanity |
+| i18n | next-intl (mk / en) |
+| Theme | next-themes |
+| Search | Fuse.js (client-side) |
+| Forms | React Hook Form + Zod |
+| Email | Resend |
+| Fonts | Playfair Display + Inter |
+| Hosting | Vercel |
+
+---
+
+## Prerequisites
+
+- **Node.js** 22 LTS
+- **npm** 10.9.2
+
+---
+
+## Installation
+
+### 1. Clone and install base dependencies
+
+```bash
+git clone <repo-url>
+cd church-website
+npm install
+```
+
+### 2. Install required packages
+
+The foundation is scaffolded. These packages must be installed before running the app:
+
+```bash
+npm install next-intl next-themes @sanity/client resend fuse.js react-hook-form @hookform/resolvers lucide-react clsx tailwind-merge class-variance-authority @vercel/analytics
+npm install -D prettier
+```
+
+### 3. Configure environment variables
+
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+Required variables:
+
+```env
+NEXT_PUBLIC_SANITY_PROJECT_ID=...
+NEXT_PUBLIC_SANITY_DATASET=production
+SANITY_API_TOKEN=...
+RESEND_API_KEY=...
+RESEND_FROM_EMAIL=noreply@your-domain.com
+RESEND_TO_EMAIL=preacher@your-domain.com
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
+### 4. Activate next-intl
+
+After installing next-intl:
+
+1. Uncomment `middleware.ts` (replace pass-through with `createMiddleware`)
+2. Uncomment `src/lib/i18n/request.ts` (activate `getRequestConfig`)
+3. Uncomment `next.config.ts` (activate `withNextIntl`)
+4. Uncomment `NextIntlClientProvider` in `src/app/[locale]/layout.tsx`
+
+### 5. Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) — you will be redirected to `/mk` (default locale).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+.
+├── .claude/                  # AI workflow rules (do not modify)
+├── messages/
+│   ├── mk.json               # Macedonian UI translations
+│   └── en.json               # English UI translations
+├── public/                   # Static assets
+├── sanity/
+│   ├── schemas/              # Sanity content schemas (add per feature)
+│   ├── sanity.config.ts      # Sanity Studio config (stub)
+│   └── sanity.client.ts      # Re-export of Sanity client
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx        # Root layout (minimal — [locale] provides html/body)
+│   │   ├── page.tsx          # Redirects / → /mk
+│   │   └── [locale]/
+│   │       ├── layout.tsx    # Locale layout: html, fonts, Header, Footer
+│   │       ├── page.tsx      # Homepage
+│   │       ├── about/
+│   │       ├── bible/
+│   │       │   ├── [bookSlug]/
+│   │       │   │   └── [chapter]/
+│   │       ├── books/
+│   │       │   └── [slug]/
+│   │       ├── sermons/
+│   │       │   └── [slug]/
+│   │       ├── gallery/
+│   │       ├── contact/
+│   │       └── privacy/
+│   ├── components/
+│   │   ├── layout/           # Header, Footer, Navigation, LayoutShell
+│   │   ├── ui/               # shadcn/ui components (add via npx shadcn@latest add)
+│   │   ├── bible/
+│   │   ├── sermons/
+│   │   ├── books/
+│   │   ├── gallery/
+│   │   └── contact/
+│   ├── features/             # Feature-level business logic (bible, sermons, etc.)
+│   ├── lib/
+│   │   ├── i18n/request.ts   # next-intl server config
+│   │   ├── sanity/           # Sanity client + GROQ queries
+│   │   ├── resend/           # Email service
+│   │   ├── search/           # Fuse.js Bible search
+│   │   ├── seo/              # Metadata generation helpers
+│   │   ├── utils/cn.ts       # Tailwind class merging utility
+│   │   └── validations/      # Zod schemas
+│   ├── data/
+│   │   └── bible/
+│   │       ├── bible-hierarchical.json    # Bible text (books → chapters → verses)
+│   │       └── bible-search-index.json   # Fuse.js search index
+│   ├── types/                # Shared TypeScript interfaces
+│   ├── constants/            # Locales, routes, site config, Bible constants
+│   └── styles/fonts.ts       # Google Fonts configuration
+├── middleware.ts              # Locale routing (next-intl)
+├── next.config.ts
+├── .env.example
+└── .prettierrc
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Bible Architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Bible verse data lives **in the codebase as JSON** — never in Sanity.
 
-## Deploy on Vercel
+```
+src/data/bible/
+├── bible-hierarchical.json   # Full Bible: books → chapters → verses (mk + en)
+└── bible-search-index.json   # Flat search index for Fuse.js
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Both files are generated offline from a parsing script and committed to the repository. The app reads them statically at build time via `generateStaticParams()`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Adding shadcn/ui Components
+
+```bash
+npx shadcn@latest add button
+npx shadcn@latest add card
+npx shadcn@latest add dialog
+```
+
+Components are copied into `src/components/ui/`.
+
+---
+
+## Locales
+
+| Code | Language | Route |
+|---|---|---|
+| `mk` | Macedonian (default) | `/mk/...` |
+| `en` | English | `/en/...` |
+
+Translation files: `messages/mk.json`, `messages/en.json`
+
+Only UI labels are translated. Sermon content and Bible books are NOT translated.
+
+---
+
+## Useful Commands
+
+```bash
+npm run dev       # Development server
+npm run build     # Production build
+npm run start     # Production server
+npm run lint      # ESLint
+```
+
+---
+
+## Deployment
+
+Deployed on **Vercel**. Set all environment variables from `.env.example` in the Vercel dashboard before deploying.
