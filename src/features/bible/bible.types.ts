@@ -1,4 +1,4 @@
-import type { Testament } from "@/constants/bible";
+import type { Testament } from "./bible.constants";
 
 export type { Testament };
 

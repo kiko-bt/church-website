@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
-import type { BibleHierarchical } from "@/types/bible";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
-import bibleData from "@/data/bible/bible-hierarchical.json";
-
-const bible = bibleData as BibleHierarchical;
+import { getAllBooks, getBook, getChapter } from "@/features/bible";
 
 type BibleChapterPageProps = {
   params: Promise<{ locale: Locale; bookSlug: string; chapter: string }>;
 };
 
 export async function generateStaticParams() {
-  return bible.books.flatMap((book) =>
+  return getAllBooks().flatMap((book) =>
     book.chapters.map((chapter) => ({
       bookSlug: book.id,
       chapter: String(chapter.number),
@@ -25,7 +22,7 @@ export async function generateMetadata({
   params,
 }: BibleChapterPageProps): Promise<Metadata> {
   const { bookSlug, chapter } = await params;
-  const book = bible.books.find((b) => b.id === bookSlug);
+  const book = getBook(bookSlug);
   return { title: book ? `${book.name} ${chapter}` : bookSlug };
 }
 
@@ -35,8 +32,8 @@ export default async function BibleChapterPage({
   const { locale, bookSlug, chapter } = await params;
   const t = await getTranslations("bible");
   const chapterNumber = Number(chapter);
-  const book = bible.books.find((b) => b.id === bookSlug);
-  const chapterData = book?.chapters.find((c) => c.number === chapterNumber);
+  const book = getBook(bookSlug);
+  const chapterData = getChapter(bookSlug, chapterNumber);
 
   if (!book || !chapterData) {
     return (

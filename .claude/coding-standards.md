@@ -94,3 +94,32 @@ export function Component({ title }: ComponentProps) {
     </section>
   );
 }
+```
+
+---
+
+# FEATURE FILE NAMING
+
+Feature code lives in `src/features/<feature>/` and follows fixed names so
+locations are predictable for both developers and Claude Code:
+
+| Pattern | Purpose |
+|---|---|
+| `<feature>.types.ts` | Domain types |
+| `<feature>.queries.ts` | GROQ queries (CMS-backed features) |
+| `<feature>.data.ts` | Data access / accessors |
+| `<feature>.constants.ts` | Feature constants |
+| `<feature>.schema.ts` | Zod schema (feature-specific validation) |
+| `index.ts` | Server-safe public barrel |
+
+Conventions:
+
+- Feature folder names are kebab-case (`church-settings`).
+- Files are prefixed with the feature name (`sermons.queries.ts`), so an open
+  editor tab is unambiguous.
+- Import features through the barrel: `import { getBook } from "@/features/bible";`
+- GROQ queries belong to the feature, never to `lib/`.
+- A feature `index.ts` MUST NOT re-export Client Component modules; import those
+  (e.g. `@/features/bible/bible-search`) directly in the client component.
+- Only create a `<feature>.data.ts` when there is a real consumer (local JSON to
+  read or a configured CMS client) — do not add empty stub accessors.

@@ -1,34 +1,31 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
-import type { BibleHierarchical } from "@/types/bible";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
-import bibleData from "@/data/bible/bible-hierarchical.json";
-
-const bible = bibleData as BibleHierarchical;
+import { getAllBooks, getBook } from "@/features/bible";
 
 type BibleBookPageProps = {
   params: Promise<{ locale: Locale; bookSlug: string }>;
 };
 
 export async function generateStaticParams() {
-  return bible.books.map((book) => ({ bookSlug: book.id }));
+  return getAllBooks().map((book) => ({ bookSlug: book.id }));
 }
 
 export async function generateMetadata({
   params,
 }: BibleBookPageProps): Promise<Metadata> {
   const { bookSlug } = await params;
-  const book = bible.books.find((b) => b.id === bookSlug);
+  const book = getBook(bookSlug);
   return { title: book?.name ?? bookSlug };
 }
 
 export default async function BibleBookPage({ params }: BibleBookPageProps) {
   const { locale, bookSlug } = await params;
   const t = await getTranslations("bible");
-  const book = bible.books.find((b) => b.id === bookSlug);
+  const book = getBook(bookSlug);
 
   if (!book) {
     return (

@@ -71,6 +71,36 @@ Content-driven architecture.
 
 NOT enterprise architecture.
 
+Concretely implemented as a **Hybrid Feature-Based Architecture**:
+feature-sliced domain modules (`src/features/<feature>/`) over a shared,
+layer-based core (`app/`, `components/`, `lib/`, shared `types/` and `constants/`).
+
+---
+
+# FEATURE ARCHITECTURE RULES
+
+Features: `bible · sermons · books · gallery · church-settings · contact`.
+
+ALWAYS:
+
+- give each domain ONE home: `src/features/<feature>/`
+- place GROQ queries in `features/<feature>/<feature>.queries.ts`
+- place feature types in `features/<feature>/<feature>.types.ts`
+- read Bible JSON only through `features/bible/bible.data.ts` accessors
+- import a feature via its barrel `@/features/<feature>`
+- keep each feature `index.ts` server-safe (never re-export Client Component modules)
+
+NEVER:
+
+- place GROQ queries in `lib/`
+- place domain/feature logic in `lib/` (infrastructure clients only)
+- import `bible-hierarchical.json` directly in a page or component
+- duplicate the Bible data-loading/cast pattern across pages
+- re-export `bible-search.ts` (or any `"use client"` module) from a feature barrel
+
+`lib/` is for cross-cutting INFRASTRUCTURE only (Sanity read client, Resend,
+i18n, SEO, utils). Shared types/constants stay in `src/types` and `src/constants`.
+
 ---
 
 # ARCHITECTURE PRIORITY ORDER
