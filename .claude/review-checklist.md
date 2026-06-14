@@ -30,16 +30,32 @@ Check:
 - Server Components default
 - static rendering strategy
 - generateStaticParams()
+- active-state nav links use the `NavLink` client island
+  (`src/components/layout/NavLink.tsx`), not a full server-to-client
+  conversion of the parent component
+
+---
+
+# TRANSLATION REVIEW
+
+Check:
+- no hardcoded strings in JSX, `aria-label`s, or `generateMetadata()`
+  titles/descriptions — everything via `t()` / `getTranslations()`
+- `messages/mk.json` and `messages/en.json` have matching keys
+- only UI text is translated (Bible verses, sermons, books, PDFs stay
+  untranslated)
 
 ---
 
 # UI REVIEW
 
 Check:
-- responsive behavior
+- responsive behavior (mobile-first, Tailwind default breakpoints)
 - accessibility
-- typography
+- typography (Playfair Display + Inter, with Cyrillic support)
 - spacing consistency
+- color tokens used via `@theme inline` CSS variables, not hardcoded hex
+- dark mode (binary light/dark via next-themes, no "system" option)
 
 ---
 

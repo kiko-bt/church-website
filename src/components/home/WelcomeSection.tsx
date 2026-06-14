@@ -7,6 +7,9 @@ type WelcomeSectionProps = {
   locale: Locale;
 };
 
+// Future CMS integration point: title/body will come from
+// HomeContent.welcomeTitle(_en) / welcomeBody(_en) (@/features/home-content).
+// Until Sanity is wired in, content is sourced from home.welcome.* messages.
 export async function WelcomeSection({ locale }: WelcomeSectionProps) {
   const t = await getTranslations("home.welcome");
 

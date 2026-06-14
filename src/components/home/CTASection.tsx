@@ -7,6 +7,9 @@ type CTASectionProps = {
   locale: Locale;
 };
 
+// Future CMS integration point: title/body will come from
+// HomeContent.shortMessage(_en) (@/features/home-content).
+// Until Sanity is wired in, content is sourced from home.cta.* messages.
 export async function CTASection({ locale }: CTASectionProps) {
   const t = await getTranslations("home.cta");
 

@@ -138,6 +138,10 @@ Examples:
 │   │   │   ├── church-settings.types.ts
 │   │   │   ├── church-settings.queries.ts
 │   │   │   └── index.ts
+│   │   ├── home-content/
+│   │   │   ├── home-content.types.ts
+│   │   │   ├── home-content.queries.ts
+│   │   │   └── index.ts
 │   │   └── contact/
 │   │       ├── contact.schema.ts
 │   │       └── index.ts
@@ -199,7 +203,7 @@ shared `types/` and `constants/`).
 ## Features
 
 ```txt
-bible · sermons · books · gallery · church-settings · contact
+bible · sermons · books · gallery · church-settings · contact · home-content
 ```
 
 ## Feature folder responsibilities
@@ -224,7 +228,7 @@ Pages in `app/` import a feature through its barrel, e.g. `@/features/bible`.
 |---|---|
 | `src/components/ui` · `layout` · `home` · `providers` | Shared/presentational UI |
 | `src/lib/sanity` (client), `resend`, `i18n`, `seo`, `utils` | Cross-cutting infrastructure |
-| `src/types` (`sanity.ts`, `navigation.ts`) | Cross-cutting types (e.g. Sanity primitives) |
+| `src/types` (`sanity.ts`, `navigation.ts`) | Cross-cutting types (e.g. Sanity primitives, `RichTextContent` Portable Text placeholder) |
 | `src/constants` (`locales`, `routes`, `site`, `navigation`) | Cross-cutting constants |
 
 ## Rules

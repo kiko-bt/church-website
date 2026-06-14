@@ -1,6 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 
+// Future CMS integration point: verse/reference will come from
+// HomeContent.mainVerseText(_en) / mainVerseReference(_en) (@/features/home-content).
+// Until Sanity is wired in, content is sourced from home.scripture.* messages.
 export async function ScriptureSection() {
   const t = await getTranslations("home.scripture");
 

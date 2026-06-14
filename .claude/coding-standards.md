@@ -123,3 +123,32 @@ Conventions:
   (e.g. `@/features/bible/bible-search`) directly in the client component.
 - Only create a `<feature>.data.ts` when there is a real consumer (local JSON to
   read or a configured CMS client) — do not add empty stub accessors.
+
+---
+
+# ACTIVE-STATE NAVIGATION PATTERN (CONFIRMED)
+
+When a server-rendered list of links needs active-route highlighting:
+
+- keep the parent component (e.g. `Navigation.tsx`, `MobileNav.tsx`) on its
+  existing server/client boundary
+- extract ONLY the active-state check into a small shared client component
+  (`src/components/layout/NavLink.tsx`) using `usePathname()`
+- do NOT convert an entire server component to a client component just to
+  read the current path
+- `NavLink` sets `aria-current="page"` on the active link
+
+This "client island" pattern is the default for any future case where a
+server component needs a small bit of route- or browser-only state.
+
+---
+
+# CORE LAYOUT PRIMITIVES (CONFIRMED)
+
+| Component | Purpose |
+|---|---|
+| `src/components/ui/SectionContainer.tsx` | `max-w-7xl` responsive container for full-bleed home page `<section>`s |
+| `src/components/layout/LayoutShell.tsx` | `max-w-7xl` + vertical padding wrapper for standard inner pages (about, contact, etc.) |
+| `src/components/providers/Providers.tsx` | `NextIntlClientProvider` (outer) wraps `ThemeProvider` (inner) — do not change this order |
+| `src/app/[locale]/layout.tsx` | Owns `<html>`/`<body>`, fonts, `Providers`, Header/main/Footer flex column |
+| `src/app/layout.tsx` | Minimal passthrough (`<>{children}</>`) — do not add markup here |

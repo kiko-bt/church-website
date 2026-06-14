@@ -7,6 +7,7 @@
     "sermons": "Sermons",
     "gallery": "Gallery",
     "contact": "Contact",
+    "ariaLabel": "Main navigation",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "mobileNavLabel": "Mobile navigation",
@@ -57,6 +58,7 @@
   },
   "bible": {
     "title": "Bible",
+    "metaDescription": "Read the Bible online.",
     "oldTestament": "Old Testament",
     "newTestament": "New Testament",
     "chapter": "Chapter",

@@ -79,7 +79,7 @@ layer-based core (`app/`, `components/`, `lib/`, shared `types/` and `constants/
 
 # FEATURE ARCHITECTURE RULES
 
-Features: `bible · sermons · books · gallery · church-settings · contact`.
+Features: `bible · sermons · books · gallery · church-settings · contact · home-content`.
 
 ALWAYS:
 
@@ -100,6 +100,20 @@ NEVER:
 
 `lib/` is for cross-cutting INFRASTRUCTURE only (Sanity read client, Resend,
 i18n, SEO, utils). Shared types/constants stay in `src/types` and `src/constants`.
+
+---
+
+# CMS CONTENT LOCALIZATION CONVENTION
+
+Any CMS-backed or future-CMS feature with bilingual fields follows the same
+convention as the Bible JSON:
+
+- the base field name (e.g. `welcomeTitle`) holds Macedonian (default)
+- an `_en` suffixed field (e.g. `welcomeTitle_en`) holds English
+
+Rich text / Portable Text fields use the `RichTextContent` placeholder type
+(`src/types/sanity.ts`) until `@portabletext/types` is introduced — do not
+invent a different rich-text shape.
 
 ---
 

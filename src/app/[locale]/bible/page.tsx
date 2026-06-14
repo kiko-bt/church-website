@@ -15,9 +15,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "bible" });
   return {
     title: t("title"),
-    description: locale === "mk"
-      ? "Читајте ја Библијата на македонски јазик."
-      : "Read the Bible online.",
+    description: t("metaDescription"),
   };
 }
 

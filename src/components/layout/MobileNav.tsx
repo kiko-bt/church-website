@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import type { Locale } from "@/constants/locales";
 import { NAV_ITEMS } from "@/constants/navigation";
+import { NavLink } from "./NavLink";
 
 type MobileNavProps = {
   locale: Locale;
@@ -72,17 +72,14 @@ export function MobileNav({ locale }: MobileNavProps) {
             <ul className="space-y-1">
               {NAV_ITEMS.map((item) => (
                 <li key={item.path}>
-                  <Link
+                  <NavLink
                     href={`/${locale}${item.path}`}
+                    exact={item.path === ""}
                     onClick={() => setIsOpen(false)}
-                    className={cn(
-                      "block rounded-sm px-4 py-3 text-lg font-medium text-text-primary",
-                      "transition-colors hover:bg-warm-bg hover:text-accent-gold",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
-                    )}
+                    className="block px-4 py-3 text-lg font-medium"
                   >
                     {t(item.key)}
-                  </Link>
+                  </NavLink>
                 </li>
               ))}
             </ul>

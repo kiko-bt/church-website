@@ -16,3 +16,8 @@ export type SanityImage = {
 export type SanitySlug = {
   readonly current: string;
 };
+
+// Placeholder for Sanity Portable Text (rich text) content. Will be
+// replaced with `PortableTextBlock[]` from `@portabletext/types` once
+// Sanity is wired in.
+export type RichTextContent = ReadonlyArray<Record<string, unknown>>;
