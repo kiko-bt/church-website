@@ -11,7 +11,7 @@ export async function Navigation({ locale }: NavigationProps) {
   const t = await getTranslations("nav");
 
   return (
-    <nav aria-label={t("ariaLabel")} className="hidden sm:block">
+    <nav aria-label={t("ariaLabel")} className="hidden lg:block">
       <ul className="flex items-center gap-1">
         {NAV_ITEMS.map((item) => (
           <li key={item.path}>

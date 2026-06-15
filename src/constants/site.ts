@@ -1,6 +1,8 @@
 export const siteConfig = {
   name: "Црква Христово Евангелие - Битола",
   nameEn: "Church of the Gospel of Christ - Bitola",
+  shortName: "ХЕ Битола",
+  shortNameEn: "CGC Bitola",
   description:
     "Добродојдовте во Црква Христово Евангелие - Битола",
   descriptionEn:

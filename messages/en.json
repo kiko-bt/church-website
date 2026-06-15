@@ -27,7 +27,8 @@
     "search": "Search",
     "loading": "Loading...",
     "notFound": "Page not found",
-    "backToHome": "Back to home"
+    "backToHome": "Back to home",
+    "viewDetails": "View details"
   },
   "home": {
     "hero": {
@@ -54,7 +55,44 @@
   },
   "about": {
     "title": "About Us",
-    "subtitle": "Learn about our community"
+    "subtitle": "Learn about our community",
+    "metaDescription": "Learn about the Church of the Gospel of Christ in Bitola — our story, mission, values, and faith.",
+    "intro": {
+      "heading": "Our Story",
+      "body": "The Church of the Gospel of Christ in Bitola is a community of believers who gather to worship God, study His Word, and support one another in faith and daily life.",
+      "body2": "For many years our doors have been open to everyone seeking peace, hope, and a deeper relationship with God. We welcome you to learn more about who we are."
+    },
+    "mission": {
+      "heading": "Our Mission",
+      "body": "Our mission is to share the Gospel of Jesus Christ, to nurture a warm and welcoming community, and to encourage every person to grow in faith through the study of Scripture and a life of prayer."
+    },
+    "values": {
+      "heading": "Our Values",
+      "love": {
+        "title": "Love",
+        "body": "We strive to reflect the love of Christ in how we treat one another and everyone who walks through our doors."
+      },
+      "community": {
+        "title": "Community",
+        "body": "We believe faith grows best in fellowship, where people support, encourage, and pray for each other."
+      },
+      "word": {
+        "title": "The Word",
+        "body": "Scripture is the foundation of our life and worship, guiding our decisions and shaping our hearts."
+      }
+    },
+    "beliefs": {
+      "heading": "What We Believe",
+      "item1": "We believe in one God, the Father, the Son, and the Holy Spirit.",
+      "item2": "We believe the Bible is the inspired Word of God.",
+      "item3": "We believe salvation is a gift of grace through faith in Jesus Christ.",
+      "item4": "We believe the Church is a community called to love and serve."
+    },
+    "visit": {
+      "heading": "Come Visit Us",
+      "body": "We would love to meet you. Reach out with any questions or simply join us for a service.",
+      "cta": "Contact Us"
+    }
   },
   "bible": {
     "title": "Bible",
@@ -79,21 +117,51 @@
   },
   "sermons": {
     "title": "Sermons",
+    "subtitle": "Listen to and watch messages from our community",
+    "metaDescription": "Listen to and watch sermons from the Church of the Gospel of Christ in Bitola.",
     "by": "Preacher",
     "date": "Date",
     "listen": "Listen",
-    "watch": "Watch"
+    "watch": "Watch",
+    "empty": {
+      "title": "No sermons yet",
+      "description": "Sermons will appear here once they are published. Please check back soon."
+    }
   },
   "books": {
     "title": "Books",
+    "subtitle": "Read and download books from our library",
+    "metaDescription": "Browse and download books from the Church of the Gospel of Christ in Bitola.",
     "downloadPdf": "Download PDF",
-    "by": "Author"
+    "by": "Author",
+    "empty": {
+      "title": "No books yet",
+      "description": "Books will appear here once they are published. Please check back soon."
+    }
   },
   "gallery": {
-    "title": "Gallery"
+    "title": "Gallery",
+    "subtitle": "Moments from the life of our community",
+    "metaDescription": "Photos from the life and events of the Church of the Gospel of Christ in Bitola.",
+    "empty": {
+      "title": "No photos yet",
+      "description": "Photos will appear here once they are added. Please check back soon."
+    }
   },
   "contact": {
     "title": "Contact Us",
+    "subtitle": "We would love to hear from you",
+    "metaDescription": "Get in touch with the Church of the Gospel of Christ in Bitola.",
+    "intro": "Whether you have a question, would like to learn more, or simply wish to visit, you are always welcome. Reach out using the details below.",
+    "info": {
+      "heading": "Get in Touch",
+      "addressLabel": "Address",
+      "emailLabel": "Email",
+      "scheduleLabel": "Service Times",
+      "scheduleValue": "Every Sunday at 10:00",
+      "followLabel": "Follow Us",
+      "emailCta": "Send us an email"
+    },
     "name": "Your Name",
     "email": "Email Address",
     "message": "Message",
@@ -109,7 +177,37 @@
     }
   },
   "privacy": {
-    "title": "Privacy Policy"
+    "title": "Privacy Policy",
+    "metaDescription": "How the Church of the Gospel of Christ in Bitola handles your personal information.",
+    "lastUpdatedLabel": "Last updated",
+    "lastUpdatedDate": "15 June 2026",
+    "intro": "This Privacy Policy explains how we handle the information you share with us when you visit our website or contact us. We are committed to protecting your privacy and using your information responsibly.",
+    "sections": {
+      "collect": {
+        "heading": "Information We Collect",
+        "body": "When you contact us through the website, we collect the name, email address, and message you provide. We do not collect this information for any purpose other than responding to you."
+      },
+      "use": {
+        "heading": "How We Use Your Information",
+        "body": "We use the information you share solely to respond to your messages and requests. We never sell, rent, or share your personal information with third parties for marketing purposes."
+      },
+      "cookies": {
+        "heading": "Cookies and Analytics",
+        "body": "Our website may use essential cookies and privacy-friendly analytics to understand how the site is used and to improve it. These do not identify you personally."
+      },
+      "thirdParty": {
+        "heading": "Third-Party Services",
+        "body": "We rely on trusted service providers for hosting and email delivery. These providers only process information as needed to operate the website and are bound by their own privacy commitments."
+      },
+      "rights": {
+        "heading": "Your Rights",
+        "body": "You may ask us to access, correct, or delete the personal information you have shared with us at any time. We will respond to your request as soon as we reasonably can."
+      },
+      "contact": {
+        "heading": "Contact Us",
+        "body": "If you have any questions about this Privacy Policy or how we handle your information, please contact us using the details on our Contact page."
+      }
+    }
   },
   "footer": {
     "allRightsReserved": "All rights reserved.",

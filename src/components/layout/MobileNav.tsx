@@ -41,7 +41,7 @@ export function MobileNav({ locale }: MobileNavProps) {
   }, []);
 
   return (
-    <div className="sm:hidden">
+    <div className="lg:hidden">
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label={isOpen ? t("closeMenu") : t("openMenu")}
