@@ -6,7 +6,7 @@
 //
 // export default defineConfig({
 //   name: "church-website-bitola",
-//   title: "Црква Христово Евангелие - Битола",
+//   title: "Црква Евангелие Христово - Битола",
 //   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
 //   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
 //   plugins: [structureTool()],

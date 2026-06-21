@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { getAllBooks, getBook, getChapter } from "@/features/bible";
 
@@ -30,6 +30,7 @@ export default async function BibleChapterPage({
   params,
 }: BibleChapterPageProps) {
   const { locale, bookSlug, chapter } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("bible");
   const chapterNumber = Number(chapter);
   const book = getBook(bookSlug);

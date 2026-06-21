@@ -1,11 +1,13 @@
 # Security Rules
-# Project: Црква Христово Евангелие - Битола
+
+# Project: Црква Евангелие Христово - Битола
 
 ---
 
 # SECURITY PRINCIPLES
 
 Prioritize:
+
 - validation
 - sanitization
 - least exposure
@@ -16,9 +18,11 @@ Prioritize:
 # ENVIRONMENT VARIABLES
 
 Use:
+
 - .env.local
 
 Never expose:
+
 - API keys
 - secrets
 - tokens
@@ -28,6 +32,7 @@ Never expose:
 # FORM SECURITY
 
 Contact forms MUST:
+
 - validate with Zod
 - sanitize input
 - use rate limiting
@@ -38,6 +43,7 @@ Contact forms MUST:
 # API RULES
 
 API routes MUST:
+
 - validate input
 - return safe errors
 - avoid leaking internals
@@ -47,11 +53,13 @@ API routes MUST:
 # DEPENDENCY RULES
 
 Always:
+
 - use stable package versions
 - audit dependencies
 - avoid unnecessary libraries
 
 Commands:
+
 - npm audit
 - npm outdated
 
@@ -60,10 +68,12 @@ Commands:
 # SANITY SECURITY
 
 Never expose:
+
 - write tokens
 - management tokens
 
 Use:
+
 - least privilege access
 
 ---

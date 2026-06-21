@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import type { Sermon } from "@/features/sermons";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SermonsList } from "@/components/sermons/SermonsList";
@@ -23,6 +23,7 @@ export async function generateMetadata({
 
 export default async function SermonsPage({ params }: SermonsPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("sermons");
 
   // Future CMS integration point: replace with the result of `sermonListQuery`

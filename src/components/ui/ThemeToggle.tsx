@@ -17,7 +17,7 @@ export function ThemeToggle() {
 
   // Render a placeholder during SSR to avoid hydration mismatch.
   if (!mounted) {
-    return <div className="h-9 w-9 shrink-0" aria-hidden="true" />;
+    return <div className="h-11 w-11 shrink-0" aria-hidden="true" />;
   }
 
   const isDark = theme === "dark";
@@ -28,7 +28,7 @@ export function ThemeToggle() {
       aria-label={isDark ? t("light") : t("dark")}
       title={isDark ? t("light") : t("dark")}
       className={cn(
-        "flex h-9 w-9 shrink-0 items-center justify-center rounded-sm transition-colors",
+        "flex h-11 w-11 shrink-0 items-center justify-center rounded-sm transition-colors",
         "text-text-primary hover:bg-warm-bg hover:text-accent-gold",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
       )}

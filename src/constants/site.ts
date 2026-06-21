@@ -1,10 +1,9 @@
 export const siteConfig = {
-  name: "Црква Христово Евангелие - Битола",
+  name: "Црква Евангелие Христово - Битола",
   nameEn: "Church of the Gospel of Christ - Bitola",
   shortName: "ХЕ Битола",
   shortNameEn: "CGC Bitola",
-  description:
-    "Добродојдовте во Црква Христово Евангелие - Битола",
+  description: "Добродојдовте во Црква Евангелие Христово - Битола",
   descriptionEn:
     "Official website of the Church of the Gospel of Christ in Bitola, Macedonia.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://your-domain.com",

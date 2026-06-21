@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import type { GalleryImage } from "@/features/gallery";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GalleryGrid } from "@/components/gallery/GalleryGrid";
@@ -23,7 +23,7 @@ export async function generateMetadata({
 
 export default async function GalleryPage({ params }: GalleryPageProps) {
   const { locale } = await params;
-  void locale;
+  setRequestLocale(locale);
   const t = await getTranslations("gallery");
 
   // Future CMS integration point: replace with the result of `galleryListQuery`

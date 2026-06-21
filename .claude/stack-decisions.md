@@ -1,36 +1,38 @@
 # Stack Decisions
-# Project: Црква Христово Евангелие - Битола
+
+# Project: Црква Евангелие Христово - Битола
 
 ---
 
 # LOCKED STACK
 
-| Area | Decision |
-|---|---|
-| Runtime | Node.js 22.22.0 |
-| Package Manager | npm 10.9.2 |
-| Framework | Next.js 15.5.18 |
-| Validation library | Zod 4.4.3 |
-| Router | App Router |
-| Language | TypeScript Strict |
-| Styling | Tailwind CSS |
-| Components | shadcn/ui |
-| CMS | Sanity |
-| Forms | React Hook Form |
-| Validation | Zod |
-| Email | Resend |
-| i18n | next-intl |
-| Theme | next-themes |
-| Search | Fuse.js |
-| Hosting | Vercel |
-| Analytics | Vercel Analytics |
-| Rendering | SSG |
+| Area               | Decision          |
+| ------------------ | ----------------- |
+| Runtime            | Node.js 22.22.0   |
+| Package Manager    | npm 10.9.2        |
+| Framework          | Next.js 15.5.18   |
+| Validation library | Zod 4.4.3         |
+| Router             | App Router        |
+| Language           | TypeScript Strict |
+| Styling            | Tailwind CSS      |
+| Components         | shadcn/ui         |
+| CMS                | Sanity            |
+| Forms              | React Hook Form   |
+| Validation         | Zod               |
+| Email              | Resend            |
+| i18n               | next-intl         |
+| Theme              | next-themes       |
+| Search             | Fuse.js           |
+| Hosting            | Vercel            |
+| Analytics          | Vercel Analytics  |
+| Rendering          | SSG               |
 
 ---
 
 # WHY NEXT.JS
 
 Chosen because:
+
 - App Router
 - SSG support
 - Vercel integration
@@ -42,6 +44,7 @@ Chosen because:
 # WHY SANITY
 
 Chosen because:
+
 - preacher-friendly CMS
 - media uploads
 - simple editing experience
@@ -52,6 +55,7 @@ Chosen because:
 # WHY LOCAL JSON FOR BIBLE
 
 Chosen because:
+
 - deterministic rendering
 - predictable search
 - static generation
@@ -63,6 +67,7 @@ Chosen because:
 # WHY FUSE.JS
 
 Chosen because:
+
 - client-side search
 - lightweight
 - deterministic
@@ -73,6 +78,7 @@ Chosen because:
 # WHY SSG
 
 Chosen because:
+
 - fast performance
 - SEO
 - lower hosting complexity

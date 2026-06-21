@@ -3,6 +3,7 @@ import type { Locale } from "@/constants/locales";
 import { siteConfig } from "@/constants/site";
 import { Navigation } from "./Navigation";
 import { MobileNav } from "./MobileNav";
+import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LocaleSwitcher } from "@/components/ui/LocaleSwitcher";
 import { SectionContainer } from "@/components/ui/SectionContainer";
@@ -13,24 +14,22 @@ type HeaderProps = {
 
 export function Header({ locale }: HeaderProps) {
   const name = locale === "mk" ? siteConfig.name : siteConfig.nameEn;
-  const shortName = locale === "mk" ? siteConfig.shortName : siteConfig.shortNameEn;
 
   return (
     <header className="sticky top-0 z-50 border-b border-soft-gold/30 bg-background/95 backdrop-blur-sm">
       <SectionContainer className="flex h-16 items-center justify-between gap-4">
-        {/* Logo */}
+        {/* Brand — the lockup already contains the church name, so no adjacent
+            text is rendered (avoids duplication and any width pressure). The
+            link's aria-label carries the localized name as the accessible name. */}
         <Link
           href={`/${locale}`}
           aria-label={name}
           className={
-            "shrink-0 rounded-sm font-heading text-base font-semibold leading-tight " +
-            "text-deep-dark transition-colors hover:text-accent-gold " +
+            "shrink-0 rounded-sm transition-opacity hover:opacity-90 " +
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
           }
         >
-          {/* Full name only fits comfortably once the desktop nav has room (xl+) */}
-          <span className="hidden xl:inline">{name}</span>
-          <span className="xl:hidden">{shortName}</span>
+          <Logo size="md" priority />
         </Link>
 
         {/* Desktop navigation — hidden below lg, where it has room to fit */}

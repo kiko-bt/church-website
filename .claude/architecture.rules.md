@@ -1,5 +1,6 @@
 # Architecture Rules
-# Project: Црква Христово Евангелие - Битола
+
+# Project: Црква Евангелие Христово - Битола
 
 ---
 
@@ -145,7 +146,7 @@ User Browser
 Claude MUST assume:
 
 {
-  "strict": true
+"strict": true
 }
 
 - NEVER use any
@@ -184,18 +185,18 @@ FINAL DECISION: Use Server Actions for simplicity and reduced client JS.
 
 ## OFFICIAL BIBLE STRATEGY
 
-| Concern | Official Solution |
-|---|---|
-| Bible text | Local JSON |
-| Search | Fuse.js |
-| Rendering | SSG |
-| PDFs | Sanity assets |
-| CMS management | Metadata only |
-| Verse navigation | Static routes |
-| Chapters | Local static data |
-| Search index | Generated locally |
-| Bible search | Client-side |
-| Download PDFs | Sanity |
+| Concern          | Official Solution |
+| ---------------- | ----------------- |
+| Bible text       | Local JSON        |
+| Search           | Fuse.js           |
+| Rendering        | SSG               |
+| PDFs             | Sanity assets     |
+| CMS management   | Metadata only     |
+| Verse navigation | Static routes     |
+| Chapters         | Local static data |
+| Search index     | Generated locally |
+| Bible search     | Client-side       |
+| Download PDFs    | Sanity            |
 
 ---
 
@@ -227,7 +228,7 @@ Because:
 
 Claude MUST assume:
 
-```txt
+````txt
 /src/data/bible/
 
 contains:
@@ -275,3 +276,4 @@ contains:
     { "id": "matej", "name": "Свето Евангелие според Матеј", "testament": "NT" }
   ]
 }
+````

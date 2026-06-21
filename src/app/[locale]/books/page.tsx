@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import type { Book } from "@/features/books";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BooksGrid } from "@/components/books/BooksGrid";
@@ -23,6 +23,7 @@ export async function generateMetadata({
 
 export default async function BooksPage({ params }: BooksPageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("books");
 
   // Future CMS integration point: replace with the result of `bookListQuery`

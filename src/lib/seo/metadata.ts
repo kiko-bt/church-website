@@ -22,6 +22,16 @@ export function generateBaseMetadata(locale: Locale, path: string = ""): Metadat
       title,
       description,
       url: canonicalUrl,
+      // Resolved against `metadataBase`. Intrinsic dimensions of the lockup.
+      // Future CMS integration: churchSettings.logo
+      images: [
+        {
+          url: "/images/branding/church-logo.png",
+          width: 1184,
+          height: 864,
+          alt: title,
+        },
+      ],
     },
     robots: {
       index: true,

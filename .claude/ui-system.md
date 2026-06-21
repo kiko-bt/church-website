@@ -1,17 +1,17 @@
-
 ---
 
 # `.claude/ui-system.md`
 
 ```md
 # UI System
-# Project: Црква Христово Евангелие - Битола
+# Project: Црква Евангелие Христово - Битола
 
 ---
 
 # DESIGN PRINCIPLES
 
 Design must feel:
+
 - peaceful
 - warm
 - elegant
@@ -25,6 +25,7 @@ Design must feel:
 # DESIGN GOALS
 
 Prioritize:
+
 - readability
 - calm visual hierarchy
 - long-form reading comfort
@@ -37,14 +38,14 @@ Prioritize:
 
 Official palette:
 
-| Color | Value |
-|---|---|
-| Background | #FDFDFD |
+| Color           | Value   |
+| --------------- | ------- |
+| Background      | #FDFDFD |
 | Warm Background | #F5F1E9 |
-| Soft Gold | #E6D7A3 |
-| Accent Gold | #C9A227 |
-| Dark Text | #2D2D2D |
-| Deep Dark | #0F172A |
+| Soft Gold       | #E6D7A3 |
+| Accent Gold     | #C9A227 |
+| Dark Text       | #2D2D2D |
+| Deep Dark       | #0F172A |
 
 ---
 
@@ -59,14 +60,14 @@ Color tokens are CSS custom properties, switched by the `.dark` class
 (applied by `next-themes` via `attribute="class"`), and exposed to
 Tailwind via `@theme inline` so utilities resolve the live variable:
 
-| Token | Utility examples |
-|---|---|
-| `--background` | `bg-background` |
-| `--warm-bg` | `bg-warm-bg` |
-| `--soft-gold` | `bg-soft-gold`, `border-soft-gold` |
-| `--accent-gold` | `text-accent-gold`, `bg-accent-gold` |
-| `--text-primary` | `text-text-primary` |
-| `--deep-dark` | `text-deep-dark`, `bg-deep-dark` |
+| Token            | Utility examples                     |
+| ---------------- | ------------------------------------ |
+| `--background`   | `bg-background`                      |
+| `--warm-bg`      | `bg-warm-bg`                         |
+| `--soft-gold`    | `bg-soft-gold`, `border-soft-gold`   |
+| `--accent-gold`  | `text-accent-gold`, `bg-accent-gold` |
+| `--text-primary` | `text-text-primary`                  |
+| `--deep-dark`    | `text-deep-dark`, `bg-deep-dark`     |
 
 Spacing, radius, shadow, transition, and breakpoint scales use Tailwind
 v4 defaults — no `tailwind.config.*` file. Do not introduce one or
@@ -76,21 +77,23 @@ duplicate these scales as custom tokens without approval.
 
 # TYPOGRAPHY
 
-| Usage | Font |
-|---|---|
+| Usage    | Font             |
+| -------- | ---------------- |
 | Headings | Playfair Display |
-| Body | Inter |
+| Body     | Inter            |
 
 ---
 
 # TYPOGRAPHY RULES
 
 Headings:
+
 - elegant
 - spacious
 - readable
 
 Body:
+
 - readable for long Bible chapters
 - optimized line-height
 - optimized spacing
@@ -112,12 +115,14 @@ Body:
 # LAYOUT RULES
 
 Use:
+
 - responsive containers
 - balanced whitespace
 - predictable spacing
 - consistent sections
 
 Avoid:
+
 - crowded layouts
 - overly animated UI
 - aggressive gradients
@@ -127,6 +132,7 @@ Avoid:
 # COMPONENT PRINCIPLES
 
 Components MUST:
+
 - be reusable
 - remain small
 - remain readable
@@ -137,23 +143,25 @@ Components MUST:
 # MOBILE-FIRST RULE
 
 All UI MUST:
+
 - start mobile-first
 - scale progressively
 
 Test:
+
 - small phones
 - tablets
 - desktops
 
 Use Tailwind v4 default breakpoints — no custom breakpoint scale:
 
-| Breakpoint | Width | Typical use |
-|---|---|---|
-| (default) | 0px | Mobile |
-| `sm` | 640px | Desktop nav cutover (Navigation shows, MobileNav hides) |
-| `md` | 768px | Tablet / small desktop |
-| `lg` | 1024px | Desktop |
-| `xl` / `2xl` | 1280px / 1536px | Large desktop |
+| Breakpoint   | Width           | Typical use                                             |
+| ------------ | --------------- | ------------------------------------------------------- |
+| (default)    | 0px             | Mobile                                                  |
+| `sm`         | 640px           | Desktop nav cutover (Navigation shows, MobileNav hides) |
+| `md`         | 768px           | Tablet / small desktop                                  |
+| `lg`         | 1024px          | Desktop                                                 |
+| `xl` / `2xl` | 1280px / 1536px | Large desktop                                           |
 
 ---
 
@@ -162,6 +170,7 @@ Use Tailwind v4 default breakpoints — no custom breakpoint scale:
 The Bible module is the highest UI priority.
 
 Requirements:
+
 - long-form readability
 - excellent typography
 - clear chapter navigation
@@ -174,6 +183,7 @@ Requirements:
 # BUTTON SYSTEM
 
 Buttons MUST:
+
 - use consistent sizing
 - use consistent spacing
 - maintain contrast accessibility
@@ -183,9 +193,11 @@ Buttons MUST:
 # DARK MODE / THEME SYSTEM (CONFIRMED)
 
 Use:
+
 - next-themes
 
 Implementation:
+
 - `ThemeProvider` with `attribute="class"`, `defaultTheme="light"`,
   `enableSystem={false}`, `disableTransitionOnChange`.
 - Binary light/dark toggle ONLY — no "system" theme option. A single
@@ -196,6 +208,7 @@ Implementation:
   not add custom persistence logic.
 
 Requirements:
+
 - persistent theme
 - elegant dark mode
 - readable typography
@@ -208,6 +221,7 @@ Do not add a "system" theme option without explicit approval.
 # LANGUAGE SWITCHER (CONFIRMED)
 
 `src/components/ui/LocaleSwitcher.tsx`:
+
 - Client component using `usePathname()` + `useRouter()` to swap the
   locale segment of the current path (`mk` ↔ `en`).
 - Rendered as a `role="group"` with `aria-label` from `locale.switchTo`.
@@ -220,9 +234,11 @@ Do not add a "system" theme option without explicit approval.
 # ICON RULES
 
 Use:
+
 - Lucide icons only
 
 Avoid:
+
 - mixed icon systems
 
 ---
@@ -230,9 +246,11 @@ Avoid:
 # ANIMATION RULES
 
 Use:
+
 - subtle transitions only
 
 Avoid:
+
 - excessive animations
 - distracting motion
 - large motion systems
@@ -242,6 +260,7 @@ Avoid:
 # ACCESSIBILITY RULES
 
 UI MUST:
+
 - support keyboard navigation
 - maintain readable contrast
 - support screen readers
@@ -252,6 +271,7 @@ UI MUST:
 # FINAL RULE
 
 The UI system MUST remain:
+
 - elegant
 - readable
 - calm

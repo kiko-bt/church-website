@@ -34,7 +34,7 @@ export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
             disabled={isActive}
             aria-pressed={isActive}
             className={cn(
-              "rounded-sm px-2 py-1 text-xs font-semibold uppercase transition-colors",
+              "flex min-h-11 min-w-11 items-center justify-center rounded-sm px-2 text-xs font-semibold uppercase transition-colors",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold",
               isActive
                 ? "cursor-default text-accent-gold"

@@ -8,7 +8,7 @@ type NavigationProps = {
 };
 
 export async function Navigation({ locale }: NavigationProps) {
-  const t = await getTranslations("nav");
+  const t = await getTranslations("navigation");
 
   return (
     <nav aria-label={t("ariaLabel")} className="hidden lg:block">

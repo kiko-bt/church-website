@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/constants/locales";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -19,6 +20,7 @@ export async function generateMetadata({
 
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
+  setRequestLocale(locale);
 
   return (
     <>

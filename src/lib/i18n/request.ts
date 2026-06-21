@@ -1,5 +1,5 @@
 import { getRequestConfig } from "next-intl/server";
-import { locales, type Locale } from "@/constants/locales";
+import { locales, timeZone, type Locale } from "@/constants/locales";
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
@@ -9,5 +9,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
   return {
     locale,
     messages: (await import(`../../../messages/${locale}.json`)).default,
+    // Pin a global time zone so any date/time formatting is deterministic and
+    // identical between the SSG build and the client (avoids hydration
+    // mismatches). Mirrored on the client provider via the same constant.
+    timeZone,
   };
 });

@@ -4,7 +4,7 @@ import type { Locale } from "@/constants/locales";
 import { locales } from "@/constants/locales";
 import { inter, playfairDisplay } from "@/styles/fonts";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { Providers } from "@/components/providers/Providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -35,6 +35,13 @@ export default async function LocaleLayout({
 }: LocaleLayoutProps) {
   const { locale: rawLocale } = await params;
   const locale = rawLocale as Locale;
+
+  // Enable static rendering: without this, next-intl cannot resolve the active
+  // locale during SSG (the request header is unavailable at build time) and
+  // falls back to `defaultLocale`, baking the wrong language into every page.
+  // Must run before `getMessages()` / any `getTranslations()` call.
+  setRequestLocale(locale);
+
   const messages = await getMessages();
 
   return (

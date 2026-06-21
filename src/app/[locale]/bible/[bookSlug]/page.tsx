@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getAllBooks, getBook } from "@/features/bible";
@@ -24,6 +24,7 @@ export async function generateMetadata({
 
 export default async function BibleBookPage({ params }: BibleBookPageProps) {
   const { locale, bookSlug } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("bible");
   const book = getBook(bookSlug);
 

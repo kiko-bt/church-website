@@ -3,7 +3,7 @@
 # Project Overview
 
 Project Name:
-Црква Христово Евангелие - Битола
+Црква Евангелие Христово - Битола
 
 Project Type:
 Content-driven church website.
@@ -12,6 +12,7 @@ Primary Goal:
 Build a stable, modern, responsive, low-maintenance church website where a non-technical preacher can easily manage sermons, books, PDFs, gallery images, church settings, and contact information without developer assistance.
 
 This project is:
+
 - production-grade
 - CMS-first
 - mobile-first
@@ -26,32 +27,33 @@ This project is:
 
 # Official Tech Stack
 
-| Area | Technology |
-|---|---|
-| Runtime | Node.js 22 LTS |
-| Package Manager | npm 10.9.2 |
-| Framework | Next.js 15 App Router |
-| Language | TypeScript Strict |
-| Styling | Tailwind CSS |
-| UI Components | shadcn/ui |
-| CMS | Sanity |
-| Forms | React Hook Form |
-| Validation | Zod |
-| Email Service | Resend |
-| Internationalization | next-intl |
-| Theme System | next-themes |
-| Search | Fuse.js |
-| Analytics | Vercel Analytics |
-| Hosting | Vercel |
-| Rendering Strategy | Static Site Generation (SSG) |
-| Architecture Style | Content-driven |
-| AI Workflow | Claude-driven |
+| Area                 | Technology                   |
+| -------------------- | ---------------------------- |
+| Runtime              | Node.js 22 LTS               |
+| Package Manager      | npm 10.9.2                   |
+| Framework            | Next.js 15 App Router        |
+| Language             | TypeScript Strict            |
+| Styling              | Tailwind CSS                 |
+| UI Components        | shadcn/ui                    |
+| CMS                  | Sanity                       |
+| Forms                | React Hook Form              |
+| Validation           | Zod                          |
+| Email Service        | Resend                       |
+| Internationalization | next-intl                    |
+| Theme System         | next-themes                  |
+| Search               | Fuse.js                      |
+| Analytics            | Vercel Analytics             |
+| Hosting              | Vercel                       |
+| Rendering Strategy   | Static Site Generation (SSG) |
+| Architecture Style   | Content-driven               |
+| AI Workflow          | Claude-driven                |
 
 ---
 
 # Core Engineering Principles
 
 ALWAYS:
+
 - follow deterministic architecture
 - prefer simplicity over abstraction
 - prioritize maintainability
@@ -66,6 +68,7 @@ ALWAYS:
 - optimize for long-term maintenance
 
 NEVER:
+
 - invent architecture
 - invent APIs
 - invent package behavior
@@ -111,6 +114,7 @@ NEVER:
 ## SELF-REVIEW MODE
 
 After every implementation:
+
 - review TypeScript correctness
 - review accessibility
 - review responsiveness
@@ -127,16 +131,19 @@ After every implementation:
 ## Rendering Strategy
 
 Preferred rendering:
+
 - SSG first
 - static rendering first
 - avoid unnecessary dynamic rendering
 
 Use:
+
 - generateStaticParams()
 - static pages
 - server components by default
 
 Avoid:
+
 - unnecessary runtime APIs
 - unnecessary client components
 - unnecessary useEffect
@@ -147,11 +154,13 @@ Avoid:
 # Next.js Rules
 
 Use:
+
 - App Router only
 - Server Components by default
 - Client Components only when necessary
 
 Never:
+
 - use Pages Router
 - overuse "use client"
 - create unnecessary API routes
@@ -164,6 +173,7 @@ Never:
 TypeScript strict mode is REQUIRED.
 
 Always:
+
 - prefer explicit typing
 - use typed route params
 - use typed CMS queries
@@ -171,6 +181,7 @@ Always:
 - use readonly where appropriate
 
 Never:
+
 - use any
 - disable strict mode
 - bypass type safety
@@ -181,6 +192,7 @@ Never:
 # Tailwind & UI Rules
 
 Use:
+
 - Tailwind CSS only
 - shadcn/ui only
 - semantic layouts
@@ -189,6 +201,7 @@ Use:
 - typography consistency
 
 Avoid:
+
 - random CSS systems
 - inline styles unless necessary
 - duplicated component patterns
@@ -203,6 +216,7 @@ Avoid:
 The project uses **shadcn/ui** as the sole UI component library.
 
 Why shadcn/ui:
+
 - Built on Radix UI – accessible, unstyled primitives
 - Tailwind CSS integration – matches our styling system
 - Copy-paste nature – no npm package lock-in, full control
@@ -212,6 +226,7 @@ Why shadcn/ui:
 - Production-grade – used in thousands of production sites
 
 Claude MUST:
+
 - Use shadcn/ui components (Button, Card, Dialog, etc.)
 - Never introduce alternative UI libraries
 - Copy component source code into `src/components/ui/` as per shadcn/cli
@@ -222,6 +237,7 @@ Claude MUST:
 # Translation Rules
 
 Translate ONLY:
+
 - UI labels
 - navigation
 - buttons
@@ -230,6 +246,7 @@ Translate ONLY:
 - UI messages
 
 DO NOT translate:
+
 - Bible books
 - Bible verses
 - uploaded PDFs
@@ -238,14 +255,17 @@ DO NOT translate:
 - preacher-generated content
 
 Languages:
+
 - Macedonian (default)
 - English
 
 Routing structure:
+
 - /mk
 - /en
 
 Use:
+
 - next-intl
 
 ---
@@ -272,6 +292,7 @@ Example:
 src/data/bible/
 
 Files:
+
 - bible-hierarchical.json
 - bible-search-index.json
 
@@ -280,11 +301,13 @@ Files:
 # Bible Search Rules
 
 Use:
+
 - Fuse.js
 - client-side search
 - generated local search indexes
 
 Never use:
+
 - Algolia
 - Elasticsearch
 - database search
@@ -295,6 +318,7 @@ Never use:
 # Bible Rendering Rules
 
 Bible pages MUST use:
+
 - SSG
 - generateStaticParams()
 
@@ -310,11 +334,13 @@ Local JSON
 # Bible CMS Rules
 
 Sanity MUST NEVER store:
+
 - verse-level content
 - Bible chapters
 - searchable verses
 
 Sanity ONLY stores:
+
 - PDF assets
 - metadata
 - descriptions
@@ -327,6 +353,7 @@ Sanity ONLY stores:
 Sanity is the official CMS and admin dashboard.
 
 CMS UX MUST be:
+
 - preacher-friendly
 - simple
 - clean
@@ -334,6 +361,7 @@ CMS UX MUST be:
 - easy to maintain
 
 Always:
+
 - use helper text
 - use validation rules
 - minimize unnecessary fields
@@ -344,14 +372,17 @@ Always:
 # Search Rules
 
 Search strategy:
+
 - client-side Fuse.js
 
 Search targets:
+
 - Bible verses
 - Bible books
 - local JSON indexes
 
 Avoid:
+
 - external search engines
 - complex indexing systems
 - unnecessary backend search services
@@ -361,6 +392,7 @@ Avoid:
 # Security Rules
 
 Always:
+
 - validate forms with Zod
 - sanitize user input
 - use environment variables
@@ -369,6 +401,7 @@ Always:
 - use rate limiting for contact forms
 
 Never:
+
 - expose secrets in client components
 - hardcode credentials
 - trust unvalidated user input
@@ -378,6 +411,7 @@ Never:
 # Performance Rules
 
 Prioritize:
+
 - static rendering
 - lazy loading
 - minimal JavaScript bundles
@@ -386,6 +420,7 @@ Prioritize:
 - mobile performance
 
 Avoid:
+
 - unnecessary dependencies
 - large client bundles
 - unnecessary hydration
@@ -414,6 +449,7 @@ This structure MUST remain stable.
 # Official Design Direction
 
 Design style:
+
 - peaceful
 - elegant
 - warm
@@ -423,6 +459,7 @@ Design style:
 - typography-focused
 
 Colors:
+
 - #FDFDFD
 - #F5F1E9
 - #E6D7A3
@@ -431,6 +468,7 @@ Colors:
 - #0F172A
 
 Fonts:
+
 - Playfair Display (headings)
 - Inter (body)
 
@@ -439,6 +477,7 @@ Fonts:
 # Accessibility Rules
 
 Always:
+
 - use semantic HTML
 - maintain keyboard accessibility
 - maintain readable contrast
@@ -450,12 +489,15 @@ Always:
 # Deployment Rules
 
 Hosting:
+
 - Vercel
 
 CMS:
+
 - Sanity
 
 Environment:
+
 - production-safe
 - HTTPS only
 
@@ -464,12 +506,14 @@ Environment:
 # Final Engineering Rule
 
 This project prioritizes:
+
 - correctness over speed
 - stability over complexity
 - predictability over abstraction
 - maintainability over cleverness
 
 All implementations MUST follow:
+
 - official architecture
 - official stack
 - official rendering strategy
