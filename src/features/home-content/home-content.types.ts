@@ -1,25 +1,31 @@
 import type { RichTextContent } from "@/types/sanity";
 
-// Future Sanity singleton document for preacher-managed homepage content.
-// Localization follows the Bible data convention: a field is Macedonian by
-// default, and the `_en` suffix holds the English translation.
+// Raw `homeContent` singleton as returned by GROQ. Bilingual via the `_en`
+// suffix convention; rich-text fields are Portable Text (`RichTextContent`).
 //
-// Until Sanity is wired in, the homepage renders the equivalent `home.*`
-// keys from messages/mk.json and messages/en.json:
-//   - welcomeTitle / welcomeBody       -> home.welcome.title / home.welcome.body
-//   - mainVerseText / mainVerseReference -> home.scripture.verse / home.scripture.reference
-//   - shortMessage                     -> home.cta.title / home.cta.body
-export type HomeContent = {
-  readonly _id: string;
-  readonly _type: "homeContent";
+// The rich-text fields are optional in the schema, so GROQ returns them as
+// `undefined`/`null` when an editor leaves them empty. They are typed optional
+// here to reflect that reality; the mapper normalizes them to `[]` so the
+// domain model stays non-nullable and safe for Portable Text rendering.
+export type HomeContentDocument = {
   readonly welcomeTitle: string;
   readonly welcomeTitle_en: string;
-  readonly welcomeBody: RichTextContent;
-  readonly welcomeBody_en: RichTextContent;
+  readonly welcomeBody?: RichTextContent;
+  readonly welcomeBody_en?: RichTextContent;
   readonly mainVerseText: string;
   readonly mainVerseText_en: string;
   readonly mainVerseReference: string;
   readonly mainVerseReference_en: string;
+  readonly shortMessage?: RichTextContent;
+  readonly shortMessage_en?: RichTextContent;
+};
+
+// Clean, locale-resolved domain model. The mapper picks the active locale, so
+// the UI consumes single-language values (no `_en` fields downstream).
+export type HomeContent = {
+  readonly welcomeTitle: string;
+  readonly welcomeBody: RichTextContent;
+  readonly mainVerseText: string;
+  readonly mainVerseReference: string;
   readonly shortMessage: RichTextContent;
-  readonly shortMessage_en: RichTextContent;
 };

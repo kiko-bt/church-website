@@ -10,11 +10,10 @@ type SermonCardProps = {
 };
 
 /**
- * Presentational card for a single sermon in the listing.
- *
- * Future CMS integration point: `sermon` will come from `sermonListQuery`
- * (@/features/sermons). The `audioUrl` / `videoUrl` badges reflect which
- * media a sermon offers; playback itself is deferred (no business logic).
+ * Presentational card for a single sermon in the listing. `sermon` is a mapped
+ * domain model from `getSermons()` (@/features/sermons). The `audioUrl` /
+ * `videoUrl` badges reflect which media a sermon offers; playback itself is
+ * deferred (no business logic).
  */
 export async function SermonCard({ sermon, locale }: SermonCardProps) {
   const t = await getTranslations("sermons");
@@ -29,7 +28,7 @@ export async function SermonCard({ sermon, locale }: SermonCardProps) {
 
   return (
     <Link
-      href={`/${locale}/sermons/${sermon.slug.current}`}
+      href={`/${locale}/sermons/${sermon.slug}`}
       className="group flex flex-col rounded-md border border-soft-gold/40 bg-background p-6 transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
     >
       <div className="flex items-center gap-3 text-xs font-medium text-text-primary/60">

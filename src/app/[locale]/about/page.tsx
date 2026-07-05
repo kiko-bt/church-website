@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { Heart, Users, BookMarked, Check } from "lucide-react";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -25,10 +26,10 @@ export async function generateMetadata({
 }: AboutPageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
-  return {
+  return generateBaseMetadata(locale, "/about", {
     title: t("title"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function AboutPage({ params }: AboutPageProps) {

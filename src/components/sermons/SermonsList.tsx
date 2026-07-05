@@ -11,11 +11,9 @@ type SermonsListProps = {
 };
 
 /**
- * Responsive list of sermons with a built-in empty state.
- *
- * Future CMS integration point: the page will pass the result of
- * `sermonListQuery` (@/features/sermons) here. Until Sanity is wired in, an
- * empty array is passed and the empty state is shown.
+ * Responsive list of sermons with a built-in empty state. The page passes the
+ * result of `getSermons()` (@/features/sermons); an empty list renders the
+ * empty state (also the fallback when Sanity is not configured).
  */
 export async function SermonsList({ sermons, locale }: SermonsListProps) {
   const t = await getTranslations("sermons");
@@ -33,7 +31,7 @@ export async function SermonsList({ sermons, locale }: SermonsListProps) {
   return (
     <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {sermons.map((sermon) => (
-        <li key={sermon._id}>
+        <li key={sermon.id}>
           <SermonCard sermon={sermon} locale={locale} />
         </li>
       ))}

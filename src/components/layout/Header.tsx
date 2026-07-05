@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Locale } from "@/constants/locales";
 import { siteConfig } from "@/constants/site";
+import { getChurchSettings } from "@/features/church-settings";
 import { Navigation } from "./Navigation";
 import { MobileNav } from "./MobileNav";
 import { Logo } from "@/components/ui/Logo";
@@ -12,8 +13,12 @@ type HeaderProps = {
   locale: Locale;
 };
 
-export function Header({ locale }: HeaderProps) {
-  const name = locale === "mk" ? siteConfig.name : siteConfig.nameEn;
+export async function Header({ locale }: HeaderProps) {
+  // Brand name from the CMS singleton (cached, tag-revalidated); falls back to
+  // the localized siteConfig name when Sanity is not configured.
+  const settings = await getChurchSettings(locale);
+  const name =
+    settings?.churchName ?? (locale === "mk" ? siteConfig.name : siteConfig.nameEn);
 
   return (
     <header className="sticky top-0 z-50 border-b border-soft-gold/30 bg-background/95 backdrop-blur-sm">
@@ -29,7 +34,7 @@ export function Header({ locale }: HeaderProps) {
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
           }
         >
-          <Logo size="md" priority />
+          <Logo size="md" priority label={name} />
         </Link>
 
         {/* Desktop navigation — hidden below lg, where it has room to fit */}

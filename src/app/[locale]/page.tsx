@@ -25,7 +25,7 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <>
       <HeroSection locale={locale} />
-      <ScriptureSection />
+      <ScriptureSection locale={locale} />
       <WelcomeSection locale={locale} />
       <CTASection locale={locale} />
     </>

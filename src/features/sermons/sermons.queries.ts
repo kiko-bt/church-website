@@ -1,5 +1,5 @@
-// GROQ query definitions for the Sermons feature.
-// Activate after configuring src/lib/sanity/client.ts.
+// GROQ queries for the Sermons feature. Results are typed as `SermonDocument`
+// and converted to the `Sermon` domain model by sermons.mappers.ts.
 
 export const sermonListQuery = `
   *[_type == "sermon"] | order(date desc) {
@@ -8,7 +8,10 @@ export const sermonListQuery = `
     slug,
     preacher,
     date,
-    description
+    description,
+    audioUrl,
+    videoUrl,
+    featured
   }
 ` as const;
 
@@ -21,6 +24,7 @@ export const sermonBySlugQuery = `
     date,
     description,
     audioUrl,
-    videoUrl
+    videoUrl,
+    featured
   }
 ` as const;

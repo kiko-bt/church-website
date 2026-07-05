@@ -228,7 +228,7 @@ Pages in `app/` import a feature through its barrel, e.g. `@/features/bible`.
 |---|---|
 | `src/components/ui` · `layout` · `home` · `providers` | Shared/presentational UI |
 | `src/lib/sanity` (client), `resend`, `i18n`, `seo`, `utils` | Cross-cutting infrastructure |
-| `src/types` (`sanity.ts`, `navigation.ts`) | Cross-cutting types (e.g. Sanity primitives, `RichTextContent` Portable Text placeholder) |
+| `src/types` (`sanity.ts`, `navigation.ts`) | Cross-cutting types (e.g. Sanity primitives, `RichTextContent` Portable Text — backed by `@portabletext/types`) |
 | `src/constants` (`locales`, `routes`, `site`, `navigation`) | Cross-cutting constants |
 
 ## Rules

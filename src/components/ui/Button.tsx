@@ -18,6 +18,8 @@ type ButtonAsButton = SharedProps & {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  external?: never;
+  download?: never;
 };
 
 type ButtonAsLink = SharedProps & {
@@ -25,6 +27,11 @@ type ButtonAsLink = SharedProps & {
   onClick?: never;
   type?: never;
   disabled?: never;
+  // External file/URL (e.g. a PDF on the Sanity CDN): rendered as a plain
+  // anchor that opens in a new tab with the standard security rel, rather than
+  // a prefetched next/link. `download` hints the browser to save the file.
+  external?: boolean;
+  download?: boolean;
 };
 
 type ButtonProps = ButtonAsButton | ButtonAsLink;
@@ -57,6 +64,8 @@ export function Button({
   onClick,
   type = "button",
   disabled,
+  external,
+  download,
   "aria-label": ariaLabel,
 }: ButtonProps) {
   const classes = cn(
@@ -67,6 +76,20 @@ export function Button({
   );
 
   if (href) {
+    if (external) {
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={download}
+          className={classes}
+          aria-label={ariaLabel}
+        >
+          {children}
+        </a>
+      );
+    }
     return (
       <Link href={href} className={classes} aria-label={ariaLabel}>
         {children}

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
-import type { Sermon } from "@/features/sermons";
+import { getSermons } from "@/features/sermons";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SermonsList } from "@/components/sermons/SermonsList";
@@ -15,10 +16,10 @@ export async function generateMetadata({
 }: SermonsPageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "sermons" });
-  return {
+  return generateBaseMetadata(locale, "/sermons", {
     title: t("title"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function SermonsPage({ params }: SermonsPageProps) {
@@ -26,10 +27,9 @@ export default async function SermonsPage({ params }: SermonsPageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("sermons");
 
-  // Future CMS integration point: replace with the result of `sermonListQuery`
-  // (@/features/sermons) once Sanity is wired in. Empty for now — the list
-  // renders its empty state.
-  const sermons: readonly Sermon[] = [];
+  // Sourced from Sanity via the sermons data accessor (cached, tag-revalidated).
+  // Falls back to an empty list (empty state) when Sanity is not configured.
+  const sermons = await getSermons();
 
   return (
     <LayoutShell>

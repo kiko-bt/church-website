@@ -2,11 +2,16 @@ import Image from "next/image";
 import { siteConfig } from "@/constants/site";
 import { cn } from "@/lib/utils/cn";
 
-// Future CMS integration:
-// churchSettings.logo
-// The static asset below will later be replaced by a Sanity image asset.
-// Swapping `LOGO_SRC` (and, for a remote asset, the dimensions) is the only
-// change required — the component API, sizing, and a11y contract stay identical.
+// The logo IMAGE is the built-in static asset. A CMS override
+// (`churchSettings.logo`, modeled but not projected) is an intentional
+// deferral: the built-in lockup is the site's identity, and social-share
+// branding is already served by the dedicated `churchSettings.seo.ogImage`. If
+// wired later it needs no new dependency — projecting `asset->metadata.dimensions`
+// gives CLS-safe sizing — and this component's API would stay the same.
+//
+// The logo's accessible LABEL (the church name) is church identity and is
+// already CMS-driven: callers pass `label` resolved from `churchSettings`,
+// defaulting to `siteConfig` only when the CMS is unconfigured.
 const LOGO_SRC = "/images/branding/church-logo.png";
 
 // Intrinsic source dimensions are 1184 × 864 (aspect ratio ≈ 1.37:1). Every
@@ -23,6 +28,12 @@ type LogoProps = {
   size?: "sm" | "md" | "lg";
   priority?: boolean;
   showText?: boolean;
+  /**
+   * Accessible label / brand text (the church name). Sourced from
+   * `churchSettings` by callers; defaults to `siteConfig.name` so the component
+   * still renders correctly when used standalone or without a configured CMS.
+   */
+  label?: string;
 };
 
 /**
@@ -37,6 +48,7 @@ export function Logo({
   size = "md",
   priority = false,
   showText = false,
+  label = siteConfig.name,
 }: LogoProps) {
   const { width, height } = LOGO_SIZES[size];
 
@@ -57,14 +69,14 @@ export function Logo({
           height={height}
           priority={priority}
           sizes={`${width}px`}
-          alt={showText ? "" : siteConfig.name}
+          alt={showText ? "" : label}
           className="object-contain"
         />
       </span>
 
       {showText && (
         <span className="font-heading text-base font-semibold leading-tight text-deep-dark">
-          {siteConfig.name}
+          {label}
         </span>
       )}
     </span>

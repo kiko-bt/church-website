@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
-import type { GalleryImage } from "@/features/gallery";
+import { getGalleryAlbums } from "@/features/gallery";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { GalleryGrid } from "@/components/gallery/GalleryGrid";
+import { GalleryAlbumsGrid } from "@/components/gallery/GalleryAlbumsGrid";
 
 type GalleryPageProps = {
   params: Promise<{ locale: Locale }>;
@@ -15,10 +16,10 @@ export async function generateMetadata({
 }: GalleryPageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "gallery" });
-  return {
+  return generateBaseMetadata(locale, "/gallery", {
     title: t("title"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function GalleryPage({ params }: GalleryPageProps) {
@@ -26,16 +27,15 @@ export default async function GalleryPage({ params }: GalleryPageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("gallery");
 
-  // Future CMS integration point: replace with the result of `galleryListQuery`
-  // (@/features/gallery) once Sanity is wired in. Empty for now — the grid
-  // renders its empty state.
-  const images: readonly GalleryImage[] = [];
+  // Albums are sourced from Sanity (cached, tag-revalidated). Each album links
+  // to its detail page. Empty list when Sanity is not configured.
+  const albums = await getGalleryAlbums();
 
   return (
     <LayoutShell>
       <PageHeader title={t("title")} subtitle={t("subtitle")} />
       <div className="pb-12">
-        <GalleryGrid images={images} />
+        <GalleryAlbumsGrid albums={albums} locale={locale} />
       </div>
     </LayoutShell>
   );

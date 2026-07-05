@@ -143,6 +143,7 @@
     "title": "Gallery",
     "subtitle": "Moments from the life of our community",
     "metaDescription": "Photos from the life and events of the Church of the Gospel of Christ in Bitola.",
+    "photoCount": "{count, plural, one {# photo} other {# photos}}",
     "empty": {
       "title": "No photos yet",
       "description": "Photos will appear here once they are added. Please check back soon."
@@ -159,6 +160,7 @@
       "emailLabel": "Email",
       "scheduleLabel": "Service Times",
       "scheduleValue": "Every Sunday at 10:00",
+      "phoneLabel": "Phone",
       "followLabel": "Follow Us",
       "emailCta": "Send us an email"
     },

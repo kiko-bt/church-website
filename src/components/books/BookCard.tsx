@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/constants/locales";
@@ -10,26 +11,48 @@ type BookCardProps = {
 };
 
 /**
- * Presentational card for a single book in the listing.
+ * Presentational card for a single book in the listing. `book` is a mapped
+ * domain model from `getBooks()` (@/features/books).
  *
- * Future CMS integration point: `book.coverImage` will be resolved through
- * the Sanity image URL builder once `src/lib/sanity/client.ts` is activated.
- * Until then (and as a fallback for books without a cover) a typographic
- * placeholder is shown.
+ * The cover is a resolved Sanity CDN URL (dereferenced in GROQ), rendered with
+ * next/image inside a fixed 3:4 box (no CLS). Books without a cover fall back
+ * to a typographic placeholder.
  */
 export async function BookCard({ book, locale }: BookCardProps) {
   const t = await getTranslations("books");
 
+  // `publishedAt` is an optional ISO date string; format it for the active
+  // locale, matching the sermon listing convention.
+  const formattedDate = book.publishedAt
+    ? new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(book.publishedAt))
+    : null;
+
   return (
     <Link
-      href={`/${locale}/books/${book.slug.current}`}
+      href={`/${locale}/books/${book.slug}`}
       className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
     >
-      <div
-        className="flex aspect-[3/4] items-center justify-center bg-warm-bg text-accent-gold/50"
-        aria-hidden="true"
-      >
-        <BookOpen size={40} />
+      <div className="relative aspect-[3/4] overflow-hidden bg-warm-bg">
+        {book.coverImageUrl ? (
+          <Image
+            src={book.coverImageUrl}
+            alt={book.coverImageAlt ?? book.title}
+            fill
+            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover"
+          />
+        ) : (
+          <div
+            className="flex h-full w-full items-center justify-center text-accent-gold/50"
+            aria-hidden="true"
+          >
+            <BookOpen size={40} />
+          </div>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <h2 className="font-heading text-lg font-semibold text-deep-dark group-hover:text-accent-gold">
@@ -38,6 +61,9 @@ export async function BookCard({ book, locale }: BookCardProps) {
         <p className="mt-1 text-sm text-text-primary/60">
           {t("by")}: {book.author}
         </p>
+        {formattedDate && (
+          <p className="mt-1 text-xs text-text-primary/50">{formattedDate}</p>
+        )}
         {book.description && (
           <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-text-primary/75">
             {book.description}

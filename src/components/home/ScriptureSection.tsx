@@ -1,11 +1,21 @@
 import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/constants/locales";
+import { getHomeContent } from "@/features/home-content";
 import { SectionContainer } from "@/components/ui/SectionContainer";
 
-// Future CMS integration point: verse/reference will come from
-// HomeContent.mainVerseText(_en) / mainVerseReference(_en) (@/features/home-content).
-// Until Sanity is wired in, content is sourced from home.scripture.* messages.
-export async function ScriptureSection() {
+type ScriptureSectionProps = {
+  locale: Locale;
+};
+
+// Verse text and reference are CMS-driven (HomeContent.mainVerseText /
+// mainVerseReference, locale-resolved by the mapper). Each falls back to the
+// home.scripture.* messages when Sanity is not configured, so the section
+// always renders. The section label stays a UI string (chrome, not content).
+export async function ScriptureSection({ locale }: ScriptureSectionProps) {
   const t = await getTranslations("home.scripture");
+  const content = await getHomeContent(locale);
+  const verse = content?.mainVerseText ?? t("verse");
+  const reference = content?.mainVerseReference ?? t("reference");
 
   return (
     <section
@@ -19,11 +29,11 @@ export async function ScriptureSection() {
 
         <blockquote className="mt-6">
           <p className="font-heading text-2xl font-medium italic leading-relaxed text-deep-dark sm:text-3xl">
-            &ldquo;{t("verse")}&rdquo;
+            &ldquo;{verse}&rdquo;
           </p>
           <footer className="mt-5">
             <cite className="not-italic text-sm font-medium text-text-primary/60">
-              — {t("reference")}
+              — {reference}
             </cite>
           </footer>
         </blockquote>

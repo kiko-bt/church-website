@@ -1,19 +1,19 @@
+import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import type { GalleryImage } from "@/features/gallery";
+import type { GalleryImageItem } from "@/features/gallery";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 type GalleryGridProps = {
-  images: readonly GalleryImage[];
+  images: readonly GalleryImageItem[];
 };
 
 /**
- * Responsive masonry-like grid of gallery images with a built-in empty state.
- *
- * Future CMS integration point: the page will pass the result of
- * `galleryListQuery` (@/features/gallery) here, and each `image` will be
- * resolved through the Sanity image URL builder once the client is active.
- * Until then an empty array is passed and the empty state is shown.
+ * Responsive photo grid for a single album's images, with a built-in empty
+ * state. Each item is a mapped `GalleryImageItem` (resolved Sanity CDN URL +
+ * required alt) from `getGalleryAlbumBySlug()` (@/features/gallery), rendered
+ * with next/image inside a fixed square box (no CLS). An optional caption is
+ * overlaid at the bottom.
  */
 export async function GalleryGrid({ images }: GalleryGridProps) {
   const t = await getTranslations("gallery");
@@ -32,19 +32,26 @@ export async function GalleryGrid({ images }: GalleryGridProps) {
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
       {images.map((image) => (
         <li
-          key={image._id}
+          key={image.key}
           className="group relative aspect-square overflow-hidden rounded-md bg-warm-bg"
         >
-          {/* Placeholder until the Sanity image URL builder is wired in. */}
+          {/* Loading placeholder behind the photo; the loaded image covers it. */}
           <div
-            className="flex h-full w-full items-center justify-center text-accent-gold/40"
+            className="absolute inset-0 flex items-center justify-center text-accent-gold/30"
             aria-hidden="true"
           >
-            <ImageIcon size={32} />
+            <ImageIcon size={28} />
           </div>
-          {image.title && (
-            <span className="absolute inset-x-0 bottom-0 bg-deep-dark/70 px-3 py-2 text-xs font-medium text-background">
-              {image.title}
+          <Image
+            src={image.url}
+            alt={image.alt}
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+            className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+          />
+          {image.caption && (
+            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-deep-dark/80 to-transparent px-3 pb-2 pt-6 text-xs font-medium text-background">
+              {image.caption}
             </span>
           )}
         </li>

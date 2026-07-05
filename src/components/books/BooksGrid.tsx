@@ -11,11 +11,9 @@ type BooksGridProps = {
 };
 
 /**
- * Responsive grid of books with a built-in empty state.
- *
- * Future CMS integration point: the page will pass the result of
- * `bookListQuery` (@/features/books) here. Until Sanity is wired in, an
- * empty array is passed and the empty state is shown.
+ * Responsive grid of books with a built-in empty state. The page passes the
+ * result of `getBooks()` (@/features/books); an empty list renders the empty
+ * state (also the fallback when Sanity is not configured).
  */
 export async function BooksGrid({ books, locale }: BooksGridProps) {
   const t = await getTranslations("books");
@@ -33,7 +31,7 @@ export async function BooksGrid({ books, locale }: BooksGridProps) {
   return (
     <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {books.map((book) => (
-        <li key={book._id}>
+        <li key={book.id}>
           <BookCard book={book} locale={locale} />
         </li>
       ))}

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
-import type { Book } from "@/features/books";
+import { getBooks } from "@/features/books";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BooksGrid } from "@/components/books/BooksGrid";
@@ -15,10 +16,10 @@ export async function generateMetadata({
 }: BooksPageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "books" });
-  return {
+  return generateBaseMetadata(locale, "/books", {
     title: t("title"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function BooksPage({ params }: BooksPageProps) {
@@ -26,10 +27,9 @@ export default async function BooksPage({ params }: BooksPageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("books");
 
-  // Future CMS integration point: replace with the result of `bookListQuery`
-  // (@/features/books) once Sanity is wired in. Empty for now — the grid
-  // renders its empty state.
-  const books: readonly Book[] = [];
+  // Sourced from Sanity via the books data accessor (cached, tag-revalidated).
+  // Falls back to an empty list (empty state) when Sanity is not configured.
+  const books = await getBooks();
 
   return (
     <LayoutShell>

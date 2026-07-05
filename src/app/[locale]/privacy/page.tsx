@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ContentSection } from "@/components/ui/ContentSection";
@@ -23,10 +24,10 @@ export async function generateMetadata({
 }: PrivacyPageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "privacy" });
-  return {
+  return generateBaseMetadata(locale, "/privacy", {
     title: t("title"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function PrivacyPage({ params }: PrivacyPageProps) {
