@@ -112,9 +112,9 @@ convention as the Bible JSON:
 - the base field name (e.g. `welcomeTitle`) holds Macedonian (default)
 - an `_en` suffixed field (e.g. `welcomeTitle_en`) holds English
 
-Rich text / Portable Text fields use the `RichTextContent` placeholder type
-(`src/types/sanity.ts`) until `@portabletext/types` is introduced — do not
-invent a different rich-text shape.
+Rich text / Portable Text fields use the shared `RichTextContent` type
+(`src/types/sanity.ts`), which is backed by `@portabletext/types`
+(`PortableTextBlock[]`) — do not invent a different rich-text shape.
 
 ---
 

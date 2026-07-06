@@ -89,10 +89,11 @@ Examples:
 │   ├── en.json
 │   └── mk.json
 │
-├── sanity/
-│   ├── schemas/
-│   ├── sanity.config.ts
-│   └── sanity.client.ts
+├── sanity/                          # CMS source of truth (imported by the standalone Studio)
+│   ├── schemas/                     # objects, singletons, documents + index.ts
+│   ├── structure.ts                 # desk structure (pins singletons)
+│   ├── defineStudioConfig.ts        # shared config factory (schema + structure + singleton rules)
+│   └── sanity.config.ts             # website-side config (calls the factory)
 │
 ├── src/
 │   ├── app/
