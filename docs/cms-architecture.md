@@ -6,6 +6,14 @@ is the permanent foundation of the project — extend it, never replace it.
 > Companion docs: **[README](../README.md)** (developer tour) ·
 > **[deployment.md](./deployment.md)** (how to stand this up in production).
 
+> **The webhook is not optional — it is the mechanism.** The Next.js Data Cache
+> (`unstable_cache`) is invalidated **only** by `revalidateTag()`, which is called
+> **only** by the Sanity webhook hitting `/api/revalidate`. There is no
+> time-based expiry. So if the webhook is missing or failing, **Publish changes
+> nothing on the live site** until the next deploy. Configuring and verifying the
+> webhook is therefore the difference between "content updates automatically" and
+> "content is frozen." See deployment.md §5 and §9.
+
 ---
 
 ## The pipeline at a glance
@@ -20,7 +28,7 @@ Sanity Studio  (studio-church-ehb — a separate app)
 Sanity  →  fires the configured webhook (on create/update/delete of published docs)
    │
    ▼
-HTTPS POST  https://hristovoevangelie.org/api/revalidate
+HTTPS POST  https://www.hristovoevangelie.org/api/revalidate
    │  headers: x-sanity-revalidate-secret: <secret>
    │  body:    { "_type": "sermon", ... }
    ▼

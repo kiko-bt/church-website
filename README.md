@@ -488,23 +488,32 @@ crept in.
 
 ## Deployment
 
-Deployed on **Vercel**, custom domain **`hristovoevangelie.org`** (DNS at
-Porkbun). The full, reproducible runbook — GitHub → Vercel, Porkbun DNS, HTTPS,
-environment variables, the Sanity webhook, cache invalidation, production
-smoke test, rollback, and troubleshooting — lives in
+**Live in production** on **Vercel** at **https://www.hristovoevangelie.org**
+(DNS at Porkbun; the apex `hristovoevangelie.org` redirects to `www`, the
+canonical host). The full, reproducible runbook — GitHub → Vercel, Porkbun DNS,
+HTTPS, environment variables, the Sanity webhook, cache invalidation, production
+smoke test, rollback, routine operations, and troubleshooting — lives in
 **[docs/deployment.md](docs/deployment.md)**. The publish → live pipeline and its
 invariants are documented in **[docs/cms-architecture.md](docs/cms-architecture.md)**.
 
-In short, before the first deploy:
+The essentials (see the runbook for the complete, checked-off checklist):
 
-1. Set the environment variables from `.env.example` in Vercel — in particular
-   `NEXT_PUBLIC_SITE_URL=https://hristovoevangelie.org` (canonical/OG/hreflang/
-   sitemap derive from it) and `SANITY_REVALIDATE_SECRET`.
-2. Create a Sanity webhook (on publish) pointing at
-   `https://hristovoevangelie.org/api/revalidate` with the
-   `x-sanity-revalidate-secret` header set to the same secret and a `{ _type }`
-   projection.
-3. Ensure the Sanity dataset is public (the read client uses public CDN reads).
+1. **Environment variables in Vercel** — in particular
+   `NEXT_PUBLIC_SITE_URL=https://www.hristovoevangelie.org` (canonical/OG/hreflang/
+   sitemap derive from it — must be the `www` host) and `SANITY_REVALIDATE_SECRET`.
+   `NEXT_PUBLIC_*` are build-time inlined, so changing one requires a **redeploy**.
+2. **Sanity webhook (this is what makes Publish reach the site)** — on publish,
+   POSTs to `https://www.hristovoevangelie.org/api/revalidate` with the
+   `x-sanity-revalidate-secret` header (matching the Vercel secret) and a
+   `{ _type }` projection. Use the **`www`** URL directly — the apex redirect can
+   drop the header and cause a 401. Without a working webhook, published content
+   **never appears** (the Data Cache invalidates on demand only, never by time).
+3. **Sanity dataset is public** (the read client uses public CDN reads).
+
+> **The Sanity Studio (`studio-church-ehb`) does not need to be deployed or
+> committed to GitHub for content updates to work** — it writes to Sanity's hosted
+> Content Lake, and the site reads from there. Committing it is optional (backup /
+> versioning / hosting the Studio later).
 
 See [docs/deployment.md](docs/deployment.md) for the step-by-step checklist.
 
