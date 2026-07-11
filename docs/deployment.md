@@ -187,6 +187,16 @@ pipeline, not just that the site loads.
    `mk`/`en` alternates.
 5. View source on any page → `<link rel="canonical">` and `og:url` use
    `https://hristovoevangelie.org` (confirms `NEXT_PUBLIC_SITE_URL`).
+6. **404**: visit `https://hristovoevangelie.org/mk/sermons/does-not-exist` —
+   returns HTTP **404** and renders the localized 404 page (site header/footer,
+   correct language, "back to home" link), not a bare error.
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}\n" \
+     https://hristovoevangelie.org/mk/sermons/does-not-exist   # → 404
+   ```
+7. **Images**: on a page with a CMS image (a gallery album or book cover),
+   confirm the `<img>`/`next/image` source resolves from `cdn.sanity.io` and the
+   image renders (validates `next.config.ts` `remotePatterns`).
 
 **B. Security headers**
 ```bash
