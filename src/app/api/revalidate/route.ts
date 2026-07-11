@@ -9,14 +9,15 @@ import { SANITY_TAGS, type SanityTag } from "@/lib/sanity/tags";
 // shared secret, maps the document `_type` to a cache tag, and revalidates it.
 //
 // Secret transport:
-//   - PRODUCTION (recommended): send the secret in the
-//     `x-sanity-revalidate-secret` HTTP header. Configure the Sanity webhook to
-//     attach this header. Headers are not captured in URL/access logs.
-//   - LOCAL / MANUAL TESTING ONLY: the `?secret=` query param is accepted as a
-//     fallback for quick curl/browser checks. Avoid it in production — query
-//     strings can be recorded in proxy and access logs.
-// The header takes precedence; the query param is only consulted when the
-// header is absent. Webhook body must be JSON including `_type`.
+//   - PRODUCTION: the secret MUST be sent in the `x-sanity-revalidate-secret`
+//     HTTP header. Configure the Sanity webhook to attach this header. Headers
+//     are not captured in URL/access logs. The `?secret=` query param is
+//     IGNORED in production (NODE_ENV === "production") so a misconfigured
+//     webhook can never leak the secret into proxy/access logs.
+//   - LOCAL / MANUAL TESTING ONLY: outside production the `?secret=` query
+//     param is accepted as a fallback for quick curl/browser checks.
+// The header always takes precedence; the query param is only consulted (and
+// only outside production) when the header is absent. Body must be JSON with `_type`.
 
 // Maps a Sanity document type to the cache tag used by the feature data layer.
 const TYPE_TO_TAG: Record<string, SanityTag> = {
@@ -35,12 +36,16 @@ function isAuthorized(request: NextRequest): boolean {
   const secret = process.env.SANITY_REVALIDATE_SECRET;
   if (!secret) return false;
 
-  // Header is the production transport; the query param is a local/manual
-  // testing fallback only (see file header). Header wins when both are present.
-  const provided =
-    request.headers.get("x-sanity-revalidate-secret") ??
-    new URL(request.url).searchParams.get("secret");
+  // Header is the production transport and always wins. The query param is a
+  // local/manual-testing fallback only and is ignored in production (see file
+  // header) so it can never leak the secret into access logs.
+  const headerSecret = request.headers.get("x-sanity-revalidate-secret");
+  const querySecret =
+    process.env.NODE_ENV === "production"
+      ? null
+      : new URL(request.url).searchParams.get("secret");
 
+  const provided = headerSecret ?? querySecret;
   return provided === secret;
 }
 

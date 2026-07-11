@@ -446,6 +446,11 @@ All metadata flows through `src/lib/seo/metadata.ts`:
   falling back to `siteConfig`. Detail pages override title/description and (for
   books/albums) the OG image with the cover.
 - `toMetaDescription()` collapses and length-caps plain-text descriptions.
+- **`robots.ts`** (`src/app/robots.ts`) allows all crawling, disallows `/api/`,
+  and points to the sitemap. **`sitemap.ts`** (`src/app/sitemap.ts`) enumerates
+  every localized static route plus all CMS slugs (sermons/books/albums, via the
+  cached accessors) and Bible book/chapter pages, each with `mk`/`en` hreflang
+  alternates. Both derive their host from `NEXT_PUBLIC_SITE_URL`.
 
 ---
 
@@ -483,15 +488,25 @@ crept in.
 
 ## Deployment
 
-Deployed on **Vercel**. Before the first deploy:
+Deployed on **Vercel**, custom domain **`hristovoevangelie.org`** (DNS at
+Porkbun). The full, reproducible runbook — GitHub → Vercel, Porkbun DNS, HTTPS,
+environment variables, the Sanity webhook, cache invalidation, production
+smoke test, rollback, and troubleshooting — lives in
+**[docs/deployment.md](docs/deployment.md)**. The publish → live pipeline and its
+invariants are documented in **[docs/cms-architecture.md](docs/cms-architecture.md)**.
 
-1. Set all environment variables from `.env.example` in the Vercel dashboard —
-   in particular `NEXT_PUBLIC_SITE_URL` (canonical/OG/hreflang derive from it)
-   and `SANITY_REVALIDATE_SECRET`.
+In short, before the first deploy:
+
+1. Set the environment variables from `.env.example` in Vercel — in particular
+   `NEXT_PUBLIC_SITE_URL=https://hristovoevangelie.org` (canonical/OG/hreflang/
+   sitemap derive from it) and `SANITY_REVALIDATE_SECRET`.
 2. Create a Sanity webhook (on publish) pointing at
-   `https://<domain>/api/revalidate` with the `x-sanity-revalidate-secret`
-   header set to the same secret. Ensure the webhook body includes `_type`.
+   `https://hristovoevangelie.org/api/revalidate` with the
+   `x-sanity-revalidate-secret` header set to the same secret and a `{ _type }`
+   projection.
 3. Ensure the Sanity dataset is public (the read client uses public CDN reads).
+
+See [docs/deployment.md](docs/deployment.md) for the step-by-step checklist.
 
 ---
 
@@ -499,8 +514,6 @@ Deployed on **Vercel**. Before the first deploy:
 
 Realistic, deferred enhancements (not blockers):
 
-- **`sitemap.ts` / `robots.ts`** — enumerate locales + CMS slugs via the existing
-  accessors (natural next SEO step).
 - **Contact form** — wire the existing `features/contact` Zod schema to a Resend
   server action.
 - **`churchSettings.logo`** — project the modeled field and wire it into `Logo`
