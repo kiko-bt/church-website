@@ -3,6 +3,8 @@ import type { Locale } from "@/constants/locales";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { TestamentSection } from "@/components/bible/TestamentSection";
+import { getAllBooks } from "@/features/bible";
 
 type BiblePageProps = {
   params: Promise<{ locale: Locale }>;
@@ -24,19 +26,28 @@ export default async function BiblePage({ params }: BiblePageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("bible");
 
+  // getAllBooks returns books in canonical order; filtering preserves it.
+  const books = await getAllBooks(locale);
+  const oldTestament = books
+    .filter((book) => book.testament === "OT")
+    .map((book) => ({ id: book.id, name: book.name }));
+  const newTestament = books
+    .filter((book) => book.testament === "NT")
+    .map((book) => ({ id: book.id, name: book.name }));
+
   return (
     <LayoutShell>
       <PageHeader title={t("title")} />
-      <section className="mt-4">
-        <h2 className="font-heading text-xl font-semibold text-deep-dark">
-          {t("oldTestament")}
-        </h2>
-      </section>
-      <section className="mt-8">
-        <h2 className="font-heading text-xl font-semibold text-deep-dark">
-          {t("newTestament")}
-        </h2>
-      </section>
+      <TestamentSection
+        locale={locale}
+        title={t("oldTestament")}
+        books={oldTestament}
+      />
+      <TestamentSection
+        locale={locale}
+        title={t("newTestament")}
+        books={newTestament}
+      />
     </LayoutShell>
   );
 }

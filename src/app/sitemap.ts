@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/constants/site";
 import { locales, defaultLocale } from "@/constants/locales";
 import { routes } from "@/constants/routes";
-import { getAllBooks } from "@/features/bible";
+import { getAllBookMeta } from "@/features/bible";
 import { getSermons } from "@/features/sermons";
 import { getBooks } from "@/features/books";
 import { getGalleryAlbums } from "@/features/gallery";
@@ -72,10 +72,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Bible: book index pages + every chapter reading page (local JSON, so this
   // is free and deterministic — no CMS call).
-  const bibleEntries: Entry[] = getAllBooks().flatMap((book) => [
+  const bibleEntries: Entry[] = getAllBookMeta().flatMap((book) => [
     entry(`${routes.bible}/${book.id}`, "yearly", 0.6),
-    ...book.chapters.map((chapter) =>
-      entry(`${routes.bible}/${book.id}/${chapter.number}`, "yearly", 0.5)
+    ...book.chapters.map((_verseCount, index) =>
+      entry(`${routes.bible}/${book.id}/${index + 1}`, "yearly", 0.5)
     ),
   ]);
 

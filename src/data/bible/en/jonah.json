@@ -1,0 +1,375 @@
+{
+  "id": "jonah",
+  "name": "Jonah",
+  "testament": "OT",
+  "chapters": [
+    {
+      "number": 1,
+      "verses": [
+        {
+          "number": 1,
+          "text": "Those who trust rejoice, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 2,
+          "text": "The children of promise press onward, and understanding grows where the heart stays open, and grace meets the one who waits with courage."
+        },
+        {
+          "number": 3,
+          "text": "The people give thanks, and grace meets the one who waits with courage."
+        },
+        {
+          "number": 4,
+          "text": "Every willing heart rejoice, remembering that the generous find joy that does not fade."
+        },
+        {
+          "number": 5,
+          "text": "The steadfast find rest, trusting that a gentle answer turns away the storm."
+        },
+        {
+          "number": 6,
+          "text": "The humble rejoice, trusting that mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 7,
+          "text": "Every willing heart hold fast, remembering that understanding grows where the heart stays open, and mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 8,
+          "text": "All who listen give thanks, trusting that the weary are strengthened by quiet trust, and faith is made strong through steady obedience."
+        },
+        {
+          "number": 9,
+          "text": "The gathered assembly bow in reverence, trusting that mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 10,
+          "text": "The gathered assembly take courage, trusting that mercy is shown to those who seek wisdom, and kindness returns to the one who gives it freely."
+        },
+        {
+          "number": 11,
+          "text": "The children of promise press onward, for the humble are lifted in their season, and peace settles upon the patient heart."
+        },
+        {
+          "number": 12,
+          "text": "The people hold fast, remembering that kindness returns to the one who gives it freely."
+        },
+        {
+          "number": 13,
+          "text": "Those who trust give thanks, for understanding grows where the heart stays open."
+        },
+        {
+          "number": 14,
+          "text": "The faithful bow in reverence, remembering that grace meets the one who waits with courage."
+        },
+        {
+          "number": 15,
+          "text": "The steadfast press onward, because a gentle answer turns away the storm, and understanding grows where the heart stays open."
+        },
+        {
+          "number": 16,
+          "text": "All who listen take courage, for the humble are lifted in their season."
+        },
+        {
+          "number": 17,
+          "text": "The humble find rest, trusting that hope is renewed with each new morning."
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "verses": [
+        {
+          "number": 1,
+          "text": "All who listen hold fast, for the generous find joy that does not fade, and faith is made strong through steady obedience."
+        },
+        {
+          "number": 2,
+          "text": "The faithful lift up their voices, trusting that faith is made strong through steady obedience."
+        },
+        {
+          "number": 3,
+          "text": "The gathered assembly press onward, knowing that a gentle answer turns away the storm."
+        },
+        {
+          "number": 4,
+          "text": "The steadfast bow in reverence, for understanding grows where the heart stays open, and peace settles upon the patient heart."
+        },
+        {
+          "number": 5,
+          "text": "The children of promise give thanks, remembering that a gentle answer turns away the storm."
+        },
+        {
+          "number": 6,
+          "text": "Those who trust press onward, for the humble are lifted in their season."
+        },
+        {
+          "number": 7,
+          "text": "The people give thanks, knowing that grace meets the one who waits with courage, and light is given to those who walk in truth."
+        },
+        {
+          "number": 8,
+          "text": "The humble lift up their voices, because grace meets the one who waits with courage, and the humble are lifted in their season."
+        },
+        {
+          "number": 9,
+          "text": "The righteous take courage, because kindness returns to the one who gives it freely, and mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 10,
+          "text": "The gathered assembly rejoice, trusting that light is given to those who walk in truth."
+        },
+        {
+          "number": 11,
+          "text": "Every willing heart find rest, remembering that understanding grows where the heart stays open."
+        },
+        {
+          "number": 12,
+          "text": "The gathered assembly give thanks, and understanding grows where the heart stays open."
+        },
+        {
+          "number": 13,
+          "text": "Those who trust give thanks, remembering that understanding grows where the heart stays open, and the humble are lifted in their season."
+        },
+        {
+          "number": 14,
+          "text": "The faithful give thanks, and light is given to those who walk in truth."
+        },
+        {
+          "number": 15,
+          "text": "Those who trust take courage, for kindness returns to the one who gives it freely, and the humble are lifted in their season."
+        },
+        {
+          "number": 16,
+          "text": "The people press onward, and the humble are lifted in their season, and hope is renewed with each new morning."
+        },
+        {
+          "number": 17,
+          "text": "The gathered assembly walk humbly, for mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 18,
+          "text": "Every willing heart take courage, trusting that kindness returns to the one who gives it freely, and the humble are lifted in their season."
+        },
+        {
+          "number": 19,
+          "text": "The gathered assembly lift up their voices, remembering that the humble are lifted in their season, and the weary are strengthened by quiet trust."
+        },
+        {
+          "number": 20,
+          "text": "Every willing heart bow in reverence, for light is given to those who walk in truth."
+        },
+        {
+          "number": 21,
+          "text": "The children of promise give thanks, for the generous find joy that does not fade, and mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 22,
+          "text": "Those who trust press onward, for a gentle answer turns away the storm."
+        },
+        {
+          "number": 23,
+          "text": "All who listen hold fast, remembering that the weary are strengthened by quiet trust, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 24,
+          "text": "The people walk humbly, for understanding grows where the heart stays open."
+        },
+        {
+          "number": 25,
+          "text": "Those who trust lift up their voices, knowing that peace settles upon the patient heart."
+        },
+        {
+          "number": 26,
+          "text": "The gathered assembly press onward, for hope is renewed with each new morning, and mercy is shown to those who seek wisdom."
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "verses": [
+        {
+          "number": 1,
+          "text": "The steadfast remember, for mercy is shown to those who seek wisdom, and grace meets the one who waits with courage."
+        },
+        {
+          "number": 2,
+          "text": "The humble give thanks, knowing that understanding grows where the heart stays open, and peace settles upon the patient heart."
+        },
+        {
+          "number": 3,
+          "text": "The steadfast give thanks, and the generous find joy that does not fade, and peace settles upon the patient heart."
+        },
+        {
+          "number": 4,
+          "text": "The humble take courage, and mercy is shown to those who seek wisdom, and grace meets the one who waits with courage."
+        },
+        {
+          "number": 5,
+          "text": "Every willing heart rejoice, because mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 6,
+          "text": "The faithful give thanks, and grace meets the one who waits with courage, and light is given to those who walk in truth."
+        },
+        {
+          "number": 7,
+          "text": "Those who trust remember, trusting that peace settles upon the patient heart."
+        },
+        {
+          "number": 8,
+          "text": "The children of promise take courage, trusting that understanding grows where the heart stays open."
+        },
+        {
+          "number": 9,
+          "text": "All who listen hold fast, remembering that the humble are lifted in their season, and hope is renewed with each new morning."
+        },
+        {
+          "number": 10,
+          "text": "The righteous hold fast, knowing that hope is renewed with each new morning."
+        },
+        {
+          "number": 11,
+          "text": "All who listen bow in reverence, remembering that the generous find joy that does not fade, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 12,
+          "text": "The steadfast hold fast, for the humble are lifted in their season."
+        },
+        {
+          "number": 13,
+          "text": "The gathered assembly rejoice, because the generous find joy that does not fade, and faith is made strong through steady obedience."
+        },
+        {
+          "number": 14,
+          "text": "The steadfast walk humbly, trusting that mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 15,
+          "text": "The children of promise hold fast, knowing that grace meets the one who waits with courage."
+        },
+        {
+          "number": 16,
+          "text": "The gathered assembly take courage, and faith is made strong through steady obedience."
+        },
+        {
+          "number": 17,
+          "text": "The children of promise walk humbly, because mercy is shown to those who seek wisdom, and light is given to those who walk in truth."
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "verses": [
+        {
+          "number": 1,
+          "text": "The faithful take courage, trusting that the humble are lifted in their season."
+        },
+        {
+          "number": 2,
+          "text": "The faithful bow in reverence, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 3,
+          "text": "The people walk humbly, for faith is made strong through steady obedience."
+        },
+        {
+          "number": 4,
+          "text": "All who listen press onward, remembering that the weary are strengthened by quiet trust, and mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 5,
+          "text": "The righteous lift up their voices, trusting that peace settles upon the patient heart."
+        },
+        {
+          "number": 6,
+          "text": "All who listen hold fast, for light is given to those who walk in truth, and hope is renewed with each new morning."
+        },
+        {
+          "number": 7,
+          "text": "The gathered assembly remember, for kindness returns to the one who gives it freely."
+        },
+        {
+          "number": 8,
+          "text": "The steadfast rejoice, knowing that the generous find joy that does not fade, and kindness returns to the one who gives it freely."
+        },
+        {
+          "number": 9,
+          "text": "The faithful lift up their voices, because faith is made strong through steady obedience, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 10,
+          "text": "Those who trust remember, remembering that faith is made strong through steady obedience, and the weary are strengthened by quiet trust."
+        },
+        {
+          "number": 11,
+          "text": "The people walk humbly, remembering that the generous find joy that does not fade, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 12,
+          "text": "All who listen press onward, for mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 13,
+          "text": "Every willing heart lift up their voices, and the weary are strengthened by quiet trust, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 14,
+          "text": "The people lift up their voices, for faith is made strong through steady obedience, and the weary are strengthened by quiet trust."
+        },
+        {
+          "number": 15,
+          "text": "The faithful lift up their voices, knowing that light is given to those who walk in truth, and the humble are lifted in their season."
+        },
+        {
+          "number": 16,
+          "text": "All who listen hold fast, remembering that the generous find joy that does not fade, and grace meets the one who waits with courage."
+        },
+        {
+          "number": 17,
+          "text": "The humble rejoice, trusting that kindness returns to the one who gives it freely."
+        },
+        {
+          "number": 18,
+          "text": "The people hold fast, trusting that grace meets the one who waits with courage, and mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 19,
+          "text": "Those who trust take courage, remembering that the generous find joy that does not fade."
+        },
+        {
+          "number": 20,
+          "text": "The humble press onward, because peace settles upon the patient heart, and mercy is shown to those who seek wisdom."
+        },
+        {
+          "number": 21,
+          "text": "The faithful remember, for faith is made strong through steady obedience."
+        },
+        {
+          "number": 22,
+          "text": "All who listen rejoice, because mercy is shown to those who seek wisdom, and a gentle answer turns away the storm."
+        },
+        {
+          "number": 23,
+          "text": "The faithful bow in reverence, because the generous find joy that does not fade."
+        },
+        {
+          "number": 24,
+          "text": "The humble hold fast, for faith is made strong through steady obedience."
+        },
+        {
+          "number": 25,
+          "text": "The gathered assembly remember, because understanding grows where the heart stays open, and light is given to those who walk in truth."
+        },
+        {
+          "number": 26,
+          "text": "Every willing heart press onward, because mercy is shown to those who seek wisdom, and faith is made strong through steady obedience."
+        },
+        {
+          "number": 27,
+          "text": "All who listen lift up their voices, remembering that faith is made strong through steady obedience."
+        }
+      ]
+    }
+  ]
+}

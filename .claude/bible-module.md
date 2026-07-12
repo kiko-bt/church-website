@@ -1,0 +1,168 @@
+# Bible Module — Architecture & Engineering Rules
+
+The Bible module is the highest-priority feature of the site. This document is
+its source of truth. It must remain robust enough to support the reading
+experience today while remaining extensible for future features (search,
+cross-references, bookmarks, reading plans, sermon integration) **without a
+structural redesign**.
+
+---
+
+## 1. Domain model (Translation-rooted, single-language)
+
+- A loaded `BibleBook` / `BibleChapter` / `BibleVerse` always belongs to exactly
+  **one translation in one language**.
+- The Macedonian and English sites read **different source Bibles**, not machine
+  translations of each other. Verse text is therefore **never** stored as a
+  bilingual pair, and the code **never assumes verse N aligns across languages**
+  (versification can differ between translations).
+- **Canonical book slugs** (`genesis`, `1-john`, …) are the only identity used
+  for URLs, the manifest, and references. They are **language-independent** and
+  **never translated**. Book display names are localized and live only inside
+  the per-locale data files.
+
+### Value objects
+
+- **`BibleReference`** — a language-independent pointer to a single verse
+  (`{ bookId, chapter, verse }`). Canonical string form: `bookId.chapter.verse`
+  (e.g. `john.3.16`). Carries no text.
+- **`BibleReferenceRange`** — a span of verses within one book
+  (`{ bookId, start:{chapter,verse}, end:{chapter,verse} }`). Canonical string
+  form: `john.3.16-18` (same chapter) or `john.3.16-4.2` (cross-chapter). This
+  exists **now** so reading plans, sermon references, and cross-references can be
+  added later without changing the domain model.
+
+Both value objects live in `bible.reference.ts` and have **zero dependencies**
+(safe to import from Server Components, Client Components, and build scripts).
+
+---
+
+## 2. Data storage & the manifest
+
+Bible verse data lives in the repository as static JSON (never in Sanity):
+
+```
+src/data/bible/
+  manifest.json         # single source of truth for routing / generateStaticParams
+  mk/<bookId>.json      # one translation, one book
+  en/<bookId>.json
+  search/{mk,en}.json   # built later (Phase 7.6), consumed only by the client
+```
+
+- The **manifest is the single source of truth** for routing. `generateStaticParams`
+  and metadata read the manifest only — never the full verse corpus.
+- The manifest describes **shape without text**: which books exist, their
+  canonical order and testament, and the verse count of every chapter.
+- The manifest **must** include provenance metadata: `translation`, `generatedAt`,
+  and `generatorVersion` (plus a schema `version`).
+- **One manifest describes the structure of ALL locales.** This is valid because
+  routing is language-independent (canonical slugs) and every locale's per-book
+  files are validated to conform to the same manifest (same chapter and verse
+  counts). It relies on the assumption that the `mk` and `en` datasets share
+  versification — which the placeholder guarantees by construction, and which
+  holds for typical Protestant-canon translations.
+  - **Future caveat:** if a client-supplied translation ever diverges in
+    versification (different verse counts in some chapters), this single-manifest
+    model must be revisited — most likely by moving to **per-locale manifests**
+    (`manifest.<locale>.json`). This is the one place versification divergence
+    would surface; see §1 ("never assume verse N aligns across languages").
+
+---
+
+## 3. Generated artifacts — manual edits are PROHIBITED
+
+`src/data/bible/manifest.json`, `src/data/bible/mk/`, and `src/data/bible/en/`
+are **GENERATED ARTIFACTS**.
+
+- **Never edit these files by hand.** Not one verse, not one field.
+- All changes must originate from the generator (`scripts/generate-placeholder-bible.mjs`)
+  or, in production, from the client-supplied source dataset processed through
+  the same pipeline.
+- Rationale: a manual "quick fix to one verse" is silently destroyed by the next
+  generation run. Corrections must be made at the source, not in the output.
+
+---
+
+## 4. Placeholder content rules (until the licensed dataset arrives)
+
+The production Bible dataset will be supplied later by the client after
+legal/licensing confirmation. Until then the module runs on **placeholder data**.
+
+The placeholder generator **MUST**:
+
+- Generate **entirely original devotional text**. It **MUST NEVER** reproduce or
+  closely paraphrase any real Bible translation.
+- Produce realistic sentence lengths, paragraph cadence, verse lengths, and
+  vocabulary — reverent in tone, so navigation/rendering/search are exercised
+  realistically. Example of an acceptable placeholder verse:
+  > "The people gathered with thankful hearts, remembering that faith is
+  > strengthened through obedience and mercy is shown to those who seek wisdom."
+- Be **deterministic**: identical inputs (generator version + structural seed)
+  always produce identical verse text and structure. The only intentionally
+  non-deterministic field is `generatedAt` (provenance).
+- Use **real structural facts** (the 66-book canon, real book names, real
+  chapter counts) so the placeholder resembles a real Bible and the production
+  dataset is a **shape-identical drop-in**.
+
+**Scope of "real structure" — verse counts are generated, not real.** The
+placeholder mirrors the real canon at the *book* and *chapter* level (66 books,
+real chapter counts, 1,189 chapters total). **Verse counts per chapter are
+deterministically generated** in a representative range (≈12–38), *not* copied
+from the real canon. Consequently the placeholder holds ≈29,780 verses/locale
+versus the real canon's ≈31,102 — this difference is **intentional**. Mirroring
+exact per-chapter verse counts is deliberately out of scope: the production
+dataset will supply the real counts, and because the manifest is the single
+source of truth for routing, that swap requires **no code changes**.
+
+### Replacement contract (no code changes)
+
+Replacing placeholder data with the production dataset must require **only**:
+
+```
+Replace the JSON files under src/data/bible/  →  Commit  →  Deploy
+```
+
+No application code changes. The architecture is translation-agnostic.
+
+---
+
+## 5. Data access boundary
+
+- Bible JSON files (`manifest.json`, `mk/*.json`, `en/*.json`) **must never be
+  imported directly outside the data layer**. All access flows through
+  `src/features/bible/bible.data.ts`.
+- The feature barrel (`features/bible/index.ts`) stays **server-safe**: it must
+  not re-export the Fuse.js-backed client search module.
+
+---
+
+## 6. Validation (build must fail on bad data)
+
+Validation is defined once in `bible.schema.ts` (Zod) and enforced at build
+time. The build **MUST FAIL** for any of:
+
+- malformed JSON
+- missing required fields or unexpected extra fields
+- **empty or whitespace-only verse text**
+- **invalid book slugs** (not in the canonical registry)
+- **invalid testament values** (not `OT` / `NT`)
+- **unknown locales** (not `mk` / `en`)
+- duplicate book ids, duplicate chapters, or duplicate verses
+- invalid ordering (canonical order not contiguous `1..N`; chapters or verses
+  not contiguous `1..N`)
+- **missing or extra chapters/verses**
+- **manifest ↔ file mismatches** (a book/chapter/verse count in a data file that
+  disagrees with the manifest)
+- an invalid or inconsistent manifest
+
+---
+
+## 7. Rendering & extensibility
+
+- **SSG + Server Components.** Zero client JavaScript on the reading path.
+- Chapter pages provide breadcrumbs, per-verse anchors (`#v1`), previous/next
+  chapter navigation, and localized UI.
+- Future features attach via `BibleReference` / `BibleReferenceRange` and the
+  canonical slugs — additively, with no structural redesign:
+  search, cross-references, footnotes, study notes, bookmarks, highlights,
+  reading plans, audio, sermon references, verse sharing.

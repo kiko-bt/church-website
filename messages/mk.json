@@ -101,6 +101,8 @@
     "newTestament": "Нов Завет",
     "chapter": "Глава",
     "verse": "Стих",
+    "prevChapter": "Претходна глава",
+    "nextChapter": "Следна глава",
     "breadcrumb": "Библија",
     "searchPlaceholder": "Пребарај библиски стихови...",
     "noResults": "Нема резултати за вашето пребарување.",
@@ -112,7 +114,8 @@
     },
     "aria": {
       "chapters": "Глави на книгата",
-      "breadcrumb": "Патека на страницата"
+      "breadcrumb": "Патека на страницата",
+      "chapterNav": "Навигација по глави"
     }
   },
   "sermons": {

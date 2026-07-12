@@ -561,5 +561,11 @@ Additional project guidance, standards, and constraints are defined in:
 - .claude/stack-decisions.md
 - .claude/security-rules.md
 - .claude/review-checklist.md
+- .claude/bible-module.md
 
 When implementing features, review all applicable project documentation before making architectural, UI, CMS, security, or code-generation decisions.
+
+The Bible module has additional binding rules in `.claude/bible-module.md`
+(generated-artifact policy, placeholder-content rules, data-access boundary,
+and build-time validation requirements). Review it before touching anything
+under `src/features/bible/`, `src/data/bible/`, or the Bible routes.

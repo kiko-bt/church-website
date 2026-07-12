@@ -4,9 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run bible:validate",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
+    "typecheck:test": "tsc -p tsconfig.test.json",
+    "bible:generate": "node scripts/generate-placeholder-bible.mjs && npm run bible:validate",
+    "bible:validate": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/validate-bible.ts"
   },
   "dependencies": {
     "@portabletext/react": "^6.2.0",

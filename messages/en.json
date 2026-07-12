@@ -101,6 +101,8 @@
     "newTestament": "New Testament",
     "chapter": "Chapter",
     "verse": "Verse",
+    "prevChapter": "Previous chapter",
+    "nextChapter": "Next chapter",
     "breadcrumb": "Bible",
     "searchPlaceholder": "Search Bible verses...",
     "noResults": "No results found for your search.",
@@ -112,7 +114,8 @@
     },
     "aria": {
       "chapters": "Book chapters",
-      "breadcrumb": "Breadcrumb navigation"
+      "breadcrumb": "Breadcrumb navigation",
+      "chapterNav": "Chapter navigation"
     }
   },
   "sermons": {
