@@ -18,8 +18,6 @@
 import { writeFileSync, rmSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-const GENERATOR_VERSION = "1.0.0";
-const MANIFEST_VERSION = 1;
 const DATA_DIR = join(process.cwd(), "src", "data", "bible");
 const LOCALES = ["mk", "en"];
 const MIN_VERSES_PER_CHAPTER = 12;
@@ -307,72 +305,35 @@ function writeJson(path, value) {
 }
 
 function main() {
-  // Wipe generated locale trees + the search index so stale content can never
-  // survive a regeneration.
+  // This script writes ONLY the per-book files. The manifest and search indexes
+  // are derived from those files by build-bible-artifacts.ts, so the same
+  // derivation runs for placeholder and real data alike (see `npm run bible:build`).
   for (const locale of LOCALES) {
     const dir = join(DATA_DIR, locale);
     rmSync(dir, { recursive: true, force: true });
     mkdirSync(dir, { recursive: true });
   }
-  const searchDir = join(DATA_DIR, "search");
-  rmSync(searchDir, { recursive: true, force: true });
-  mkdirSync(searchDir, { recursive: true });
 
-  const manifestBooks = [];
   let totalVerses = 0;
-  // Flat search entries per locale: { reference, bookName, text } — no verse
-  // text is duplicated elsewhere; this is the client search corpus.
-  const searchEntries = Object.fromEntries(LOCALES.map((locale) => [locale, []]));
+  let totalChapters = 0;
 
-  BOOKS.forEach((book, index) => {
+  for (const book of BOOKS) {
     const verseCounts = verseCountsFor(book);
+    totalChapters += verseCounts.length;
     totalVerses += verseCounts.reduce((sum, n) => sum + n, 0);
 
     for (const locale of LOCALES) {
-      const file = buildBookFile(book, locale, verseCounts);
-      writeJson(join(DATA_DIR, locale, `${book.id}.json`), file);
-
-      for (const chapter of file.chapters) {
-        for (const verse of chapter.verses) {
-          searchEntries[locale].push({
-            reference: `${book.id}.${chapter.number}.${verse.number}`,
-            bookName: file.name,
-            text: verse.text,
-          });
-        }
-      }
+      writeJson(
+        join(DATA_DIR, locale, `${book.id}.json`),
+        buildBookFile(book, locale, verseCounts)
+      );
     }
-
-    manifestBooks.push({
-      id: book.id,
-      order: index + 1,
-      testament: book.testament,
-      chapters: verseCounts,
-    });
-  });
-
-  for (const locale of LOCALES) {
-    writeJson(join(searchDir, `${locale}.json`), {
-      locale,
-      entries: searchEntries[locale],
-    });
   }
 
-  const manifest = {
-    version: MANIFEST_VERSION,
-    metadata: {
-      translation: "placeholder",
-      generatedAt: new Date().toISOString(),
-      generatorVersion: GENERATOR_VERSION,
-    },
-    books: manifestBooks,
-  };
-  writeJson(join(DATA_DIR, "manifest.json"), manifest);
-
-  const chapters = manifestBooks.reduce((sum, b) => sum + b.chapters.length, 0);
   console.log(
-    `Generated ${BOOKS.length} books, ${chapters} chapters, ${totalVerses} verses per locale ` +
-      `(${LOCALES.join(", ")}). Manifest + search indexes written to src/data/bible/.`
+    `Generated ${BOOKS.length} placeholder book files per locale ` +
+      `(${LOCALES.join(", ")}), ${totalChapters} chapters, ${totalVerses} verses. ` +
+      "Run `npm run bible:build` to derive the manifest + search indexes."
   );
 }
 

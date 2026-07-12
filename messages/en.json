@@ -106,6 +106,7 @@
     "breadcrumb": "Bible",
     "searchPlaceholder": "Search Bible verses...",
     "noResults": "No results found for your search.",
+    "searchError": "Search is temporarily unavailable. Please try again.",
     "selectBook": "Select a book",
     "selectChapter": "Select a chapter",
     "notFound": {

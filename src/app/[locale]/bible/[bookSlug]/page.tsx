@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import type { Locale } from "@/constants/locales";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
@@ -12,9 +13,14 @@ type BibleBookPageProps = {
 };
 
 // Book routes come from the manifest — the single source of truth for routing.
+// Only these params exist; anything else is a real 404 (see dynamicParams).
 export async function generateStaticParams() {
   return getAllBookMeta().map((book) => ({ bookSlug: book.id }));
 }
+
+// Reject any book slug not produced by generateStaticParams (e.g. unknown books,
+// or non-canonical spellings) with a proper 404 instead of a soft "not found".
+export const dynamicParams = false;
 
 export async function generateMetadata({
   params,
@@ -30,15 +36,9 @@ export default async function BibleBookPage({ params }: BibleBookPageProps) {
   const t = await getTranslations("bible");
   const book = await getBook(locale, bookSlug);
 
-  if (!book) {
-    return (
-      <LayoutShell>
-        <p className="py-12 text-center text-text-primary/70">
-          {t("notFound.book")}
-        </p>
-      </LayoutShell>
-    );
-  }
+  // With dynamicParams=false this is defensive only — the slug is guaranteed to
+  // be a real book — but it keeps the type non-nullable and fails safe.
+  if (!book) notFound();
 
   return (
     <LayoutShell>

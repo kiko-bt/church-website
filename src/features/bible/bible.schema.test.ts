@@ -239,9 +239,27 @@ test("rejects a search index with an out-of-range reference", () => {
   const index = makeSearchIndex("en", broken);
   assert.ok(
     validateSearchIndex(manifest, index, "en").some((e) =>
-      e.includes("inconsistent reference")
+      e.includes("do not resolve")
     )
   );
+});
+
+test("rejects a search index with a duplicate + a missing verse (same count)", () => {
+  const { manifest } = makeValid();
+  // Same length (6), but "genesis.1.2" is replaced by a duplicate "genesis.1.1"
+  // — so the count matches yet one verse is duplicated and another is missing.
+  const broken = [
+    "genesis.1.1",
+    "genesis.1.1",
+    "genesis.2.1",
+    "genesis.2.2",
+    "genesis.2.3",
+    "john.1.1",
+  ];
+  const index = makeSearchIndex("en", broken);
+  const errors = validateSearchIndex(manifest, index, "en");
+  assert.ok(errors.some((e) => e.includes("duplicate reference")));
+  assert.ok(errors.some((e) => e.includes("missing")));
 });
 
 test("rejects a search index whose locale field is wrong", () => {

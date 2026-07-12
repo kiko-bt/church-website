@@ -6,9 +6,9 @@ type VerseListProps = {
   readonly ariaLabel: string;
 };
 
-// The reading view: an ordered list of verses. Each verse has a stable DOM id
-// (`v1`, `v2`, …) so it can be deep-linked / shared via a URL fragment, with
-// scroll-margin so the anchored verse is not hidden under the sticky header.
+// Each verse carries a stable DOM id (`v1`, `v2`, …) so it can be deep-linked and
+// shared via a URL fragment; scroll-margin keeps the anchored verse clear of the
+// sticky header.
 export async function VerseList({ verses, ariaLabel }: VerseListProps) {
   const t = await getTranslations("bible");
 

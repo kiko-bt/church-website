@@ -215,31 +215,51 @@ Follow the established pattern (the **Books** feature — `src/features/books/` 
 
 ## Bible module
 
-The Bible is the site's most important feature and the **one module that does not use
-Sanity** — all verse text lives as static JSON in the repo and renders as SSG. Full
-details in **[docs/bible-module.md](docs/bible-module.md)**; the binding rules are in
-`.claude/bible-module.md`.
+The Bible module is intentionally designed as a fully **static, translation-agnostic**
+subsystem — it is the one module that does not use Sanity. It exists to make Bible
+reading fast, reliable, and safe to maintain for years.
 
-- **Data** lives under `src/data/bible/` and is a **generated artifact — never edited by
-  hand**: a `manifest.json` (routing/shape for both locales, no verse text), one file per
-  book per locale (`mk/<book>.json`, `en/<book>.json`), and per-locale search indexes
-  (`search/<locale>.json`).
-- **Domain model** is translation-rooted with canonical, language-independent book slugs
-  (`genesis`, `1-john`) and `Reference` / `ReferenceRange` value objects — the hinges for
-  search and future features (cross-references, sermon links, reading plans).
-- **Routes** (`src/app/[locale]/bible/**`) are SSG: landing (books by testament + search),
-  book (chapter grid), chapter (verses with `#v` anchors, breadcrumb, prev/next). Reading
-  pages ship **zero page-specific JavaScript**; search is client-side and lazy-loaded on
-  the landing page only.
-- **Validation gates the build.** `bible:validate` runs on every `prebuild`; malformed or
-  inconsistent data fails the build rather than shipping.
-- **All JSON access goes through `src/features/bible/bible.data.ts`** — never import the
-  JSON directly elsewhere.
+### Goals
 
-**Swapping in the real Bible** (after the licensed text is ready) is intentionally
-low-risk: replace the files under `src/data/bible/`, run `npm run bible:validate`, commit,
-deploy — **no code changes**. See docs/bible-module.md §11 and hand the content owner
-**[docs/bible-dataset-guide.md](docs/bible-dataset-guide.md)**.
+- Static generation for every chapter
+- Zero client JavaScript while reading
+- Safe, no-code replacement of Bible translations
+- Automatic validation before every deployment
+- No runtime database
+- Canonical routing independent of language
+
+### Architecture
+
+```
+manifest.json
+      │
+      ▼
+generateStaticParams()
+      │
+      ▼
+per-book JSON
+      │
+      ▼
+Zod validation
+      │
+      ▼
+Static HTML
+```
+
+The book files (`src/data/bible/{mk,en}/*.json`) are the **source of truth**;
+`manifest.json` and `search/*.json` are **derived** from them (`npm run bible:build`)
+and never hand-edited. All JSON access goes through `src/features/bible/bible.data.ts`.
+Full design, data model, validation, and rationale live in
+**[docs/bible-module.md](docs/bible-module.md)** (binding rules: `.claude/bible-module.md`).
+
+### Replacing the Bible translation — no code changes
+
+1. Replace the files in `src/data/bible/mk/` and `src/data/bible/en/`.
+2. Run `npm run bible:build` — re-derives the manifest + search indexes and validates.
+3. If validation passes, commit and deploy. Nothing else changes.
+
+Hand the content owner **[docs/bible-dataset-guide.md](docs/bible-dataset-guide.md)** —
+plain-language instructions for structuring the files.
 
 ---
 
@@ -251,7 +271,8 @@ npm run build            # Production build (runs bible:validate first via prebu
 npm run start            # Serve the production build
 npm run lint             # ESLint
 npm test                 # Unit tests (Bible reference/value objects, schema/validation, search)
-npm run bible:generate   # Regenerate the placeholder Bible dataset + search indexes, then validate
+npm run bible:build      # Re-derive manifest + search indexes from the book files, then validate
+npm run bible:generate   # Regenerate the placeholder book files, then bible:build
 npm run bible:validate   # Validate the Bible dataset (also runs automatically before every build)
 ```
 

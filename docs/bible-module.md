@@ -1,65 +1,189 @@
-# Bible Module — Design & Operations
+# Bible Module — Source of Truth
 
-The Bible is the most important feature of the site: the church's primary purpose
-is ministry and Bible reading. This document explains what the module does, how it
-is built, and — most importantly — how to swap the placeholder text for the real,
-licensed Bible with **no code changes**.
+The Bible is the most important feature of the site: the church's primary purpose is
+ministry and Bible reading. This document is the single source of truth for the module
+— organized by responsibility, not by history.
 
 > Companion docs: **[README](../README.md)** (developer tour) ·
-> **[bible-dataset-guide.md](./bible-dataset-guide.md)** (plain-language instructions
-> for the content owner supplying the real Bible) ·
-> **[.claude/bible-module.md](../.claude/bible-module.md)** (the binding engineering
-> rules this document implements).
+> **[bible-dataset-guide.md](./bible-dataset-guide.md)** (plain-language instructions for
+> the content owner supplying the real Bible) ·
+> **[.claude/bible-module.md](../.claude/bible-module.md)** (the binding engineering rules
+> this document implements).
+
+**Contents:** [1. Purpose](#1-purpose) · [2. Requirements](#2-requirements) ·
+[3. Business Rules](#3-business-rules) · [4. Architecture](#4-architecture) ·
+[5. Design Decisions](#5-design-decisions) · [6. Folder Structure](#6-folder-structure) ·
+[7. Data Model](#7-data-model) · [8. Rendering Pipeline](#8-rendering-pipeline) ·
+[9. Validation Pipeline](#9-validation-pipeline) · [10. Search](#10-search) ·
+[11. Dataset Replacement](#11-dataset-replacement) · [12. Performance](#12-performance) ·
+[13. Future Extensions](#13-future-extensions)
 
 ---
 
-## 1. Purpose & business need
+## 1. Purpose
 
-- A visitor can **read the whole Bible** — Old and New Testament, every book, every
-  chapter, every verse — in **Macedonian or English**.
-- Reading must be **fast on mobile**, work offline of any CMS, and be **shareable**
-  (each verse has a stable link).
-- The site owner will provide the **final, licensed Bible text later**. Until then
-  the module runs on realistic **placeholder** text so everything can be built and
-  reviewed. Swapping in the real text must be **trivial and low-risk**.
-- The Bible is the **foundation for future ministry features** (search — already
-  built — plus cross-references, sermon links, reading plans, verse sharing), so its
-  data model was designed to support them without a rewrite.
+The module lets a visitor **read the entire Bible** — Old and New Testament, every book,
+chapter, and verse — in **Macedonian or English**, with a fast, shareable, offline-of-any-CMS
+reading experience. It is also the **foundation for future ministry features** (search is
+already built; cross-references, sermon links, reading plans, and verse sharing are designed
+for), so its data model is deliberately extensible.
 
----
-
-## 2. What it does (functional scope)
-
-| Route | Page | Content |
-|---|---|---|
-| `/<locale>/bible` | Landing | Search box + all 66 books, split Old / New Testament, in canonical order |
-| `/<locale>/bible/<book>` | Book | The book's chapters as a numbered grid |
-| `/<locale>/bible/<book>/<chapter>` | Chapter (reading) | Every verse with a `#v<n>` anchor, breadcrumb, previous/next chapter navigation |
-
-- **Localized** UI and book names (`mk` default, `en`); verse text is the language's
-  own translation, never machine-translated.
-- **Search** across all verses, client-side, on the landing page.
-- Deep links: `…/bible/john/3#v16` scrolls to that verse.
+The real, licensed Bible text will be provided later by the content owner. Until then the
+module runs on realistic **placeholder** text, and swapping in the real text is a
+**no-code change**.
 
 ---
 
-## 3. Architecture at a glance
+## 2. Requirements
 
-| Decision | Choice | Why |
-|---|---|---|
-| Where verse data lives | **Static JSON in the repo** (never Sanity) | Immutable canonical text; fastest possible delivery; no CMS dependency. Mandated by `CLAUDE.md`. |
-| Rendering | **SSG + Server Components** | Text changes only on deploy; static HTML gives the best mobile performance. |
-| Book identity | **Canonical, language-independent slugs** (`genesis`, `1-john`) | One URL space for both languages; stable keys for search / future links. |
-| File layout | **Manifest + one file per book, per locale** | Small, reviewable files; routing reads only the tiny manifest, never the corpus. |
-| Localization of text | **Separate `mk` and `en` datasets** | The two languages are *different translations*, not translations of each other. |
-| Search | **Client-side Fuse.js, lazy-loaded index** | No search server; the (large) index loads only when the user searches. |
+**Functional**
+
+- Read the full 66-book Protestant canon: Old and New Testament, books, chapters, verses.
+- Two languages (`mk` default, `en`), each its own translation.
+- Landing page listing books by testament, in canonical order, with search.
+- Chapter reading view with per-verse anchors, breadcrumb, and previous/next navigation.
+- Full-text search across all verses.
+- Deep, shareable links to a specific verse (`…/bible/john/3#v16`).
+
+**Non-functional**
+
+- Static generation (SSG) for every page.
+- Zero client JavaScript on the reading path.
+- No runtime database or CMS dependency for verse text.
+- Canonical, language-independent routing.
+- Automatic validation that blocks deployment of bad data.
 
 ---
 
-## 4. Domain model
+## 3. Business Rules
 
-A loaded book/chapter/verse always belongs to **one language**. The model is rooted
-in the idea of a *translation* (one language's Bible), never a bilingual pair.
+These are invariants — every change must uphold them.
+
+1. **Verse data lives in the repository, never in the CMS.** Sanity stores only Bible PDFs
+   and metadata, never verse text.
+2. **Book slugs are canonical and never translated.** `genesis`, `1-john` are identity and
+   URL; display names are localized.
+3. **Macedonian and English are different translations**, not translations of each other.
+   Verse text is never machine-translated.
+4. **The per-book files are the source of truth.** `manifest.json` and `search/*.json` are
+   derived from them and are never hand-edited.
+5. **All generated files are artifacts.** Corrections are made to the source book files (or
+   the pipeline), never to the manifest or search indexes directly.
+6. **Both languages share versification** — the same chapter and verse counts per book. (True
+   for the placeholder and for typical Protestant-canon translations; see §5.)
+7. **A translation may be published only if licensed.** Confirming rights is a prerequisite to
+   supplying the real dataset.
+
+---
+
+## 4. Architecture
+
+Two flows define the module: how data becomes a live page, and how the generated artifacts
+are produced.
+
+**Reading pipeline (build → serve):**
+
+```
+manifest.json ──▶ generateStaticParams()  ──▶ static routes
+                                                    │
+per-book JSON ──▶ data layer (validated, cached) ───┘ ──▶ static HTML  (0 JS while reading)
+```
+
+**Generated-artifact flow (how the dataset is produced):**
+
+```
+book files (mk/*.json, en/*.json)        ← the source of truth (real or placeholder)
+      │
+      ▼
+build-bible-artifacts.ts   (npm run bible:build)
+      │
+      ├──▶ manifest.json          (routing/shape, no verse text)
+      └──▶ search/<locale>.json    (one entry per verse)
+      │
+      ▼
+validate-bible.ts          (npm run bible:validate)   ← blocks the build if anything is wrong
+      │
+      ▼
+next build  ──▶ static HTML  ──▶ deploy
+```
+
+For placeholder data, `generate-placeholder-bible.mjs` writes the book files first; from that
+point the flow is identical to real data.
+
+---
+
+## 5. Design Decisions
+
+The *why* behind the architecture. Each decision exists to protect a specific property.
+
+**Why a manifest?**
+Routing must never scan verse text. The manifest keeps route generation independent of Bible
+content — `generateStaticParams` reads only the manifest (which books, their order and
+testament, and each chapter's verse count), so building ~2,500 routes never loads the corpus.
+
+**Why per-book files (not one big file)?**
+- Small, reviewable commits — a fix to one book touches one small file, not a multi-megabyte blob.
+- Lower memory — a chapter page loads only its book, not the whole Bible.
+- Better cache locality — each book is parsed and cached once.
+- Easier translation replacement — books can be delivered and swapped independently.
+
+**Why canonical, language-independent slugs?**
+A verse's location must be one thing in both languages. Canonical slugs give one URL space,
+stable keys for search and future references, and book names that localize without changing
+identity or links.
+
+**Why static JSON (not a CMS or database)?**
+Bible text is immutable canonical content that changes only on deploy. Static JSON gives the
+fastest possible delivery, no runtime dependency, and deterministic builds. A CMS or database
+would add runtime failure modes for content that never changes between deployments.
+
+**Why derive the manifest and search from the book files?**
+The book files are the single source of truth. Deriving the manifest and search indexes means
+they can never silently drift from the text, and replacing the Bible is "replace the book
+files and re-derive" — not "hand-edit three things and hope they agree."
+
+**Why one manifest for both locales?**
+Routing is language-independent, and every locale is validated to conform to the same shape.
+This keeps routing simple. It relies on both translations sharing versification; if a future
+translation diverges, the module moves to per-locale manifests (`manifest.<locale>.json`).
+
+**Why client-side search?**
+Search needs a full-text index but no search server. A prebuilt index loaded lazily in the
+browser keeps the reading path free of any search cost and avoids a backend service.
+
+---
+
+## 6. Folder Structure
+
+```
+src/
+├── data/bible/                 # GENERATED ARTIFACTS — never hand-edit
+│   ├── manifest.json           #   derived: routing/shape for all locales, no verse text
+│   ├── mk/<book>.json          #   SOURCE OF TRUTH: Macedonian text, one file per book (66)
+│   ├── en/<book>.json          #   SOURCE OF TRUTH: English text, one file per book (66)
+│   └── search/<locale>.json    #   derived: flat search index, one entry per verse
+├── features/bible/             # The module's code
+│   ├── bible.types.ts          #   Domain model + manifest/search types
+│   ├── bible.constants.ts      #   Canonical 66-book registry (slug, order, testament)
+│   ├── bible.reference.ts      #   Reference / ReferenceRange value objects (pure)
+│   ├── bible.schema.ts         #   Zod schemas + cross-file validation
+│   ├── bible.data.ts           #   The ONLY reader of the JSON — accessors + cache
+│   ├── bible-search.ts         #   Fuse.js wrapper (client-only)
+│   └── index.ts                #   Server-safe public API (barrel)
+├── components/bible/           # Server components + BibleSearch (client)
+└── app/[locale]/bible/**       # The three routes (landing, book, chapter)
+
+scripts/
+├── generate-placeholder-bible.mjs   # Writes placeholder BOOK FILES only
+├── build-bible-artifacts.ts         # Derives manifest + search FROM the book files
+└── validate-bible.ts                # The build gate
+```
+
+---
+
+## 7. Data Model
+
+A loaded book/chapter/verse always belongs to **one language**.
 
 ```
 Book        id (canonical slug)  ·  name (localized)  ·  testament (OT|NT)  ·  chapters[]
@@ -67,187 +191,155 @@ Chapter     number  ·  verses[]
 Verse       number  ·  text          ← single language, no bilingual twin
 ```
 
-Two **value objects** (in `src/features/bible/bible.reference.ts`) are the hinges for
-current and future features. They carry coordinates, never text:
+**Value objects** (in `bible.reference.ts`) carry coordinates, never text — they are the
+hinges for search and every future feature:
 
 - **`BibleReference`** — one verse. Canonical string `book.chapter.verse` → `john.3.16`.
 - **`BibleReferenceRange`** — a span within one book. `john.3.16-18` or `john.3.16-4.2`.
 
-Search results, deep links, and every planned feature (cross-references, sermon links,
-sharing, reading plans) resolve through these + the canonical slug — so they attach
-additively, with no change to the reading pages.
+**Manifest** — shape without text: `version`, provenance `metadata`
+(`translation`, `generatedAt`, `generatorVersion`), and `books[]` where each book has
+`id`, `order`, `testament`, and `chapters` (an array of per-chapter verse counts).
+
+**Search entry** — `{ reference, bookName, text }`, one per verse.
+
+The exact JSON shapes are shown in [bible-dataset-guide.md](./bible-dataset-guide.md).
 
 ---
 
-## 5. Files & data structure
-
-Everything under `src/data/bible/` is a **generated artifact** (see §8):
+## 8. Rendering Pipeline
 
 ```
-src/data/bible/
-├── manifest.json          # routing/shape for ALL locales — the single source of truth
-├── mk/<book>.json         # Macedonian text, one file per book (66)
-├── en/<book>.json         # English text, one file per book (66)
-└── search/<locale>.json   # flat search index per locale (one entry per verse)
+/en/bible/john/3
+      │
+      ▼
+generateStaticParams()   reads manifest.json only → knows john has N chapters
+      │
+      ▼
+getChapter("en","john",3)   loads en/john.json (validated on read, cached)
+      │
+      ▼
+Server Components render verses + breadcrumb + prev/next  →  static HTML
 ```
 
-**A per-book file** (`en/john.json`):
-
-```jsonc
-{
-  "id": "john",              // canonical slug — must equal the file name
-  "name": "John",            // localized display name for THIS language
-  "testament": "NT",         // "OT" or "NT"
-  "chapters": [
-    {
-      "number": 1,
-      "verses": [
-        { "number": 1, "text": "…" },
-        { "number": 2, "text": "…" }
-      ]
-    }
-  ]
-}
-```
-
-**The manifest** — describes the *shape* of the data (which books, their order and
-testament, and how many verses each chapter has). It contains **no verse text**:
-
-```jsonc
-{
-  "version": 1,
-  "metadata": {
-    "translation": "placeholder",           // provenance only
-    "generatedAt": "2026-07-12T14:03:35Z",
-    "generatorVersion": "1.0.0"
-  },
-  "books": [
-    { "id": "genesis", "order": 1, "testament": "OT", "chapters": [31, 25, 24, /* … */] }
-    // chapters[i] = number of verses in chapter (i+1); array length = chapter count
-  ]
-}
-```
-
-> **One manifest covers both languages.** This is valid because routing is
-> language-independent and both locales are validated to match the same shape. It
-> assumes `mk` and `en` share versification (same verse counts) — true for the
-> placeholder and for typical Protestant-canon translations. If a future translation
-> ever diverges, the module would move to per-locale manifests (`manifest.<locale>.json`).
-
-**The search index** (`search/en.json`) — one entry per verse:
-
-```jsonc
-{ "locale": "en", "entries": [ { "reference": "john.3.16", "bookName": "John", "text": "…" } ] }
-```
+- **SSG + Server Components.** Every landing, book, and chapter page is prerendered.
+- **`dynamicParams = false`** on book and chapter routes: any URL not generated (unknown book,
+  out-of-range or non-canonical chapter like `/john/03`) returns a real **404**, not a soft
+  200.
+- **Prev/next navigation crosses book boundaries**, computed from the manifest (no verse text
+  loaded).
+- **Reading pages ship zero page-specific JavaScript.**
 
 ---
 
-## 6. Data flow
+## 9. Validation Pipeline
 
-**Build (all pages are prerendered):**
+Validation is defined once in `bible.schema.ts` (Zod schemas + cross-file checks) and runs
+**before every build** via the `prebuild` script (`bible:validate`), and again in the data
+layer as files are read. **The build fails — and cannot deploy — if any check fails.**
 
-```
-manifest.json ──▶ generateStaticParams()  ──▶ ~2,512 static routes
-                     (books + chapters,          (2 landing + 132 book +
-                      no verse text loaded)        2,378 chapter pages)
-                                                        │
-per-book JSON ──▶ data layer (lazy, validated, cached) ─┘ ──▶ static HTML
-```
+Every guarantee, explicitly:
 
-**Reading a chapter (at request time there is nothing to do — it is static HTML):**
+- ✓ malformed JSON
+- ✓ missing required fields / unexpected extra fields (strict objects)
+- ✓ empty or whitespace-only verse text
+- ✓ invalid book slug (not in the canonical registry)
+- ✓ invalid testament (not `OT` / `NT`)
+- ✓ unknown or missing locale
+- ✓ duplicate book ids
+- ✓ duplicate chapters
+- ✓ duplicate verses
+- ✓ invalid ordering (canon order / chapter / verse numbering not contiguous `1..N`)
+- ✓ missing or extra chapters / verses
+- ✓ manifest ↔ file mismatch (a data file that disagrees with the manifest)
+- ✓ search index: exactly one entry per verse (no out-of-canon references, duplicates, or gaps)
+- ✓ locale consistency (each locale conforms to the same manifest)
 
-```
-/en/bible/john/3  →  getChapter("en","john",3)  →  en/john.json (cached)  →  verses
-                     ChapterNav reads the manifest for prev/next (crosses book edges)
-```
-
-**Search (client-side, on the landing page only):**
-
-```
-user types  →  lazy import search/<locale>.json  →  build Fuse index (once)
-            →  match  →  results link to /<locale>/bible/<book>/<chapter>#v<verse>
-```
-
-All Bible file access goes through **`src/features/bible/bible.data.ts`** — the only
-module allowed to read the JSON. Pages and components never import the JSON directly.
+This is the safety net that makes swapping the dataset low-risk: **if the new files are wrong,
+the site will not build.**
 
 ---
 
-## 7. Rendering & performance
+## 10. Search
 
-- **Reading pages ship zero page-specific JavaScript.** Book and chapter pages are
-  pure Server Components — no client bundle, no client fetching, no hydration.
-- **Routing never loads verse text** — `generateStaticParams` reads only the manifest.
-- **Search is isolated** to the landing page; its multi-MB index is a separate chunk
-  loaded **only when the user starts typing**, never in any initial page.
-- Verified at build: ~2,512 Bible pages prerender as static HTML; reading routes carry
-  no added JS.
+```
+user types
+      │
+      ▼
+lazy-load search/<locale>.json     (on first focus / keystroke — never in the initial page)
+      │
+      ▼
+Fuse.js  (built once, in memory)
+      │
+      ▼
+results
+      │
+      ▼
+deep link  →  /<locale>/bible/<book>/<chapter>#v<verse>
+```
 
----
-
-## 8. Validation — the build fails on bad data
-
-Validation is defined once in `src/features/bible/bible.schema.ts` (Zod + cross-file
-checks) and runs **before every build** via the `prebuild` script, and again in the
-data layer as files are read. A build **fails** if any of these are true:
-
-malformed JSON · missing/extra fields · empty or whitespace-only verse text ·
-unknown book slug · invalid testament · unknown/missing locale · duplicate or
-non-contiguous chapters/verses · a data file that disagrees with the manifest ·
-a search entry whose reference does not resolve.
-
-This is the safety net that makes swapping the dataset low-risk: **if the new files
-are wrong, the site will not build — it cannot deploy broken Bible data.**
-
----
-
-## 9. Search
-
-- Offline per-locale indexes (`search/<locale>.json`) are generated with the rest of
-  the data and validated at build.
-- The Fuse.js wrapper lives in `bible-search.ts` (client-only; deliberately **not**
-  exported from the server barrel). The client component `BibleSearch.tsx` loads the
-  index lazily and matches on verse text and book name.
+- Indexes are generated with the dataset and validated at build (§9).
+- The Fuse wrapper (`bible-search.ts`) is **client-only** and deliberately **not** exported
+  from the server barrel; the reading path stays 0-JS.
+- **Robustness:** the search component is remounted per locale (so a language switch never
+  reuses the wrong-language index), a failed index load surfaces an error and can be retried,
+  and the load is preloaded on input focus to overlap the download with typing.
 
 ---
 
-## 10. Commands
+## 11. Dataset Replacement
+
+**This is the payoff of the whole design. No code changes are required.**
+
+Replace only:
+
+```
+src/data/bible/mk/*
+src/data/bible/en/*
+```
+
+Then run:
 
 ```bash
-npm run bible:generate   # regenerate the placeholder dataset + search indexes, then validate
-npm run bible:validate   # validate the dataset only (also runs automatically before every build)
-npm test                 # unit tests (reference value objects, schema/validation, search)
-npm run build            # full production build (runs bible:validate first)
+npm run bible:build
 ```
 
-The generator is `scripts/generate-placeholder-bible.mjs`; the validator is
-`scripts/validate-bible.ts`. **Never hand-edit files under `src/data/bible/`** —
-regeneration overwrites them.
+`bible:build` re-derives `manifest.json` and `search/*.json` from the new book files and then
+validates the whole dataset.
+
+- If validation **succeeds** → commit and deploy. Nothing else changes.
+- If validation **fails** → it prints exactly what is wrong; fix the source files and re-run.
+  Broken Bible data can never reach production.
+
+> Do **not** hand-edit `manifest.json` or `search/*.json`, and do **not** run
+> `bible:generate` after placing real files — that regenerates *placeholder* text and would
+> overwrite them. Real data flow is: replace book files → `bible:build` → deploy.
+
+The content owner's plain-language instructions for writing the files are in
+**[bible-dataset-guide.md](./bible-dataset-guide.md)**.
 
 ---
 
-## 11. Replacing the placeholder with the real Bible
+## 12. Performance
 
-This is the whole point of the design. When the licensed Bible is ready:
-
-1. The content owner supplies the text following
-   **[bible-dataset-guide.md](./bible-dataset-guide.md)** (plain-language instructions).
-2. A developer produces the files under `src/data/bible/` (`manifest.json`, `mk/*.json`,
-   `en/*.json`, `search/*.json`) in the exact structure of §5 — either by hand-placing
-   provided JSON or by running it through the pipeline.
-3. `npm run bible:validate` must pass (the build runs it automatically).
-4. Commit and deploy.
-
-**No application code changes are required** — the code is translation-agnostic and
-reads whatever valid dataset is present. If the data is malformed, validation stops the
-deploy rather than shipping a broken Bible.
+- **Reading pages: 0 KB page-specific JavaScript** — pure Server Components, no hydration, no
+  client fetching.
+- **Routing never loads verse text** — `generateStaticParams` reads only the manifest.
+- **Verse text loads per book, cached** — each book is parsed once per build/process.
+- **Search is isolated** to the landing page; its multi-MB index is a separate chunk loaded
+  only on interaction.
+- **Known trade-off (accepted for launch):** the first search parses the multi-MB index (the
+  Macedonian index is largest) and builds the Fuse index over ~30k entries on the main thread.
+  Network cost is mitigated by compression, caching, and focus-preload; the parse/build cost
+  is not. Acceptable for this site's traffic — escalate to a Web Worker or a prebuilt Fuse
+  index if real-device testing shows jank.
 
 ---
 
-## 12. Extensibility (no rewrite required)
+## 13. Future Extensions
 
-Each future feature attaches through the `Reference` / `ReferenceRange` value objects
-and the canonical slugs:
+Each attaches through the `Reference` / `ReferenceRange` value objects and the canonical slugs
+— additively, with no structural redesign:
 
 | Feature | How it attaches |
 |---|---|
@@ -255,21 +347,17 @@ and the canonical slugs:
 | Sermon → verse links | Sermon stores a reference; UI links to `…/#v<n>` |
 | Bookmarks / highlights | Client storage keyed by the reference string |
 | Reading plans | Ordered lists of reference ranges |
+| Footnotes / study notes | Optional per-verse field or a sidecar keyed by reference |
 | Verse sharing | Format a reference → canonical citation + deep link |
 
 ---
 
-## 13. Source map
+## Commands
 
-| File | Responsibility |
-|---|---|
-| `src/features/bible/bible.types.ts` | Domain model + manifest/search types |
-| `src/features/bible/bible.constants.ts` | Canonical 66-book registry (slug, order, testament) |
-| `src/features/bible/bible.reference.ts` | `Reference` / `ReferenceRange` value objects (pure) |
-| `src/features/bible/bible.schema.ts` | Zod schemas + cross-file validation |
-| `src/features/bible/bible.data.ts` | The only reader of the JSON — accessors, cache |
-| `src/features/bible/bible-search.ts` | Fuse.js wrapper (client-only) |
-| `src/components/bible/*` | Server components (lists, grid, verses, nav, breadcrumb) + `BibleSearch` (client) |
-| `src/app/[locale]/bible/**` | The three routes |
-| `scripts/generate-placeholder-bible.mjs` | Placeholder generator |
-| `scripts/validate-bible.ts` | Dataset validator (the build gate) |
+```bash
+npm run bible:build      # re-derive manifest + search from the book files, then validate
+npm run bible:generate   # (placeholder only) regenerate placeholder book files, then bible:build
+npm run bible:validate   # validate the dataset (runs automatically before every build)
+npm test                 # unit tests (reference value objects, schema/validation, search)
+npm run build            # full production build (runs bible:validate first)
+```

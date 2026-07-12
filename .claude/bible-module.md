@@ -74,17 +74,20 @@ src/data/bible/
 
 ---
 
-## 3. Generated artifacts — manual edits are PROHIBITED
+## 3. Source of truth vs generated artifacts
 
-`src/data/bible/manifest.json`, `src/data/bible/mk/`, and `src/data/bible/en/`
-are **GENERATED ARTIFACTS**.
+The **per-book files** (`src/data/bible/mk/*.json`, `src/data/bible/en/*.json`)
+are the **source of truth**. `manifest.json` and `search/*.json` are **derived**
+from them by `scripts/build-bible-artifacts.ts` (`npm run bible:build`).
 
-- **Never edit these files by hand.** Not one verse, not one field.
-- All changes must originate from the generator (`scripts/generate-placeholder-bible.mjs`)
-  or, in production, from the client-supplied source dataset processed through
-  the same pipeline.
-- Rationale: a manual "quick fix to one verse" is silently destroyed by the next
-  generation run. Corrections must be made at the source, not in the output.
+- **Never hand-edit `manifest.json` or `search/*.json`.** They are regenerated
+  from the book files and a manual edit is silently destroyed on the next build.
+- **Never hand-edit the book files to "match" the placeholder.** Real corrections
+  come from the source dataset (or, for placeholder, the generator), then
+  `bible:build` re-derives the manifest and search indexes.
+- For placeholder data, `scripts/generate-placeholder-bible.mjs` writes the book
+  files; `bible:build` then derives the rest — the same derivation used for real
+  data, so the two paths never diverge.
 
 ---
 

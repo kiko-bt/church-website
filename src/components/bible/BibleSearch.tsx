@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import type Fuse from "fuse.js";
 import type { Locale } from "@/constants/locales";
@@ -13,46 +13,73 @@ type BibleSearchProps = {
   readonly placeholder: string;
   readonly ariaLabel: string;
   readonly noResults: string;
+  readonly errorLabel: string;
 };
 
 const MIN_QUERY_LENGTH = 2;
 const DEBOUNCE_MS = 200;
 
-// Client-side Bible search. The (large) per-locale index is loaded LAZILY the
-// first time the user types — it is never part of the initial page payload, so
-// the reading experience stays fast. All matching is in-memory via Fuse.js;
-// there is no server round-trip.
+// Client-side Bible search. The (large) per-locale index is loaded LAZILY — on
+// first focus or first keystroke — so it is never part of the initial page
+// payload and the reading experience stays fast. All matching is in-memory via
+// Fuse.js; there is no server round-trip.
+//
+// This component is remounted per locale (via a `key` at the call site), so its
+// refs always hold the index for the current language.
 export function BibleSearch({
   locale,
   placeholder,
   ariaLabel,
   noResults,
+  errorLabel,
 }: BibleSearchProps) {
+  const inputId = useId();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<readonly BibleSearchEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const fuseRef = useRef<Fuse<BibleSearchEntry> | null>(null);
   const indexPromiseRef = useRef<Promise<Fuse<BibleSearchEntry>> | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestQueryRef = useRef("");
 
-  // Load + build the Fuse index once; concurrent callers share one promise.
+  // Clear any pending debounce timer when the component unmounts.
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  // Load + build the Fuse index once; concurrent callers share one promise. On
+  // failure the shared promise is cleared so a later attempt can retry.
   const ensureIndex = useCallback(async (): Promise<Fuse<BibleSearchEntry>> => {
     if (fuseRef.current) return fuseRef.current;
     if (!indexPromiseRef.current) {
       indexPromiseRef.current = import(
         `../../data/bible/search/${locale}.json`
-      ).then((module) => {
-        const index = module.default as BibleSearchIndex;
-        const fuse = createBibleSearch(index.entries);
-        fuseRef.current = fuse;
-        return fuse;
-      });
+      )
+        .then((module) => {
+          const index = module.default as BibleSearchIndex;
+          const fuse = createBibleSearch(index.entries);
+          fuseRef.current = fuse;
+          return fuse;
+        })
+        .catch((error) => {
+          indexPromiseRef.current = null; // allow a retry on the next attempt
+          throw error;
+        });
     }
     return indexPromiseRef.current;
   }, [locale]);
+
+  // Kick off loading the index without running a search — used on focus so the
+  // (slow) download + parse overlaps with the user typing their query.
+  const preloadIndex = useCallback(() => {
+    if (fuseRef.current || hasError) return;
+    void ensureIndex().catch(() => setHasError(true));
+  }, [ensureIndex, hasError]);
 
   const runSearch = useCallback(
     async (value: string) => {
@@ -62,13 +89,20 @@ export function BibleSearch({
         setHasSearched(false);
         return;
       }
-      if (!fuseRef.current) setIsLoading(true);
-      const fuse = await ensureIndex();
-      setIsLoading(false);
-      // Discard results if the query changed while the index was loading.
-      if (latestQueryRef.current !== value) return;
-      setResults(searchBible(fuse, trimmed));
-      setHasSearched(true);
+      try {
+        if (!fuseRef.current) setIsLoading(true);
+        const fuse = await ensureIndex();
+        setIsLoading(false);
+        // Discard results if the query changed while the index was loading.
+        if (latestQueryRef.current !== value) return;
+        setResults(searchBible(fuse, trimmed));
+        setHasSearched(true);
+        setHasError(false);
+      } catch {
+        setIsLoading(false);
+        setResults([]);
+        setHasError(true);
+      }
     },
     [ensureIndex]
   );
@@ -82,14 +116,15 @@ export function BibleSearch({
 
   return (
     <search className="mt-2">
-      <label htmlFor="bible-search" className="sr-only">
+      <label htmlFor={inputId} className="sr-only">
         {ariaLabel}
       </label>
       <input
-        id="bible-search"
+        id={inputId}
         type="search"
         value={query}
         onChange={(event) => onChange(event.target.value)}
+        onFocus={preloadIndex}
         placeholder={placeholder}
         aria-label={ariaLabel}
         autoComplete="off"
@@ -97,15 +132,17 @@ export function BibleSearch({
       />
 
       <div aria-live="polite" className="mt-4">
-        {isLoading && (
-          <p className="text-sm text-text-primary/60">…</p>
+        {isLoading && <p className="text-sm text-text-primary/60">…</p>}
+
+        {!isLoading && hasError && (
+          <p className="text-sm text-text-primary/70">{errorLabel}</p>
         )}
 
-        {!isLoading && hasSearched && results.length === 0 && (
+        {!isLoading && !hasError && hasSearched && results.length === 0 && (
           <p className="text-sm text-text-primary/70">{noResults}</p>
         )}
 
-        {results.length > 0 && (
+        {!hasError && results.length > 0 && (
           <ul className="divide-y divide-soft-gold/30 rounded-sm border border-soft-gold/30">
             {results.map((entry) => {
               const ref = parseReference(entry.reference);

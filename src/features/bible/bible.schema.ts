@@ -220,22 +220,11 @@ export function validateDataset(input: ValidateDatasetInput): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Search-index integrity (references must resolve; count must match the corpus)
+// Search-index integrity — every entry references a real verse, and the index
+// covers every verse exactly once (no out-of-canon references, duplicates, or
+// gaps). References are compared as strings against the exact expected set, so
+// no reference parsing is needed here.
 // ---------------------------------------------------------------------------
-
-// Reference parsing is inlined (rather than importing bible.reference) so this
-// module keeps `zod` as its only value import — see the note at the top.
-function parseRefInline(
-  value: string
-): { bookId: string; chapter: number; verse: number } | null {
-  const parts = value.split(".");
-  if (parts.length !== 3) return null;
-  const [bookId, chapterRaw, verseRaw] = parts;
-  if (!bookId || !/^[1-9][0-9]*$/.test(chapterRaw) || !/^[1-9][0-9]*$/.test(verseRaw)) {
-    return null;
-  }
-  return { bookId, chapter: Number(chapterRaw), verse: Number(verseRaw) };
-}
 
 export function validateSearchIndex(
   manifest: ParsedManifest,
@@ -249,40 +238,50 @@ export function validateSearchIndex(
     errors.push(`${label}: locale field "${index.locale}" != "${locale}"`);
   }
 
-  const bookById = new Map(manifest.books.map((book) => [book.id, book]));
-  const expectedCount = manifest.books.reduce(
-    (sum, book) => sum + book.chapters.reduce((s, verses) => s + verses, 0),
-    0
-  );
-  if (index.entries.length !== expectedCount) {
+  // The exact set of references the index must contain: one per verse.
+  const expected = new Set<string>();
+  for (const book of manifest.books) {
+    book.chapters.forEach((verseCount, chapterIndex) => {
+      for (let verse = 1; verse <= verseCount; verse++) {
+        expected.add(`${book.id}.${chapterIndex + 1}.${verse}`);
+      }
+    });
+  }
+  if (index.entries.length !== expected.size) {
     errors.push(
-      `${label}: has ${index.entries.length} entries, expected ${expectedCount} (one per verse)`
+      `${label}: has ${index.entries.length} entries, expected ${expected.size} (one per verse)`
     );
   }
 
-  // Verify each reference resolves within the manifest. Cap reported errors so
-  // a systemic problem doesn't flood the output.
-  let invalid = 0;
-  const samples: string[] = [];
+  // Every entry must reference a real verse, and the index must cover every
+  // verse exactly once — no references outside the canon, no duplicates, no
+  // gaps. Cap reported samples so a systemic problem doesn't flood the output.
+  const invalid: string[] = [];
+  const duplicated: string[] = [];
+  const seen = new Set<string>();
   for (const entry of index.entries) {
-    const ref = parseRefInline(entry.reference);
-    const book = ref ? bookById.get(ref.bookId) : undefined;
-    const verseCount = ref && book ? book.chapters[ref.chapter - 1] : undefined;
-    const ok =
-      ref !== null &&
-      book !== undefined &&
-      verseCount !== undefined &&
-      ref.verse >= 1 &&
-      ref.verse <= verseCount;
-    if (!ok) {
-      invalid++;
-      if (samples.length < 5) samples.push(entry.reference);
+    if (!expected.has(entry.reference)) {
+      if (invalid.length < 5) invalid.push(entry.reference);
+    } else if (seen.has(entry.reference)) {
+      if (duplicated.length < 5) duplicated.push(entry.reference);
+    } else {
+      seen.add(entry.reference);
     }
   }
-  if (invalid > 0) {
+
+  if (invalid.length > 0) {
     errors.push(
-      `${label}: ${invalid} entr${invalid === 1 ? "y has an" : "ies have"} inconsistent reference(s), e.g. ${samples.join(", ")}`
+      `${label}: reference(s) that do not resolve within the manifest, e.g. ${invalid.join(", ")}`
     );
+  }
+  if (duplicated.length > 0) {
+    errors.push(
+      `${label}: duplicate reference(s), e.g. ${duplicated.join(", ")}`
+    );
+  }
+  const missing = expected.size - seen.size;
+  if (missing > 0) {
+    errors.push(`${label}: ${missing} verse(s) missing from the search index`);
   }
 
   return errors;

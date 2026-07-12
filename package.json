@@ -2,6 +2,9 @@
   "name": "church-website",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev",
     "prebuild": "npm run bible:validate",
@@ -10,7 +13,8 @@
     "lint": "next lint",
     "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
     "typecheck:test": "tsc -p tsconfig.test.json",
-    "bible:generate": "node scripts/generate-placeholder-bible.mjs && npm run bible:validate",
+    "bible:generate": "node scripts/generate-placeholder-bible.mjs && node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/build-bible-artifacts.ts placeholder && npm run bible:validate",
+    "bible:build": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/build-bible-artifacts.ts && npm run bible:validate",
     "bible:validate": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/validate-bible.ts"
   },
   "dependencies": {

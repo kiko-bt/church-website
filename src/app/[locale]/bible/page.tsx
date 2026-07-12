@@ -40,10 +40,14 @@ export default async function BiblePage({ params }: BiblePageProps) {
     <LayoutShell>
       <PageHeader title={t("title")} />
       <BibleSearch
+        // Remount on locale change so a client-side language switch never
+        // reuses the previously loaded (wrong-language) search index or results.
+        key={locale}
         locale={locale}
         placeholder={t("searchPlaceholder")}
         ariaLabel={t("aria.search")}
         noResults={t("noResults")}
+        errorLabel={t("searchError")}
       />
       <TestamentSection
         locale={locale}

@@ -8,9 +8,8 @@ type ChapterGridProps = {
   readonly chapterCount: number;
 };
 
-// Responsive grid of chapter-number links for a book. `chapterCount` is the
-// manifest-guaranteed number of chapters (the per-book file is validated to
-// match the manifest), so the grid always reflects the canonical chapter count.
+// `chapterCount` comes from the manifest (the per-book file is validated to match
+// it), so the grid always reflects the canonical chapter count.
 export async function ChapterGrid({ locale, bookId, chapterCount }: ChapterGridProps) {
   const t = await getTranslations("bible");
   const chapters = Array.from({ length: chapterCount }, (_unused, index) => index + 1);

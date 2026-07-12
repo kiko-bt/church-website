@@ -1,6 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createBibleSearch, searchBible } from "./bible-search.ts";
+import { parseReference } from "./bible.reference.ts";
+import type { BibleSearchIndex } from "./bible.types.ts";
 
 // Exercises the Fuse.js wrapper directly (no browser needed) so the search
 // behaviour is regression-tested. Run via `npm test`.
@@ -44,3 +48,27 @@ test("respects the result limit", () => {
   const fuse = createBibleSearch(entries);
   assert.ok(searchBible(fuse, "the", 1).length <= 1);
 });
+
+// Integration: build Fuse over the REAL generated index and search it. This is
+// the closest we get to the browser flow without a DOM — it proves the shipped
+// index is searchable and results carry resolvable references. Skips if the
+// dataset has not been generated (e.g. a clean checkout before `bible:generate`).
+const enIndexPath = join(process.cwd(), "src", "data", "bible", "search", "en.json");
+
+test(
+  "searches the real generated English index",
+  { skip: existsSync(enIndexPath) ? false : "run `npm run bible:generate` first" },
+  () => {
+    const index = JSON.parse(readFileSync(enIndexPath, "utf8")) as BibleSearchIndex;
+    const fuse = createBibleSearch(index.entries);
+
+    // "wisdom" is part of the placeholder vocabulary, so it must match.
+    const results = searchBible(fuse, "wisdom", 30);
+    assert.ok(results.length > 0, "expected matches for a known placeholder word");
+    // Every result must carry a well-formed, resolvable reference (this is what
+    // the UI turns into a /bible/<book>/<chapter>#v<verse> link).
+    for (const result of results) {
+      assert.ok(parseReference(result.reference), `bad reference: ${result.reference}`);
+    }
+  }
+);

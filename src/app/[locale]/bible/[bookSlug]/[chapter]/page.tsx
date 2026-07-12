@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import type { Locale } from "@/constants/locales";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
@@ -13,7 +14,8 @@ type BibleChapterPageProps = {
 
 // Chapter routes come from the manifest only (no verse corpus is loaded). Each
 // book's `chapters` array holds one entry per chapter, so its length is the
-// chapter count.
+// chapter count. Only these exact params are valid — every chapter link the app
+// emits uses the canonical form `String(index + 1)`.
 export async function generateStaticParams() {
   return getAllBookMeta().flatMap((book) =>
     book.chapters.map((_verseCount, index) => ({
@@ -22,6 +24,11 @@ export async function generateStaticParams() {
     }))
   );
 }
+
+// Reject anything not generated above with a real 404. This also rules out
+// non-canonical numeric forms (e.g. `/john/03`, `/john/9999`) that would
+// otherwise resolve via Number() and produce duplicate content at HTTP 200.
+export const dynamicParams = false;
 
 export async function generateMetadata({
   params,
@@ -41,15 +48,9 @@ export default async function BibleChapterPage({
   const book = await getBook(locale, bookSlug);
   const chapterData = await getChapter(locale, bookSlug, chapterNumber);
 
-  if (!book || !chapterData) {
-    return (
-      <LayoutShell>
-        <p className="py-12 text-center text-text-primary/70">
-          {t("notFound.chapter")}
-        </p>
-      </LayoutShell>
-    );
-  }
+  // Defensive with dynamicParams=false — the params are guaranteed valid — but
+  // it keeps the types non-nullable and fails safe.
+  if (!book || !chapterData) notFound();
 
   return (
     <LayoutShell>
