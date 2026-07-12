@@ -66,15 +66,21 @@ Vercel auto-detects Next.js — no `vercel.json` is required.
    - Root directory: **`./`** — the repo root **is** the Next.js app. (The Studio
      lives in the *separate* `studio-church-ehb` repo and is **not** deployed
      from here.)
-2. **Production branch:** Settings → Git → set to **`main`**. Every push to `main`
-   triggers a production deploy; other branches get preview deployments.
+2. **Production branch:** Settings → Git. **As deployed, this is
+   `feature/project-foundation`** — production currently builds from that branch,
+   so every push to it triggers a production deploy; other branches get preview
+   deployments. *Recommended follow-up:* once the initial build stabilizes, merge
+   `feature/project-foundation` into `main` and switch Vercel's production branch
+   to **`main`** (the conventional long-term default). Whichever branch is chosen,
+   the steps below apply to it.
 3. Set environment variables (§3) **before** the first production deploy, or the
    build will bake in fallback values (e.g. a wrong site URL).
-4. Push to `main` (or click **Redeploy**). Confirm the build log ends green and
-   the deployment opens on its `*.vercel.app` URL before touching DNS.
+4. Push to the production branch (or click **Redeploy**). Confirm the build log
+   ends green and the deployment opens on its `*.vercel.app` URL before touching DNS.
 
 **Merge flow to production:** work on a feature branch → open a PR → Vercel posts
-a **Preview** deployment on the PR → merge to `main` → Vercel ships **Production**.
+a **Preview** deployment on the PR → merge into the production branch → Vercel
+ships **Production**.
 
 ---
 

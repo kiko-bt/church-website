@@ -66,8 +66,9 @@ which is the single source of truth. The editor sees a fixed desk structure
 cannot be created, deleted, or duplicated (enforced by `defineStudioConfig`).
 
 **Why a separate Studio:** the public site ships zero Studio code (smaller,
-faster, isolated), and the CMS can be versioned/deployed independently. See the
-README's _Sanity Studio (standalone)_ section.
+faster, isolated), and the CMS can be versioned/deployed independently. The exact
+config-sharing mechanism is described in
+[Studio configuration](#studio-configuration--the-two-repo-layout) below.
 
 ### 2. Publish → Sanity Content Lake
 
@@ -159,4 +160,76 @@ performance:
 The webhook needs no change per type — it already forwards `_type`. To wire a new
 type end to end: add its tag to `SANITY_TAGS`, map its `_type` in
 `TYPE_TO_TAG` (`route.ts`), and tag its accessor. Full checklist:
-README → _Adding a New CMS Feature_.
+README → _Adding a content type_.
+
+---
+
+## Studio configuration — the two-repo layout
+
+The Studio (`studio-church-ehb/`) is a **separate application** — the editing UI
+only. It defines **no** content model of its own; it imports the entire
+configuration from this repo, which stays the single source of truth.
+
+### The source of truth (`church-website/sanity/`)
+
+```
+sanity/
+├── schemas/
+│   ├── objects/            # imageWithAlt, socialLinks, seo, richText
+│   ├── singletons/         # churchSettings, homeContent
+│   ├── documents/          # sermon, book, galleryAlbum
+│   └── index.ts            # schemaTypes + SINGLETON_TYPES
+├── structure.ts            # Desk structure (pins the singletons)
+├── defineStudioConfig.ts   # Shared config factory: schema + structure +
+│                           #   singleton templates filter + document actions
+└── sanity.config.ts        # Website-side config — a thin call to the factory
+```
+
+### `defineStudioConfig()` — one config, consumed by both apps
+
+`sanity/defineStudioConfig.ts` is the **single place** that assembles the Studio
+configuration: the schema types, the custom desk structure, the rule that hides
+singletons from the global "create" menu, and the document-action filter that
+strips create/delete/duplicate from singletons. The exact same configuration is
+used by:
+
+- **this repo** — `sanity/sanity.config.ts` calls `defineStudioConfig({ … })`
+  with the project id from the environment; and
+- **the standalone Studio** — `studio-church-ehb/sanity.config.ts` imports the
+  same factory via the sibling path and only adds the Vision query tool:
+
+  ```ts
+  // studio-church-ehb/sanity.config.ts
+  import { visionTool } from "@sanity/vision";
+  import { defineStudioConfig } from "../church-website/sanity/defineStudioConfig";
+
+  export default defineStudioConfig({
+    name: "default",
+    title: "Црква Евангелие Христово - Битола",
+    projectId: "9nwz9xmi",
+    dataset: "production",
+    plugins: [visionTool()],
+  });
+  ```
+
+**Rule:** any new CMS capability (a schema, a structure change, a new singleton
+rule) is added to `church-website/sanity/` and flows to the Studio automatically.
+**Never** add schema or duplicate this config inside `studio-church-ehb/`.
+
+### Why the sibling-folder layout is required
+
+The Studio imports the config with a **relative path** (`../church-website/…`), so
+the two repos must sit side by side under the same parent folder. Because the two
+repos have separate `node_modules`, `studio-church-ehb/sanity.cli.ts` also
+configures Vite to `dedupe` React/Sanity/styled-components and to `allow` reading
+files from the sibling repo — this prevents duplicate-instance ("invalid hook
+call") errors when one repo's config pulls modules across the boundary.
+
+> If the repos are ever separated (e.g. deploying the Studio from its own
+> checkout), promote `sanity/` into a small shared package the Studio depends on —
+> the relative import is the only thing tying them to a shared parent folder.
+
+> **The Studio is not part of the content-update pipeline's runtime.** It writes to
+> Sanity's hosted Content Lake; the website reads from there. The Studio does not
+> need to be deployed or committed to GitHub for publishing to reach the live site
+> (see deployment.md §5). Committing it is optional — for backup and versioning.

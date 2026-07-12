@@ -543,7 +543,7 @@ The following are the primary sources of truth for this project. Claude MUST ref
 - Next.js SSG: https://nextjs.org/docs/pages/building-your-application/rendering/static-site-generation
 - Sanity Asset API: https://www.sanity.io/docs/http-reference/assets
 - Sanity JS Client: https://www.sanity.io/docs/js-client
-- Tailwind CSS: https://v2.tailwindcss.com/docs
+- Tailwind CSS (v4): https://tailwindcss.com/docs
 
 Claude MUST NOT invent API behavior or rely on outdated unofficial sources.
 
