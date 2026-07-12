@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TestamentSection } from "@/components/bible/TestamentSection";
+import { BibleSearch } from "@/components/bible/BibleSearch";
 import { getAllBooks } from "@/features/bible";
 
 type BiblePageProps = {
@@ -38,6 +39,12 @@ export default async function BiblePage({ params }: BiblePageProps) {
   return (
     <LayoutShell>
       <PageHeader title={t("title")} />
+      <BibleSearch
+        locale={locale}
+        placeholder={t("searchPlaceholder")}
+        ariaLabel={t("aria.search")}
+        noResults={t("noResults")}
+      />
       <TestamentSection
         locale={locale}
         title={t("oldTestament")}

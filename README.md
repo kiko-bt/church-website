@@ -19,9 +19,11 @@ Start here — the deep guides live in `docs/`:
 | Document | What it covers |
 |---|---|
 | **[docs/cms-architecture.md](docs/cms-architecture.md)** | The publish → live content pipeline, stage by stage, plus the Studio setup and the invariants it depends on |
+| **[docs/bible-module.md](docs/bible-module.md)** | The Bible module — design, data structure, flow, validation, search, and how to swap the placeholder text for the real Bible with no code changes |
+| **[docs/bible-dataset-guide.md](docs/bible-dataset-guide.md)** | Plain-language instructions for the content owner on how to structure the Bible text files (hand this to the preacher) |
 | **[docs/deployment.md](docs/deployment.md)** | Production runbook: Vercel, Porkbun DNS, HTTPS, environment variables, the Sanity webhook, smoke tests, rollback, troubleshooting, routine operations |
 | **[.env.example](.env.example)** | Every environment variable, annotated (local vs Vercel, public vs secret) |
-| `CLAUDE.md`, `.claude/*.md` | Engineering rules and non-negotiable architectural constraints |
+| `CLAUDE.md`, `.claude/*.md` | Engineering rules and non-negotiable architectural constraints (`.claude/bible-module.md` is the binding spec for the Bible) |
 
 ---
 
@@ -211,13 +213,46 @@ Follow the established pattern (the **Books** feature — `src/features/books/` 
 
 ---
 
+## Bible module
+
+The Bible is the site's most important feature and the **one module that does not use
+Sanity** — all verse text lives as static JSON in the repo and renders as SSG. Full
+details in **[docs/bible-module.md](docs/bible-module.md)**; the binding rules are in
+`.claude/bible-module.md`.
+
+- **Data** lives under `src/data/bible/` and is a **generated artifact — never edited by
+  hand**: a `manifest.json` (routing/shape for both locales, no verse text), one file per
+  book per locale (`mk/<book>.json`, `en/<book>.json`), and per-locale search indexes
+  (`search/<locale>.json`).
+- **Domain model** is translation-rooted with canonical, language-independent book slugs
+  (`genesis`, `1-john`) and `Reference` / `ReferenceRange` value objects — the hinges for
+  search and future features (cross-references, sermon links, reading plans).
+- **Routes** (`src/app/[locale]/bible/**`) are SSG: landing (books by testament + search),
+  book (chapter grid), chapter (verses with `#v` anchors, breadcrumb, prev/next). Reading
+  pages ship **zero page-specific JavaScript**; search is client-side and lazy-loaded on
+  the landing page only.
+- **Validation gates the build.** `bible:validate` runs on every `prebuild`; malformed or
+  inconsistent data fails the build rather than shipping.
+- **All JSON access goes through `src/features/bible/bible.data.ts`** — never import the
+  JSON directly elsewhere.
+
+**Swapping in the real Bible** (after the licensed text is ready) is intentionally
+low-risk: replace the files under `src/data/bible/`, run `npm run bible:validate`, commit,
+deploy — **no code changes**. See docs/bible-module.md §11 and hand the content owner
+**[docs/bible-dataset-guide.md](docs/bible-dataset-guide.md)**.
+
+---
+
 ## Scripts & verification
 
 ```bash
-npm run dev       # Development server (http://localhost:3000)
-npm run build     # Production build
-npm run start     # Serve the production build
-npm run lint      # ESLint
+npm run dev              # Development server (http://localhost:3000)
+npm run build            # Production build (runs bible:validate first via prebuild)
+npm run start            # Serve the production build
+npm run lint             # ESLint
+npm test                 # Unit tests (Bible reference/value objects, schema/validation, search)
+npm run bible:generate   # Regenerate the placeholder Bible dataset + search indexes, then validate
+npm run bible:validate   # Validate the Bible dataset (also runs automatically before every build)
 ```
 
 Before committing anything non-trivial:
@@ -225,6 +260,7 @@ Before committing anything non-trivial:
 ```bash
 npx tsc --noEmit  # strict type check — must be 0 errors
 npm run lint      # must be clean
+npm test          # unit tests — must pass
 npm run build     # must succeed; content routes are ○/● (static), not ƒ
 ```
 

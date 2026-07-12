@@ -12,7 +12,9 @@ import { join } from "node:path";
 import {
   manifestSchema,
   bookFileSchema,
+  searchIndexSchema,
   validateDataset,
+  validateSearchIndex,
   type ParsedBookFile,
   type ParsedManifest,
 } from "../src/features/bible/bible.schema.ts";
@@ -89,6 +91,23 @@ if (manifest) {
       expectedLocales: locales,
     })
   );
+
+  // --- Search indexes (data/bible/search/<locale>.json) ---
+  for (const locale of locales) {
+    const searchPath = join(DATA_DIR, "search", `${locale}.json`);
+    if (!existsSync(searchPath)) {
+      errors.push(`missing search index "search/${locale}.json"`);
+      continue;
+    }
+    const parsed = searchIndexSchema.safeParse(readJsonSafe(searchPath));
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        errors.push(`search/${locale}.json: ${issue.path.join(".")} — ${issue.message}`);
+      }
+      continue;
+    }
+    errors.push(...validateSearchIndex(manifest, parsed.data, locale));
+  }
 }
 
 // --- Report ---

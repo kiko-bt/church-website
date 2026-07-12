@@ -307,15 +307,22 @@ function writeJson(path, value) {
 }
 
 function main() {
-  // Wipe generated locale trees so stale books can never survive a regeneration.
+  // Wipe generated locale trees + the search index so stale content can never
+  // survive a regeneration.
   for (const locale of LOCALES) {
     const dir = join(DATA_DIR, locale);
     rmSync(dir, { recursive: true, force: true });
     mkdirSync(dir, { recursive: true });
   }
+  const searchDir = join(DATA_DIR, "search");
+  rmSync(searchDir, { recursive: true, force: true });
+  mkdirSync(searchDir, { recursive: true });
 
   const manifestBooks = [];
   let totalVerses = 0;
+  // Flat search entries per locale: { reference, bookName, text } — no verse
+  // text is duplicated elsewhere; this is the client search corpus.
+  const searchEntries = Object.fromEntries(LOCALES.map((locale) => [locale, []]));
 
   BOOKS.forEach((book, index) => {
     const verseCounts = verseCountsFor(book);
@@ -324,6 +331,16 @@ function main() {
     for (const locale of LOCALES) {
       const file = buildBookFile(book, locale, verseCounts);
       writeJson(join(DATA_DIR, locale, `${book.id}.json`), file);
+
+      for (const chapter of file.chapters) {
+        for (const verse of chapter.verses) {
+          searchEntries[locale].push({
+            reference: `${book.id}.${chapter.number}.${verse.number}`,
+            bookName: file.name,
+            text: verse.text,
+          });
+        }
+      }
     }
 
     manifestBooks.push({
@@ -333,6 +350,13 @@ function main() {
       chapters: verseCounts,
     });
   });
+
+  for (const locale of LOCALES) {
+    writeJson(join(searchDir, `${locale}.json`), {
+      locale,
+      entries: searchEntries[locale],
+    });
+  }
 
   const manifest = {
     version: MANIFEST_VERSION,
@@ -348,7 +372,7 @@ function main() {
   const chapters = manifestBooks.reduce((sum, b) => sum + b.chapters.length, 0);
   console.log(
     `Generated ${BOOKS.length} books, ${chapters} chapters, ${totalVerses} verses per locale ` +
-      `(${LOCALES.join(", ")}). Manifest written to src/data/bible/manifest.json.`
+      `(${LOCALES.join(", ")}). Manifest + search indexes written to src/data/bible/.`
   );
 }
 

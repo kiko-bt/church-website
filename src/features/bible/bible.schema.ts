@@ -65,8 +65,22 @@ export const manifestSchema = z.strictObject({
   books: z.array(manifestBookSchema).min(1),
 });
 
+// --- Search index (data/bible/search/<locale>.json) ---
+
+export const searchEntrySchema = z.strictObject({
+  reference: nonBlankString, // canonical "bookId.chapter.verse"
+  bookName: nonBlankString,
+  text: nonBlankString,
+});
+
+export const searchIndexSchema = z.strictObject({
+  locale: nonBlankString,
+  entries: z.array(searchEntrySchema).min(1),
+});
+
 export type ParsedBookFile = z.infer<typeof bookFileSchema>;
 export type ParsedManifest = z.infer<typeof manifestSchema>;
+export type ParsedSearchIndex = z.infer<typeof searchIndexSchema>;
 
 // ---------------------------------------------------------------------------
 // Holistic cross-file validation.
@@ -200,6 +214,75 @@ export function validateDataset(input: ValidateDatasetInput): string[] {
         });
       });
     }
+  }
+
+  return errors;
+}
+
+// ---------------------------------------------------------------------------
+// Search-index integrity (references must resolve; count must match the corpus)
+// ---------------------------------------------------------------------------
+
+// Reference parsing is inlined (rather than importing bible.reference) so this
+// module keeps `zod` as its only value import — see the note at the top.
+function parseRefInline(
+  value: string
+): { bookId: string; chapter: number; verse: number } | null {
+  const parts = value.split(".");
+  if (parts.length !== 3) return null;
+  const [bookId, chapterRaw, verseRaw] = parts;
+  if (!bookId || !/^[1-9][0-9]*$/.test(chapterRaw) || !/^[1-9][0-9]*$/.test(verseRaw)) {
+    return null;
+  }
+  return { bookId, chapter: Number(chapterRaw), verse: Number(verseRaw) };
+}
+
+export function validateSearchIndex(
+  manifest: ParsedManifest,
+  index: ParsedSearchIndex,
+  locale: string
+): string[] {
+  const errors: string[] = [];
+  const label = `search/${locale}.json`;
+
+  if (index.locale !== locale) {
+    errors.push(`${label}: locale field "${index.locale}" != "${locale}"`);
+  }
+
+  const bookById = new Map(manifest.books.map((book) => [book.id, book]));
+  const expectedCount = manifest.books.reduce(
+    (sum, book) => sum + book.chapters.reduce((s, verses) => s + verses, 0),
+    0
+  );
+  if (index.entries.length !== expectedCount) {
+    errors.push(
+      `${label}: has ${index.entries.length} entries, expected ${expectedCount} (one per verse)`
+    );
+  }
+
+  // Verify each reference resolves within the manifest. Cap reported errors so
+  // a systemic problem doesn't flood the output.
+  let invalid = 0;
+  const samples: string[] = [];
+  for (const entry of index.entries) {
+    const ref = parseRefInline(entry.reference);
+    const book = ref ? bookById.get(ref.bookId) : undefined;
+    const verseCount = ref && book ? book.chapters[ref.chapter - 1] : undefined;
+    const ok =
+      ref !== null &&
+      book !== undefined &&
+      verseCount !== undefined &&
+      ref.verse >= 1 &&
+      ref.verse <= verseCount;
+    if (!ok) {
+      invalid++;
+      if (samples.length < 5) samples.push(entry.reference);
+    }
+  }
+  if (invalid > 0) {
+    errors.push(
+      `${label}: ${invalid} entr${invalid === 1 ? "y has an" : "ies have"} inconsistent reference(s), e.g. ${samples.join(", ")}`
+    );
   }
 
   return errors;

@@ -1,10 +1,15 @@
 # Bible Module — Architecture & Engineering Rules
 
 The Bible module is the highest-priority feature of the site. This document is
-its source of truth. It must remain robust enough to support the reading
-experience today while remaining extensible for future features (search,
-cross-references, bookmarks, reading plans, sermon integration) **without a
-structural redesign**.
+the **binding rule set** — the constraints every change must uphold. It must
+remain robust enough to support the reading experience today while remaining
+extensible for future features (search, cross-references, bookmarks, reading
+plans, sermon integration) **without a structural redesign**.
+
+> Companion docs: **[docs/bible-module.md](../docs/bible-module.md)** (how the
+> module works, end to end — design, data flow, operations) ·
+> **[docs/bible-dataset-guide.md](../docs/bible-dataset-guide.md)** (plain-language
+> instructions for the content owner supplying the real Bible).
 
 ---
 
@@ -164,5 +169,24 @@ time. The build **MUST FAIL** for any of:
   chapter navigation, and localized UI.
 - Future features attach via `BibleReference` / `BibleReferenceRange` and the
   canonical slugs — additively, with no structural redesign:
-  search, cross-references, footnotes, study notes, bookmarks, highlights,
+  cross-references, footnotes, study notes, bookmarks, highlights,
   reading plans, audio, sermon references, verse sharing.
+
+---
+
+## 8. Search (implemented)
+
+- **Offline indexes are generated artifacts.** `src/data/bible/search/<locale>.json`
+  is produced by the same generator/pipeline as the rest of the dataset (one
+  entry per verse: `{ reference, bookName, text }`). Never edit by hand (§3), and
+  they are validated at build time (§6): entry count must equal the verse count
+  and every `reference` must resolve within the manifest.
+- **Search is client-side (Fuse.js), lazy-loaded.** The index is loaded only when
+  the user starts typing — it is **never** part of any initial page payload. The
+  Fuse wrapper lives in `features/bible/bible-search.ts` and is imported directly
+  by the client component; it is **not** re-exported from the server barrel (§5).
+- **The reading path stays 0-JS.** Search lives on the Bible landing page only.
+  Book and chapter (reading) pages remain pure Server Components with no
+  client-side JavaScript, fetching, or state.
+- Results link to `/<locale>/bible/<book>/<chapter>#v<verse>`, resolved from the
+  entry's canonical `reference` via `bible.reference.ts`.

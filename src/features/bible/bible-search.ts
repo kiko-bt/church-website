@@ -1,30 +1,30 @@
-// Client-side Bible search powered by Fuse.js.
-// Requires: npm install fuse.js
-// This module is imported only in Client Components ("use client").
-// It is intentionally NOT re-exported from features/bible/index.ts so the
-// feature barrel stays safe to import from Server Components.
-//
-// import Fuse, { type IFuseOptions } from "fuse.js";
-// import type { BibleSearchEntry, BibleSearchIndex } from "@/features/bible";
-//
-// const FUSE_OPTIONS: IFuseOptions<BibleSearchEntry> = {
-//   keys: ["text", "bookName", "fullReference"],
-//   threshold: 0.3,
-//   minMatchCharLength: 2,
-// };
-//
-// export function createBibleSearchIndex(data: BibleSearchIndex) {
-//   return new Fuse(data.searchIndex as BibleSearchEntry[], FUSE_OPTIONS);
-// }
-//
-// export type BibleSearchResult = {
-//   item: BibleSearchEntry;
-//   score?: number;
-// };
+import Fuse, { type IFuseOptions } from "fuse.js";
+import type { BibleSearchEntry } from "./bible.types";
 
-export type BibleSearchOptions = {
-  query: string;
-  limit?: number;
+// Client-side Bible search powered by Fuse.js.
+//
+// This module imports Fuse and is therefore a CLIENT dependency. It is
+// deliberately NOT re-exported from features/bible/index.ts so the feature
+// barrel stays safe to import from Server Components — import it directly from
+// the client search component instead.
+
+const FUSE_OPTIONS: IFuseOptions<BibleSearchEntry> = {
+  keys: ["text", "bookName"],
+  threshold: 0.3,
+  ignoreLocation: true,
+  minMatchCharLength: 2,
 };
 
-export {};
+export function createBibleSearch(
+  entries: readonly BibleSearchEntry[]
+): Fuse<BibleSearchEntry> {
+  return new Fuse(entries as BibleSearchEntry[], FUSE_OPTIONS);
+}
+
+export function searchBible(
+  fuse: Fuse<BibleSearchEntry>,
+  query: string,
+  limit = 30
+): BibleSearchEntry[] {
+  return fuse.search(query, { limit }).map((result) => result.item);
+}

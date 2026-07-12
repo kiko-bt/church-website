@@ -115,7 +115,8 @@
     "aria": {
       "chapters": "Book chapters",
       "breadcrumb": "Breadcrumb navigation",
-      "chapterNav": "Chapter navigation"
+      "chapterNav": "Chapter navigation",
+      "search": "Search the Bible"
     }
   },
   "sermons": {

@@ -11,10 +11,12 @@ import manifestJson from "@/data/bible/manifest.json";
 // ---------------------------------------------------------------------------
 // Bible data layer — the ONLY module that reads the Bible JSON files.
 //
-// Routing/metadata read the MANIFEST (tiny, no verse text). Verse text is
-// loaded lazily, one book at a time, per locale, and cached. This keeps
-// `generateStaticParams` and the landing/book pages off the full corpus, and
-// bounds build memory to "one book at a time" rather than the whole Bible.
+// Routing and metadata read the MANIFEST only (tiny, no verse text), so
+// `generateStaticParams` never touches the verse corpus. Verse text is loaded
+// lazily, per book, per locale — never as one monolithic file — and each book
+// is parsed and validated at most once, then cached for the lifetime of the
+// process. (The cache is not evicted, so a full build ends up holding the books
+// it rendered; that is expected and bounded by the dataset size.)
 //
 // Every file is validated with the shared Zod schemas as it is read, so a
 // malformed dataset fails the build here too — a second gate behind the

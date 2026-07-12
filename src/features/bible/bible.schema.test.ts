@@ -4,8 +4,10 @@ import {
   verseSchema,
   bookFileSchema,
   validateDataset,
+  validateSearchIndex,
   type ParsedBookFile,
   type ParsedManifest,
+  type ParsedSearchIndex,
 } from "./bible.schema.ts";
 
 // Proves the dataset validation rejects every failure mode required by the
@@ -185,4 +187,67 @@ test("rejects an unknown locale", () => {
   const d = makeValid();
   d.filesByLocale.de = { genesis: makeBook("genesis", "Genesis", "OT", [2, 3]) };
   assert.ok(validateDataset(d).some((e) => e.includes('unknown locale "de"')));
+});
+
+// ---------------------------------------------------------------------------
+// Search-index integrity
+// ---------------------------------------------------------------------------
+
+// The valid dataset's manifest describes genesis [2,3] + john [1] = 6 verses.
+const VALID_REFERENCES = [
+  "genesis.1.1",
+  "genesis.1.2",
+  "genesis.2.1",
+  "genesis.2.2",
+  "genesis.2.3",
+  "john.1.1",
+];
+
+function makeSearchIndex(
+  locale: string,
+  references: readonly string[]
+): ParsedSearchIndex {
+  return {
+    locale,
+    entries: references.map((reference) => ({
+      reference,
+      bookName: reference.split(".")[0],
+      text: `Placeholder for ${reference}.`,
+    })),
+  };
+}
+
+test("accepts a well-formed search index", () => {
+  const { manifest } = makeValid();
+  const index = makeSearchIndex("en", VALID_REFERENCES);
+  assert.deepEqual(validateSearchIndex(manifest, index, "en"), []);
+});
+
+test("rejects a search index whose entry count != verse count", () => {
+  const { manifest } = makeValid();
+  const index = makeSearchIndex("en", VALID_REFERENCES.slice(0, 5));
+  assert.ok(
+    validateSearchIndex(manifest, index, "en").some((e) =>
+      e.includes("expected 6")
+    )
+  );
+});
+
+test("rejects a search index with an out-of-range reference", () => {
+  const { manifest } = makeValid();
+  const broken = [...VALID_REFERENCES.slice(0, 5), "genesis.9.9"];
+  const index = makeSearchIndex("en", broken);
+  assert.ok(
+    validateSearchIndex(manifest, index, "en").some((e) =>
+      e.includes("inconsistent reference")
+    )
+  );
+});
+
+test("rejects a search index whose locale field is wrong", () => {
+  const { manifest } = makeValid();
+  const index = makeSearchIndex("de", VALID_REFERENCES);
+  assert.ok(
+    validateSearchIndex(manifest, index, "en").some((e) => e.includes("locale field"))
+  );
 });
