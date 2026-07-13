@@ -14,14 +14,14 @@ import { cn } from "@/lib/utils/cn";
 // defaulting to `siteConfig` only when the CMS is unconfigured.
 const LOGO_SRC = "/images/branding/church-logo.png";
 
-// Intrinsic source dimensions are 1184 × 864 (aspect ratio ≈ 1.37:1). Every
-// entry below preserves that ratio exactly, so next/image reserves the correct
-// box and the logo never causes layout shift (CLS). Heights drive the scale:
+// Intrinsic source dimensions are 480 × 480 (aspect ratio 1:1). Every entry
+// below preserves that ratio exactly, so next/image reserves the correct box
+// and the logo never causes layout shift (CLS). Heights drive the scale:
 // sm ≈ 32px tall, md ≈ 44px tall, lg ≈ 80px tall.
 const LOGO_SIZES = {
-  sm: { width: 44, height: 32 },
-  md: { width: 60, height: 44 },
-  lg: { width: 110, height: 80 },
+  sm: { width: 32, height: 32 },
+  md: { width: 44, height: 44 },
+  lg: { width: 80, height: 80 },
 } as const;
 
 type LogoProps = {

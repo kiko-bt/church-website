@@ -20,21 +20,29 @@ export async function Header({ locale }: HeaderProps) {
   const name =
     settings?.churchName ?? (locale === "mk" ? siteConfig.name : siteConfig.nameEn);
 
+  // Short brand wordmark shown beside the cross logo. The full church name stays
+  // the link's accessible name (aria-label); this is the visible site title.
+  const brandTitle = locale === "mk" ? "Евангелие Христово" : "Gospel of Christ";
+
   return (
     <header className="sticky top-0 z-50 border-b border-soft-gold/30 bg-background/95 backdrop-blur-sm">
       <SectionContainer className="flex h-16 items-center justify-between gap-4">
-        {/* Brand — the lockup already contains the church name, so no adjacent
-            text is rendered (avoids duplication and any width pressure). The
-            link's aria-label carries the localized name as the accessible name. */}
+        {/* Brand — cross logo + site title as one responsive unit. The title is
+            hidden on the smallest phones (< sm) so it can never overflow, wrap,
+            or crowd the actions; from sm up it sits beside the logo. The link's
+            aria-label carries the full localized name as the accessible name. */}
         <Link
           href={`/${locale}`}
           aria-label={name}
           className={
-            "shrink-0 rounded-sm transition-opacity hover:opacity-90 " +
+            "flex shrink-0 items-center gap-2 rounded-sm transition-opacity hover:opacity-90 " +
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
           }
         >
           <Logo size="md" priority label={name} />
+          <span className="hidden whitespace-nowrap font-heading text-lg font-semibold leading-none text-text-primary sm:inline-block">
+            {brandTitle}
+          </span>
         </Link>
 
         {/* Desktop navigation — hidden below lg, where it has room to fit */}

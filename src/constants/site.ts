@@ -3,7 +3,7 @@ export const siteConfig = {
   nameEn: "Church of the Gospel of Christ - Bitola",
   shortName: "ХЕ Битола",
   shortNameEn: "CGC Bitola",
-  description: "Добродојдовте во Црква Евангелие Христово - Битола",
+  description: "Добредојдовте во Црква Евангелие Христово - Битола",
   descriptionEn:
     "Official website of the Church of the Gospel of Christ in Bitola, Macedonia.",
   // Canonical/OG/hreflang base. Set NEXT_PUBLIC_SITE_URL in every environment;
