@@ -95,9 +95,10 @@ of truth is [`.env.example`](../.env.example); this table is the production view
 | `NEXT_PUBLIC_SANITY_DATASET` | Vercel + local | **Public** | Production, Preview | Sanity dataset name. Value: `production`. |
 | `NEXT_PUBLIC_SITE_URL` | Vercel + local | **Public** | Production (`https://www.hristovoevangelie.org`), Preview, local (`http://localhost:3000`) | Base URL for canonical, hreflang, Open Graph, `robots.ts`, `sitemap.ts` (`src/constants/site.ts`, `src/lib/seo/metadata.ts`). **Must be the `www` host** (the canonical one). Wrong value ⇒ SEO points at the wrong host — a real incident we hit: it was accidentally left as `http://localhost:3000` and every canonical tag pointed at localhost until corrected + redeployed (see §9). |
 | `SANITY_REVALIDATE_SECRET` | Vercel + Sanity | **SECRET** | Production (Preview optional) | Shared secret guarding `/api/revalidate` (`route.ts`). Must be **identical** to the Sanity webhook header (§4–5). |
-| `RESEND_TO_EMAIL` | Vercel + local | secret-ish | Production | Public contact address shown on the site (`ContactInfo`) unless `churchSettings.email` is set in the CMS. Set to the church's real inbox. |
+| `RESEND_TO_EMAIL` | Vercel + local | secret-ish | Production | **Recipient of contact-form messages** (the church's real inbox) — the contact server action sends here. Also the public contact address shown on the site (`ContactInfo`) unless `churchSettings.email` is set in the CMS. **Change this var to change who receives contact messages** (then redeploy). |
 | `SANITY_API_TOKEN` | — | **SECRET** | *none (reserved)* | Unused by the read client (public CDN reads). Only if drafts / a private dataset are added later — use a **read-only** token then. |
-| `RESEND_API_KEY` / `RESEND_FROM_EMAIL` | — | **SECRET** | *none yet* | For the **planned** contact-form server action (Resend). Leave unset until built. |
+| `RESEND_API_KEY` | Vercel | **SECRET** | Production | Powers the contact-form server action (`src/features/contact`). Create in Resend → API Keys. Server-only. Unset ⇒ the form fails gracefully (generic error to the visitor, real reason logged), page never crashes. |
+| `RESEND_FROM_EMAIL` | Vercel | **SECRET** | Production | The contact email's **From** address. MUST be on a domain verified in Resend (Resend → Domains), or sends are rejected. |
 
 Rules of thumb:
 - `NEXT_PUBLIC_*` are inlined into the browser bundle **at build time** — they are
@@ -350,8 +351,9 @@ Diagnose in order:
 - **No write/management tokens** anywhere in the site. Reads are public CDN reads.
 - **Published perspective only** — drafts never reach production.
 - **Least privilege, future-ready:** if a private dataset or drafts are needed
-  later, add a **read-only** `SANITY_API_TOKEN` (server-only). If the contact form
-  ships, `RESEND_API_KEY` stays server-only behind the Zod-validated action.
+  later, add a **read-only** `SANITY_API_TOKEN` (server-only). `RESEND_API_KEY`
+  stays server-only behind the Zod-validated contact server action; provider
+  errors are logged, never returned to the browser.
 - **Input validation:** `/api/revalidate` Zod-parses its body and returns generic
   errors (no internals leaked).
 
@@ -368,6 +370,8 @@ as of go-live** — keep the list for re-deployments and audits.
 - [x] Vercel env vars set for **Production**: `NEXT_PUBLIC_SANITY_PROJECT_ID`,
       `NEXT_PUBLIC_SANITY_DATASET`, `NEXT_PUBLIC_SITE_URL=https://www.hristovoevangelie.org`,
       `SANITY_REVALIDATE_SECRET`, `RESEND_TO_EMAIL` (§3)
+- [ ] Contact form sending: set `RESEND_API_KEY` + `RESEND_FROM_EMAIL` (verified
+      domain) in Vercel **Production**; `RESEND_TO_EMAIL` is the recipient (§3)
 - [x] Production deploy is green (§2)
 - [x] Sanity webhook created → **`www`** URL, header secret, `{ _type }`
       projection, on create/update/delete (§5)

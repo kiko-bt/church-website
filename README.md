@@ -51,11 +51,12 @@ Content modules and their data sources:
 | Books / PDFs | Sanity (`book`) | SSG + ISR |
 | Gallery albums | Sanity (`galleryAlbum`) | SSG + ISR |
 | Bible (text + PDFs) | Local JSON (never Sanity) | SSG |
-| Contact form | _Planned_ (React Hook Form + Zod + Resend) | — |
+| Contact form | Zod + Resend server action (`features/contact`) | Static page + action |
 
 The Bible module deliberately keeps all verse data and PDFs local to the codebase
-(see `CLAUDE.md`). The contact form is scaffolded (`features/contact` Zod schema)
-but not yet built — the contact page currently directs visitors to email.
+(see `CLAUDE.md`). The contact form validates with a shared Zod schema on both the
+client and the server, then sends the message to the church via a Resend server
+action (see `RESEND_*` in [.env.example](.env.example)).
 
 ---
 
@@ -129,7 +130,9 @@ See **[.env.example](.env.example)** for the annotated, authoritative list. Summ
 | `NEXT_PUBLIC_SANITY_DATASET` | defaults to `production` | Sanity dataset name |
 | `NEXT_PUBLIC_SITE_URL` | for correct SEO | Base URL for canonical / hreflang / OG / sitemap (the `www` host in production) |
 | `SANITY_REVALIDATE_SECRET` | for the webhook | Shared secret guarding `/api/revalidate` |
-| `RESEND_TO_EMAIL` | public contact address | Shown on the site unless `churchSettings.email` is set in the CMS |
+| `RESEND_TO_EMAIL` | contact recipient | Inbox that receives contact-form messages; also the public address shown on the site unless `churchSettings.email` is set. Change it to change the recipient |
+| `RESEND_API_KEY` | to send contact email | Resend API key for the contact server action (server-only). Unset ⇒ form fails gracefully |
+| `RESEND_FROM_EMAIL` | to send contact email | "From" address; must be on a Resend-verified domain |
 | `SANITY_API_TOKEN` | no (reserved) | Unused by the read client (public CDN reads); only for future drafts / a private dataset |
 
 The read client reads the **published** dataset over the public CDN, so the dataset
@@ -294,7 +297,6 @@ dynamic, a request-time API (headers/cookies) or an uncached fetch has crept in.
 
 Realistic, deferred enhancements (not blockers):
 
-- **Contact form** — wire the existing `features/contact` Zod schema to a Resend server action.
 - **`churchSettings.logo`** — project the modeled field and wire it into `Logo`.
 - **`featured` highlights** — the flag is mapped end-to-end on book/sermon/album, ready
   to surface featured items on the homepage.

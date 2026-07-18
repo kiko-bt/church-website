@@ -5,6 +5,7 @@ import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ContactInfo } from "@/components/contact/ContactInfo";
+import { ContactForm } from "@/components/contact/ContactForm";
 
 type ContactPageProps = {
   params: Promise<{ locale: Locale }>;
@@ -35,13 +36,11 @@ export default async function ContactPage({ params }: ContactPageProps) {
           <p className="text-lg leading-relaxed text-text-primary/80">
             {t("intro")}
           </p>
+          <div className="mt-8">
+            <ContactForm />
+          </div>
         </div>
 
-        {/*
-          Future phase: the contact form (React Hook Form + Zod + Resend) will
-          live here. It is intentionally omitted in this phase — visitors are
-          directed to email via the contact details.
-        */}
         <ContactInfo />
       </div>
     </LayoutShell>
