@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import { BookOpen } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -13,6 +12,11 @@ type BookCardProps = {
 /**
  * Presentational card for a single book in the listing. `book` is a mapped
  * domain model from `getBooks()` (@/features/books).
+ *
+ * Books are downloadable resources, so the whole card acts as the download
+ * trigger: clicking it saves the PDF directly (Sanity's `?dl=` attachment URL)
+ * rather than navigating to an intermediate page. A book without a PDF renders
+ * as a non-interactive card with a "coming soon" badge — never a broken link.
  *
  * The cover is a resolved Sanity CDN URL (dereferenced in GROQ), rendered with
  * next/image inside a fixed 3:4 box (no CLS). Books without a cover fall back
@@ -31,11 +35,10 @@ export async function BookCard({ book, locale }: BookCardProps) {
       }).format(new Date(book.publishedAt))
     : null;
 
-  return (
-    <Link
-      href={`/${locale}/books/${book.slug}`}
-      className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
-    >
+  // Shared visual body — identical whether or not the book is downloadable, so
+  // the design stays consistent across both states.
+  const content = (
+    <>
       <div className="relative aspect-[3/4] overflow-hidden bg-warm-bg">
         {book.coverImageUrl ? (
           <Image
@@ -64,12 +67,39 @@ export async function BookCard({ book, locale }: BookCardProps) {
         {formattedDate && (
           <p className="mt-1 text-xs text-text-primary/50">{formattedDate}</p>
         )}
+        {!book.pdfDownloadUrl && (
+          <p className="mt-3 inline-flex w-fit items-center rounded-sm bg-warm-bg px-2.5 py-1 text-xs font-medium text-text-primary/70">
+            {t("comingSoon")}
+          </p>
+        )}
         {book.description && (
           <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-text-primary/75">
             {book.description}
           </p>
         )}
       </div>
-    </Link>
+    </>
+  );
+
+  // No PDF → non-interactive card (no navigation, no 404).
+  if (!book.pdfDownloadUrl) {
+    return (
+      <div className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background">
+        {content}
+      </div>
+    );
+  }
+
+  // Whole card downloads the PDF. `download` + Sanity's `?dl=` force an
+  // attachment; same-tab keeps the browser on the listing.
+  return (
+    <a
+      href={book.pdfDownloadUrl}
+      download
+      aria-label={`${t("downloadPdf")}: ${book.title}`}
+      className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+    >
+      {content}
+    </a>
   );
 }

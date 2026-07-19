@@ -11,6 +11,7 @@ export const sermonListQuery = `
     description,
     audioUrl,
     videoUrl,
+    bibleReferences,
     featured
   }
 ` as const;
@@ -25,6 +26,7 @@ export const sermonBySlugQuery = `
     description,
     audioUrl,
     videoUrl,
+    bibleReferences,
     featured
   }
 ` as const;

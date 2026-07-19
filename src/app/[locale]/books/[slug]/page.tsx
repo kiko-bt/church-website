@@ -96,14 +96,26 @@ export default async function BookPage({ params }: BookPageProps) {
               </p>
             )}
 
-            {book.pdfUrl && (
-              <div className="mt-6">
-                <Button href={book.pdfUrl} external variant="primary" size="lg">
+            <div className="mt-6">
+              {book.pdfDownloadUrl ? (
+                <Button
+                  href={book.pdfDownloadUrl}
+                  external
+                  download
+                  variant="primary"
+                  size="lg"
+                >
                   <Download size={18} aria-hidden="true" />
                   {t("downloadPdf")}
                 </Button>
-              </div>
-            )}
+              ) : (
+                // Broken/missing PDF reference → disabled, never a dead link.
+                <Button variant="primary" size="lg" disabled>
+                  <Download size={18} aria-hidden="true" />
+                  {t("comingSoon")}
+                </Button>
+              )}
+            </div>
 
             {book.description && (
               <div className="mt-8 whitespace-pre-line text-lg leading-relaxed text-text-primary/80">

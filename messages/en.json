@@ -128,6 +128,7 @@
     "date": "Date",
     "listen": "Listen",
     "watch": "Watch",
+    "references": "Scripture references",
     "empty": {
       "title": "No sermons yet",
       "description": "Sermons will appear here once they are published. Please check back soon."
@@ -138,6 +139,7 @@
     "subtitle": "Read and download books from our library",
     "metaDescription": "Browse and download books from the Church of the Gospel of Christ in Bitola.",
     "downloadPdf": "Download PDF",
+    "comingSoon": "Coming soon",
     "by": "Author",
     "empty": {
       "title": "No books yet",

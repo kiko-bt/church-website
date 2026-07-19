@@ -26,6 +26,10 @@ export type Book = {
   readonly author: string;
   readonly description?: string;
   readonly pdfUrl: string | null;
+  // Same asset URL with Sanity's `?dl=` download flag, so clicking it saves the
+  // file (Content-Disposition: attachment) instead of opening it inline. `null`
+  // whenever `pdfUrl` is (a book with no PDF yet). See books.mappers.ts.
+  readonly pdfDownloadUrl: string | null;
   readonly coverImageUrl?: string;
   readonly coverImageAlt?: string;
   readonly publishedAt?: string;

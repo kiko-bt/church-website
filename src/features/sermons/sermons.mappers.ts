@@ -11,6 +11,7 @@ export function mapSermon(doc: SermonDocument): Sermon {
     description: doc.description,
     audioUrl: doc.audioUrl,
     videoUrl: doc.videoUrl,
+    bibleReferences: doc.bibleReferences ?? [],
     featured: doc.featured ?? false,
   };
 }

@@ -11,6 +11,7 @@ export type SermonDocument = {
   readonly description?: string;
   readonly audioUrl?: string;
   readonly videoUrl?: string;
+  readonly bibleReferences?: readonly string[] | null;
   readonly featured?: boolean;
 };
 
@@ -25,5 +26,9 @@ export type Sermon = {
   readonly description?: string;
   readonly audioUrl?: string;
   readonly videoUrl?: string;
+  // Free-text scripture citations (e.g. "John 3:16"), always defined (may be
+  // empty). Displayed on the detail page; kept as text so the preacher can
+  // enter references in any form without a rigid parser.
+  readonly bibleReferences: readonly string[];
   readonly featured: boolean;
 };

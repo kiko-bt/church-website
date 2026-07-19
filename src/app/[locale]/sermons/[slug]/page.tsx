@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Headphones, Video } from "lucide-react";
+import { BookOpen, Headphones, Video } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/constants/locales";
-import { getSermons, getSermonBySlug } from "@/features/sermons";
+import {
+  getSermons,
+  getSermonBySlug,
+  getYouTubeEmbed,
+} from "@/features/sermons";
 import { generateBaseMetadata, toMetaDescription } from "@/lib/seo/metadata";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { Button } from "@/components/ui/Button";
@@ -57,6 +61,13 @@ export default async function SermonPage({ params }: SermonPageProps) {
     day: "numeric",
   }).format(new Date(sermon.date));
 
+  // A YouTube video is embedded inline; any other video URL keeps the external
+  // "Watch" button so the media is never lost. `watchUrl` is set only when the
+  // video is a non-YouTube link, so the button and its container can narrow off
+  // a single string | undefined.
+  const youTube = getYouTubeEmbed(sermon.videoUrl);
+  const watchUrl = youTube ? undefined : sermon.videoUrl;
+
   return (
     <LayoutShell>
       <article className="py-8">
@@ -73,8 +84,25 @@ export default async function SermonPage({ params }: SermonPageProps) {
             </span>
           </div>
 
-          {/* External media links — rendered only for the URLs that exist. */}
-          {(sermon.audioUrl || sermon.videoUrl) && (
+          {/* Inline YouTube player (privacy-enhanced host). Responsive 16:9
+              box keeps layout stable and avoids CLS. */}
+          {youTube && (
+            <div className="mt-6 aspect-video w-full overflow-hidden rounded-md border border-soft-gold/40 bg-warm-bg">
+              <iframe
+                src={youTube.embedUrl}
+                title={sermon.title}
+                className="h-full w-full"
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          )}
+
+          {/* External media links — audio, and video that isn't an embeddable
+              YouTube link. */}
+          {(sermon.audioUrl || watchUrl) && (
             <div className="mt-6 flex flex-wrap gap-3">
               {sermon.audioUrl && (
                 <Button
@@ -87,13 +115,8 @@ export default async function SermonPage({ params }: SermonPageProps) {
                   {t("listen")}
                 </Button>
               )}
-              {sermon.videoUrl && (
-                <Button
-                  href={sermon.videoUrl}
-                  external
-                  variant="outline"
-                  size="lg"
-                >
+              {watchUrl && (
+                <Button href={watchUrl} external variant="outline" size="lg">
                   <Video size={18} aria-hidden="true" />
                   {t("watch")}
                 </Button>
@@ -104,6 +127,26 @@ export default async function SermonPage({ params }: SermonPageProps) {
           {sermon.description && (
             <div className="mt-8 whitespace-pre-line text-lg leading-relaxed text-text-primary/80">
               {sermon.description}
+            </div>
+          )}
+
+          {/* Scripture references, shown only when the sermon has any. */}
+          {sermon.bibleReferences.length > 0 && (
+            <div className="mt-8">
+              <h2 className="font-heading text-sm font-semibold uppercase tracking-wide text-text-primary/60">
+                {t("references")}
+              </h2>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {sermon.bibleReferences.map((reference) => (
+                  <li
+                    key={reference}
+                    className="inline-flex items-center gap-1.5 rounded-sm bg-warm-bg px-2.5 py-1 text-sm font-medium text-text-primary/80"
+                  >
+                    <BookOpen size={14} aria-hidden="true" />
+                    {reference}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>

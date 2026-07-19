@@ -1,5 +1,6 @@
 import { defineType, defineField } from "sanity";
 import { BookOpen } from "lucide-react";
+import { mkSlugify, isValidSlug } from "../lib/slug";
 
 // A downloadable book: metadata + a PDF file asset + an optional cover image.
 // Title/author/description are single-language (Macedonian) content.
@@ -22,8 +23,8 @@ export const book = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
-      options: { source: "title", maxLength: 96 },
-      validation: (rule) => rule.required(),
+      options: { source: "title", maxLength: 96, slugify: mkSlugify },
+      validation: (rule) => rule.required().custom(isValidSlug),
     }),
     defineField({
       name: "author",

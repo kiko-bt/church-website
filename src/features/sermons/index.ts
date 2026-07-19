@@ -2,4 +2,5 @@
 export * from "./sermons.queries";
 export * from "./sermons.mappers";
 export * from "./sermons.data";
+export * from "./sermons.video";
 export type * from "./sermons.types";
