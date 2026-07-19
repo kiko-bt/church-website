@@ -175,6 +175,7 @@ src/
 
 scripts/
 ├── generate-placeholder-bible.mjs   # Writes placeholder BOOK FILES only
+├── import-bible-book.ts             # Imports ONE real book: cleans mk, fetches matching en
 ├── build-bible-artifacts.ts         # Derives manifest + search FROM the book files
 └── validate-bible.ts                # The build gate
 ```
@@ -318,6 +319,38 @@ validates the whole dataset.
 The content owner's plain-language instructions for writing the files are in
 **[bible-dataset-guide.md](./bible-dataset-guide.md)**.
 
+### 11.1 Importing one real book at a time
+
+The content owner delivers the Bible **book by book**, in Macedonian, following
+`bible-dataset-guide.md`. `scripts/import-bible-book.ts` (`npm run bible:import`) automates
+turning that single delivery into a validated `mk/*.json` + `en/*.json` pair:
+
+```bash
+npm run bible:import -- <book-id> <path-to-mk-source-file.json>
+npm run bible:build
+```
+
+What it does, and does **not** do:
+
+- Cleans the Macedonian file: strips any field the schema doesn't allow (§3 below), checks
+  chapter/verse numbering is contiguous.
+- **Never machine-translates.** Per business rule §3.3, mk and en must be two real, independent
+  source translations. For English it fetches the matching book from the **World English Bible**
+  (WEB) — a real, public-domain translation — from `bible-api.com`, chapter by chapter. No verse
+  text is ever passed through an LLM.
+- Verifies the mk and en chapter/verse counts match exactly (shared versification, §5 "Why one
+  manifest for both locales"). If they don't, it writes **nothing** for that book and prints
+  exactly which chapters disagree — that needs a human to resolve, not an automatic guess.
+- Handles the well-known **critical-text omissions** (Matthew 17:21, Mark 7:16, John 5:4, and a
+  short fixed list of similar verses — see `KNOWN_OMITTED_VERSES` in the script): if the
+  Macedonian source skips exactly one of these numbers, it inserts a bracketed editorial note so
+  numbering stays contiguous and aligned with the WEB. Any **other** gap is treated as a likely
+  typo in the source and stops the script — it is never silently patched.
+- Does **not** run `bible:build` for you — run it yourself afterward and read its output.
+
+This script only ever writes `src/data/bible/mk/<id>.json` and `src/data/bible/en/<id>.json`. It
+never touches `manifest.json` or `search/*.json` (§3) — those still only come from `bible:build`.
+
 ---
 
 ## 12. Performance
@@ -355,6 +388,7 @@ Each attaches through the `Reference` / `ReferenceRange` value objects and the c
 ## Commands
 
 ```bash
+npm run bible:import -- <book-id> <path>   # import ONE real book (mk clean + matching en), see §11.1
 npm run bible:build      # re-derive manifest + search from the book files, then validate
 npm run bible:generate   # (placeholder only) regenerate placeholder book files, then bible:build
 npm run bible:validate   # validate the dataset (runs automatically before every build)

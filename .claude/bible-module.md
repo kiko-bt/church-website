@@ -132,6 +132,20 @@ Replace the JSON files under src/data/bible/  →  Commit  →  Deploy
 
 No application code changes. The architecture is translation-agnostic.
 
+### Real-book intake tool
+
+`scripts/import-bible-book.ts` (`npm run bible:import -- <book-id> <path>`) is the standing
+tool for turning one preacher-supplied Macedonian book into a validated `mk`/`en` pair — see
+[docs/bible-module.md §11.1](../docs/bible-module.md#111-importing-one-real-book-at-a-time) for
+the full behavior. Two rules it exists to enforce, that any future change to it MUST preserve:
+
+- **English is never machine-translated from the Macedonian text.** It is fetched from a real,
+  independent public-domain source (currently the World English Bible via bible-api.com), per
+  §1's "different source Bibles" rule. Verse text must never be passed through an LLM.
+- **Only a fixed, known list of critical-text verse omissions may be auto-healed**
+  (`KNOWN_OMITTED_VERSES` in the script). Any other missing verse number must hard-stop the
+  script — it is very likely a real error in the supplied source, not something to paper over.
+
 ---
 
 ## 5. Data access boundary

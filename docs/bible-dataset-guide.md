@@ -72,7 +72,11 @@ Following these rules means it passes the first time:
 
 1. **Every verse must have text.** No empty verses, no blank spaces only.
 2. **Numbers start at 1 and go up one at a time** — chapters 1, 2, 3… and verses 1, 2,
-   3… **Do not skip a number and do not repeat one.**
+   3… **Do not skip a number and do not repeat one.** (The one exception: a handful of New
+   Testament verses — e.g. Matthew 17:21, Mark 7:16 — are skipped by some modern translations
+   because they're considered later additions not in the earliest manuscripts. If your
+   translation does this, that's fine — just tell your developer which verse it is, they know
+   how to handle it. Don't skip a number for any other reason.)
 3. **Every book must be present**, in both languages — all 39 Old Testament books and
    all 27 New Testament books.
 4. **The `id` must match the list in §7 exactly**, and must be the **same in both
