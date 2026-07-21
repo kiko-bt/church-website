@@ -57,18 +57,23 @@ export const churchSettings = defineType({
     }),
     defineField({
       name: "serviceSchedule",
-      title: "Service schedule (MK)",
+      title: "Service times (MK)",
       type: "text",
       rows: 3,
       group: "contact",
-      description: "When services are held. Shown on the contact page.",
+      description:
+        'Shown on the contact page under "Време на богослужби". Write it exactly as visitors should read it, e.g. "Секоја недела во 10:00". Use a new line for each additional service.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: "serviceSchedule_en",
-      title: "Service schedule (EN)",
+      title: "Service times (EN)",
       type: "text",
       rows: 3,
       group: "contact",
+      description:
+        'English version of the same text, e.g. "Every Sunday at 10:00". Always update this together with the Macedonian text — the English page reads this field only.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: "social",
