@@ -32,48 +32,12 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { bookFileSchema, type ParsedBookFile } from "../src/features/bible/bible.schema.ts";
 import { BIBLE_CANON } from "../src/features/bible/bible.constants.ts";
+// The known critical-text omissions and the editorial note used to heal them
+// live in one place so this script and scripts/migrate-client-bible.ts can
+// never drift apart. See scripts/bible-omissions.ts for the full rationale.
+import { KNOWN_OMITTED_VERSES, OMITTED_NOTE_MK } from "./bible-omissions.ts";
 
 const DATA_DIR = resolve(process.cwd(), "src", "data", "bible");
-
-// Verse numbers that modern critical-text translations (which the preacher's
-// Macedonian text appears to follow) commonly omit as later scribal
-// additions, while traditional/Majority-Text translations (like the WEB)
-// keep them. When the Macedonian file skips exactly one of these numbers,
-// we insert a bracketed note instead of treating it as a data error.
-//
-// This list only covers single-verse gaps. Larger disputed passages (the
-// Mark 16:9-20 long ending, John 7:53-8:11) are NOT handled here — if the
-// preacher's text is missing one of those, the script will stop and you
-// must resolve it by hand.
-const KNOWN_OMITTED_VERSES: Record<string, ReadonlyArray<{ chapter: number; verse: number }>> = {
-  matthew: [
-    { chapter: 17, verse: 21 },
-    { chapter: 18, verse: 11 },
-    { chapter: 21, verse: 44 },
-    { chapter: 23, verse: 14 },
-  ],
-  mark: [
-    { chapter: 7, verse: 16 },
-    { chapter: 9, verse: 44 },
-    { chapter: 9, verse: 46 },
-    { chapter: 11, verse: 26 },
-    { chapter: 15, verse: 28 },
-  ],
-  luke: [
-    { chapter: 17, verse: 36 },
-    { chapter: 23, verse: 17 },
-  ],
-  john: [{ chapter: 5, verse: 4 }],
-  acts: [
-    { chapter: 8, verse: 37 },
-    { chapter: 15, verse: 34 },
-    { chapter: 24, verse: 7 },
-    { chapter: 28, verse: 29 },
-  ],
-  romans: [{ chapter: 16, verse: 24 }],
-};
-
-const OMITTED_NOTE_MK = "[Овој стих не се наоѓа во најстарите ракописи.]";
 
 type RawVerse = { number: number; text: string; [key: string]: unknown };
 type RawChapter = { number: number; verses: RawVerse[]; [key: string]: unknown };

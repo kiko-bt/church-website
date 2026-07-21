@@ -16,7 +16,8 @@
     "bible:generate": "node scripts/generate-placeholder-bible.mjs && node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/build-bible-artifacts.ts placeholder && npm run bible:validate",
     "bible:build": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/build-bible-artifacts.ts && npm run bible:validate",
     "bible:validate": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/validate-bible.ts",
-    "bible:import": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/import-bible-book.ts"
+    "bible:import": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/import-bible-book.ts",
+    "bible:migrate": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/migrate-client-bible.ts"
   },
   "dependencies": {
     "@portabletext/react": "^6.2.0",

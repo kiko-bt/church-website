@@ -66,11 +66,19 @@ src/data/bible/
   counts). It relies on the assumption that the `mk` and `en` datasets share
   versification — which the placeholder guarantees by construction, and which
   holds for typical Protestant-canon translations.
+  - **Verified against the real dataset.** When the preacher's complete Macedonian
+    Bible was migrated (`npm run bible:migrate`), all 1,189 chapters were compared
+    against the WEB English chapter by chapter: **zero divergence**. The delivered
+    Macedonian follows traditional (KJV/WEB) versification — including the cases
+    that most often differ, such as the Psalm superscriptions, Joel, and Malachi —
+    so the single-manifest model holds for the production dataset.
   - **Future caveat:** if a client-supplied translation ever diverges in
     versification (different verse counts in some chapters), this single-manifest
     model must be revisited — most likely by moving to **per-locale manifests**
     (`manifest.<locale>.json`). This is the one place versification divergence
     would surface; see §1 ("never assume verse N aligns across languages").
+    `bible:migrate` and `bible:import` both hard-stop rather than write a
+    diverging pair, so this can never reach the dataset silently.
 
 ---
 
@@ -132,19 +140,31 @@ Replace the JSON files under src/data/bible/  →  Commit  →  Deploy
 
 No application code changes. The architecture is translation-agnostic.
 
-### Real-book intake tool
+### Real-book intake tools
 
-`scripts/import-bible-book.ts` (`npm run bible:import -- <book-id> <path>`) is the standing
-tool for turning one preacher-supplied Macedonian book into a validated `mk`/`en` pair — see
-[docs/bible-module.md §11.1](../docs/bible-module.md#111-importing-one-real-book-at-a-time) for
-the full behavior. Two rules it exists to enforce, that any future change to it MUST preserve:
+Two scripts turn preacher-supplied Macedonian text into a validated `mk`/`en` pair:
+
+- `scripts/import-bible-book.ts` (`npm run bible:import -- <book-id> <path>`) — **one book**;
+  see [docs/bible-module.md §11.1](../docs/bible-module.md#111-importing-one-real-book-at-a-time).
+- `scripts/migrate-client-bible.ts` (`npm run bible:migrate -- <ot.json> <nt.json>`) — a
+  **complete two-file delivery** (one file per testament); see
+  [docs/bible-module.md §11.2](../docs/bible-module.md#112-migrating-a-complete-two-file-delivery).
+
+Rules they exist to enforce, that any future change to **either** MUST preserve:
 
 - **English is never machine-translated from the Macedonian text.** It is fetched from a real,
   independent public-domain source (currently the World English Bible via bible-api.com), per
   §1's "different source Bibles" rule. Verse text must never be passed through an LLM.
 - **Only a fixed, known list of critical-text verse omissions may be auto-healed**
-  (`KNOWN_OMITTED_VERSES` in the script). Any other missing verse number must hard-stop the
-  script — it is very likely a real error in the supplied source, not something to paper over.
+  (`KNOWN_OMITTED_VERSES`, shared by both scripts via `scripts/bible-omissions.ts` so they can
+  never drift apart). Any other missing verse number must hard-stop the script — it is very
+  likely a real error in the supplied source, not something to paper over.
+- **Nothing is written unless mk and en versification agrees** chapter by chapter. A divergence
+  is a human decision (see §2's per-locale-manifest caveat), never an automatic fix.
+- **Verse text is transformed only structurally.** The one sanctioned character-level repair is
+  Latin→Cyrillic homoglyph correction inside otherwise-Cyrillic words (the delivered NT encoded
+  `сѐ`/`нѐ` with Latin `è` U+00E8). Any new text-altering rule needs explicit approval and must
+  be reported per-occurrence.
 
 ---
 

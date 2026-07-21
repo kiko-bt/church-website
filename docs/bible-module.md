@@ -351,6 +351,80 @@ What it does, and does **not** do:
 This script only ever writes `src/data/bible/mk/<id>.json` and `src/data/bible/en/<id>.json`. It
 never touches `manifest.json` or `search/*.json` (§3) — those still only come from `bible:build`.
 
+### 11.2 Migrating a complete two-file delivery
+
+The content owner ultimately delivered the **whole Bible at once**, as two files — one per
+testament (`starzavet.json`, `novzavet.json`) — rather than book by book.
+`scripts/migrate-client-bible.ts` (`npm run bible:migrate`) is the bulk counterpart to §11.1:
+
+```bash
+npm run bible:migrate -- ./starzavet.json ./novzavet.json
+npm run bible:build
+```
+
+> **The two delivery files are no longer in the repository.** They were ~9 MB of verse text that
+> is now fully represented (and validated) under `src/data/bible/`, so committing them would have
+> duplicated the dataset. Everything the migration *drops* — each book's `shortName` and `slug`,
+> the delivered ordering, and the file-level metadata including `textBasis`
+> ("Nestle-Aland 28 — современо јазично прочистена верзија") — was extracted first into
+> **[bible-delivery-provenance.json](./bible-delivery-provenance.json)** (19 KB), along with the
+> SHA-256 of each original file. Re-running `bible:migrate` therefore requires obtaining the
+> originals from the content owner again; the checksums in the provenance file let you confirm
+> you received the same delivery.
+
+It enforces the **same rules** as `bible:import` — same schema, same canon, the same
+`KNOWN_OMITTED_VERSES` healing (both scripts import it from `scripts/bible-omissions.ts`, so
+they can never drift apart), the same real-WEB English fetch, and the same
+"nothing is written unless mk and en versification agrees" guarantee. On top of that it:
+
+- Splits the two files into 66 per-book files and drops the delivery's extra fields
+  (`shortName`, `slug`, `order`, and the file-level metadata block).
+- Maps the delivery's `"old"` / `"new"` testament vocabulary to the project's `OT` / `NT`.
+- Corrects non-canonical book ids via `ID_CORRECTIONS` (the delivery used `song-of-songs`;
+  the project canon uses `song-of-solomon`). This is an **identity** correction only — it never
+  changes a book's contents or its display name.
+- Repairs a **homoglyph** in the delivered New Testament: `сѐ` / `нѐ` were encoded with the
+  **Latin** `è` (U+00E8) instead of the **Cyrillic** `ѐ` (U+0450), which silently breaks Fuse.js
+  search and produces mixed-script words for screen readers. The Old Testament file used the
+  correct Cyrillic character throughout, so this was an artifact of how the NT was exported.
+  Only that one substitution is applied, and only inside otherwise-Cyrillic words.
+- Caches the WEB download in `.bible-web-cache/` (git-ignored) so a rate-limited or interrupted
+  run resumes instead of re-downloading. `bible-api.com` throttles aggressively; a full run
+  takes a couple of hours.
+
+Verse text is **never** otherwise altered — no rewording, re-punctuation, or re-capitalization.
+
+#### English-side corrections
+
+Two things had to be handled on the English side. Both are **numbering / completeness** fixes;
+neither rewords the WEB.
+
+**1. Single-chapter books.** `bible-api.com` reads `Jude 1` as Jude *verse* 1, not chapter 1, and
+returns a single verse. Obadiah, Philemon, 2 John, 3 John and Jude must be requested as a verse
+range (`Jude 1:1-25`). `bible:migrate` does this automatically for any one-chapter book.
+**Note:** `scripts/import-bible-book.ts` still has this bug — if it is ever used for one of those
+five books it will silently produce a one-verse file. Worth fixing before that happens.
+
+**2. Versification realignment** (`scripts/bible-versification.ts`). In five chapters the WEB
+divides the same words differently from the NA28-based Macedonian. Because the project derives
+one manifest from mk, the English is renumbered to match. Every English word is preserved — only
+the boundary between verses moves:
+
+| Book | WEB | Macedonian (NA28) | Action |
+|---|---|---|---|
+| 3 John 1 | 14 verses | 15 | Split WEB v14 at "Peace be to you." |
+| 2 Cor 13 | 14 verses | 13 | Merge WEB v12+v13; benediction becomes v13 |
+| Revelation 12/13 | 17 / 18 | 18 / 18 | Move "Then I stood on the sand of the sea." from 13:1 to 12:18 |
+| Romans 14/16 | 26 / 25 | 23 / 27 | Move the doxology from 14:24-26 to 16:25-27 |
+
+Each rule asserts the exact source wording it expects before touching it, so if the WEB text ever
+changes upstream the migration **hard-stops** instead of mangling the text.
+
+**3. Empty WEB verses.** The WEB returns Luke 17:36, Acts 8:37, Acts 15:34 and Acts 24:7 as empty
+strings — it omits them for the same critical-text reason the Macedonian does. An empty verse
+fails the schema, so `OMITTED_NOTE_EN` ("[This verse is not found in the earliest manuscripts.]")
+is inserted, exactly mirroring the Macedonian side. Any *other* empty verse is a hard stop.
+
 ---
 
 ## 12. Performance
@@ -389,6 +463,7 @@ Each attaches through the `Reference` / `ReferenceRange` value objects and the c
 
 ```bash
 npm run bible:import -- <book-id> <path>   # import ONE real book (mk clean + matching en), see §11.1
+npm run bible:migrate -- <ot.json> <nt.json>  # migrate a complete two-file delivery, see §11.2
 npm run bible:build      # re-derive manifest + search from the book files, then validate
 npm run bible:generate   # (placeholder only) regenerate placeholder book files, then bible:build
 npm run bible:validate   # validate the dataset (runs automatically before every build)
