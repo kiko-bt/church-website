@@ -55,6 +55,27 @@ const ID_CORRECTIONS: Record<string, string> = {
   "song-of-songs": "song-of-solomon",
 };
 
+// The plain English book titles the WEB API is queried with. These are lookup
+// keys for the external API — NOT display names. The display names in
+// src/data/bible/en/*.json are editorial (e.g. "The First Book of Moses —
+// Genesis", "First Samuel") and the API does not recognize them, so the two
+// must stay decoupled: changing a display name must never change the query.
+// Only books whose display name differs from the API title need an entry.
+const EN_API_NAMES: Record<string, string> = {
+  genesis: "Genesis",
+  exodus: "Exodus",
+  leviticus: "Leviticus",
+  numbers: "Numbers",
+  deuteronomy: "Deuteronomy",
+  "1-samuel": "1 Samuel",
+  "2-samuel": "2 Samuel",
+  "1-kings": "1 Kings",
+  "2-kings": "2 Kings",
+  "1-chronicles": "1 Chronicles",
+  "2-chronicles": "2 Chronicles",
+  "song-of-solomon": "Song of Solomon",
+};
+
 const LATIN_E_GRAVE = "è"; // è
 const CYRILLIC_E_GRAVE = "ѐ"; // ѐ
 const CYRILLIC_RE = /[Ѐ-ӿ]/;
@@ -373,13 +394,16 @@ async function main(): Promise<void> {
   const blanksFilled: string[] = [];
   for (const canonBook of BIBLE_CANON) {
     const mkBook = mkBooks.get(canonBook.id)!;
-    // Reuse the existing English file's display name as the API query — it is
-    // already a real, correctly capitalized English book title.
+    // Query the API with the plain English title. Books not in EN_API_NAMES
+    // still display under their plain title, so the existing file's name is a
+    // correct fallback; the overrides cover the editorially renamed books.
     const existingEnPath = join(DATA_DIR, "en", `${canonBook.id}.json`);
     if (!existsSync(existingEnPath)) {
       fail(`no existing en/${canonBook.id}.json to read the English book title from`);
     }
-    const apiBookName = JSON.parse(readFileSync(existingEnPath, "utf8")).name as string;
+    const apiBookName =
+      EN_API_NAMES[canonBook.id] ??
+      (JSON.parse(readFileSync(existingEnPath, "utf8")).name as string);
 
     const enBook = await fetchWebBook(
       canonBook.id,
