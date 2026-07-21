@@ -234,11 +234,24 @@ export function ContactForm() {
             placeholder={t("messagePlaceholder")}
             className={`${inputClasses} resize-y`}
           />
-          {errors.message && (
-            <p id={errorId("message")} className={errorClasses}>
-              {errorText(errors.message)}
-            </p>
-          )}
+          <div className="mt-1.5 flex items-start justify-between gap-4">
+            {errors.message ? (
+              <p id={errorId("message")} className={errorClasses.replace("mt-1.5 ", "")}>
+                {errorText(errors.message)}
+              </p>
+            ) : (
+              <span />
+            )}
+            <span
+              aria-live="polite"
+              className="shrink-0 text-sm tabular-nums text-text-primary/50"
+            >
+              {t("messageCounter", {
+                count: values.message.length,
+                max: CONTACT_LIMITS.message.max,
+              })}
+            </span>
+          </div>
         </div>
 
         <Button type="submit" disabled={isPending} className="w-full sm:w-auto">

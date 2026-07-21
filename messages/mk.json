@@ -180,6 +180,7 @@
     "subjectPlaceholder": "За што се работи?",
     "message": "Порака",
     "messagePlaceholder": "Напишете ја вашата порака...",
+    "messageCounter": "{count} / {max} знаци",
     "send": "Испрати Порака",
     "sending": "Се испраќа...",
     "success": "Вашата порака е успешно испратена. Наскоро ќе ви одговориме.",
