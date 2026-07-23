@@ -15,7 +15,7 @@ export default async function LocaleNotFound() {
   return (
     <LayoutShell>
       <div className="flex min-h-[50vh] flex-col items-center justify-center py-16 text-center">
-        <p className="font-heading text-6xl font-bold text-accent-gold">404</p>
+        <p className="font-heading text-6xl font-bold text-accent-gold-strong">404</p>
         <h1 className="mt-4 font-heading text-2xl font-bold text-deep-dark sm:text-3xl">
           {t("notFound")}
         </h1>

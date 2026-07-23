@@ -56,10 +56,10 @@ export async function GalleryAlbumCard({ album, locale }: GalleryAlbumCardProps)
         )}
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <h2 className="font-heading text-lg font-semibold text-deep-dark group-hover:text-accent-gold">
+        <h2 className="font-heading text-lg font-semibold text-deep-dark group-hover:text-accent-gold-strong">
           {album.title}
         </h2>
-        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-primary/60">
+        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-primary/70">
           {formattedDate && <span>{formattedDate}</span>}
           {formattedDate && <span aria-hidden="true">·</span>}
           <span>{t("photoCount", { count: album.images.length })}</span>

@@ -6,6 +6,9 @@ import { LayoutShell } from "@/components/layout/LayoutShell";
 import { BibleBreadcrumb } from "@/components/bible/BibleBreadcrumb";
 import { VerseList } from "@/components/bible/VerseList";
 import { ChapterNav } from "@/components/bible/ChapterNav";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
+import { buildBreadcrumbSchema } from "@/lib/seo/structured-data";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getAllBookMeta, getBook, getChapter } from "@/features/bible";
 
 type BibleChapterPageProps = {
@@ -34,8 +37,15 @@ export async function generateMetadata({
   params,
 }: BibleChapterPageProps): Promise<Metadata> {
   const { locale, bookSlug, chapter } = await params;
-  const book = await getBook(locale, bookSlug);
-  return { title: book ? `${book.name} ${chapter}` : bookSlug };
+  const [book, t] = await Promise.all([
+    getBook(locale, bookSlug),
+    getTranslations({ locale, namespace: "bible" }),
+  ]);
+  const name = book?.name ?? bookSlug;
+  return generateBaseMetadata(locale, `/bible/${bookSlug}/${chapter}`, {
+    title: `${name} ${chapter}`,
+    description: t("chapterMetaDescription", { book: name, chapter }),
+  });
 }
 
 export default async function BibleChapterPage({
@@ -54,6 +64,13 @@ export default async function BibleChapterPage({
 
   return (
     <LayoutShell>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: t("breadcrumb"), path: `/${locale}/bible` },
+          { name: book.name, path: `/${locale}/bible/${bookSlug}` },
+          { name: `${t("chapter")} ${chapter}` },
+        ])}
+      />
       <BibleBreadcrumb
         ariaLabel={t("aria.breadcrumb")}
         items={[
@@ -67,7 +84,7 @@ export default async function BibleChapterPage({
         <h1 className="font-heading text-3xl font-bold text-deep-dark sm:text-4xl">
           {book.name}
         </h1>
-        <p className="mt-2 text-lg text-text-primary/60">
+        <p className="mt-2 text-lg text-text-primary/70">
           {t("chapter")} {chapter}
         </p>
       </header>

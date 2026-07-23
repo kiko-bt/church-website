@@ -40,7 +40,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
       <PageHeader title={t("title")} />
 
       <div className="max-w-3xl pb-12">
-        <p className="text-sm text-text-primary/55">
+        <p className="text-sm text-text-primary/70">
           {t("lastUpdatedLabel")}: {t("lastUpdatedDate")}
         </p>
 

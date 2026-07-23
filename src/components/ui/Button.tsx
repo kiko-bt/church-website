@@ -38,12 +38,12 @@ type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent-gold text-white hover:bg-accent-gold/90 focus-visible:ring-accent-gold",
+    "bg-accent-gold text-accent-gold-foreground hover:bg-accent-gold/90 focus-visible:ring-accent-gold",
   secondary:
     "bg-warm-bg text-deep-dark hover:bg-soft-gold focus-visible:ring-soft-gold",
   ghost: "hover:bg-warm-bg text-text-primary focus-visible:ring-text-primary/30",
   outline:
-    "border border-accent-gold text-accent-gold hover:bg-accent-gold/10 focus-visible:ring-accent-gold",
+    "border border-accent-gold text-accent-gold-strong hover:bg-accent-gold/10 focus-visible:ring-accent-gold",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

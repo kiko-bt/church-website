@@ -25,17 +25,22 @@ const base = siteConfig.url;
 function entry(
   path: string,
   changeFrequency: Entry["changeFrequency"],
-  priority: number
+  priority: number,
+  lastModified?: string | Date
 ): Entry {
   // Normalize the home path ("/") to "" so the URL is `/mk` (matching the
   // canonical tag), not `/mk/` — otherwise the sitemap advertises a URL that
   // Next.js 308-redirects (trailingSlash: false), which search engines penalize.
   const suffix = path === "/" ? "" : path;
-  const languages = Object.fromEntries(
+  const languages: Record<string, string> = Object.fromEntries(
     locales.map((locale) => [locale, `${base}/${locale}${suffix}`])
   );
+  // x-default advertises the default-locale URL as the fallback for any locale
+  // not explicitly listed — mirrors the per-page hreflang alternates.
+  languages["x-default"] = `${base}/${defaultLocale}${suffix}`;
   return {
     url: `${base}/${defaultLocale}${suffix}`,
+    ...(lastModified ? { lastModified } : {}),
     changeFrequency,
     priority,
     alternates: { languages },
@@ -60,14 +65,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry(routes.privacy, "yearly", 0.3),
   ];
 
+  // Content URLs carry a real `lastModified` from their publish/date field so
+  // crawlers can prioritize recrawls; entries without a date simply omit it.
   const sermonEntries = sermons.map((s) =>
-    entry(`${routes.sermons}/${s.slug}`, "monthly", 0.6)
+    entry(`${routes.sermons}/${s.slug}`, "monthly", 0.6, s.date)
   );
   const bookEntries = books.map((b) =>
-    entry(`${routes.books}/${b.slug}`, "monthly", 0.6)
+    entry(`${routes.books}/${b.slug}`, "monthly", 0.6, b.publishedAt)
   );
   const albumEntries = albums.map((a) =>
-    entry(`${routes.gallery}/${a.slug}`, "monthly", 0.6)
+    entry(`${routes.gallery}/${a.slug}`, "monthly", 0.6, a.date)
   );
 
   // Bible: book index pages + every chapter reading page (local JSON, so this

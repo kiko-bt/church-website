@@ -30,8 +30,8 @@ export function NavLink({ href, exact = false, className, onClick, children }: N
         "rounded-sm transition-colors",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold",
         isActive
-          ? "bg-warm-bg text-accent-gold"
-          : "text-text-primary hover:bg-warm-bg hover:text-accent-gold",
+          ? "bg-warm-bg text-accent-gold-strong"
+          : "text-text-primary hover:bg-warm-bg hover:text-accent-gold-strong",
         className
       )}
     >

@@ -23,7 +23,7 @@ export async function ScriptureSection({ locale }: ScriptureSectionProps) {
       className="border-y border-soft-gold/30 bg-background py-16 sm:py-20"
     >
       <SectionContainer className="text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-accent-gold">
+        <p className="text-xs font-semibold uppercase tracking-widest text-accent-gold-strong">
           {t("label")}
         </p>
 
@@ -32,7 +32,7 @@ export async function ScriptureSection({ locale }: ScriptureSectionProps) {
             &ldquo;{verse}&rdquo;
           </p>
           <footer className="mt-5">
-            <cite className="not-italic text-sm font-medium text-text-primary/60">
+            <cite className="not-italic text-sm font-medium text-text-primary/70">
               — {reference}
             </cite>
           </footer>

@@ -28,7 +28,11 @@
     "loading": "Loading...",
     "notFound": "Page not found",
     "backToHome": "Back to home",
-    "viewDetails": "View details"
+    "viewDetails": "View details",
+    "skipToContent": "Skip to main content",
+    "errorTitle": "Something went wrong",
+    "errorBody": "An unexpected error occurred while loading this page. Please try again.",
+    "retry": "Try again"
   },
   "home": {
     "hero": {
@@ -97,6 +101,8 @@
   "bible": {
     "title": "Bible",
     "metaDescription": "Read the Bible online.",
+    "bookMetaDescription": "Read the book of {book} online — all chapters and verses.",
+    "chapterMetaDescription": "Read {book} chapter {chapter} online.",
     "oldTestament": "Old Testament",
     "newTestament": "New Testament",
     "chapter": "Chapter",
@@ -231,6 +237,7 @@
   },
   "footer": {
     "allRightsReserved": "All rights reserved.",
-    "tagline": "A place of peace and God's Word"
+    "tagline": "A place of peace and God's Word",
+    "navLabel": "Footer navigation"
   }
 }

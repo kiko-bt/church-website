@@ -13,5 +13,8 @@ export default function robots(): MetadataRoute.Robots {
       disallow: "/api/",
     },
     sitemap: `${siteConfig.url}/sitemap.xml`,
+    // Preferred host (read by Yandex; ignored by Google/Bing). Host only — no
+    // scheme/trailing slash — per the directive's format.
+    host: new URL(siteConfig.url).host,
   };
 }

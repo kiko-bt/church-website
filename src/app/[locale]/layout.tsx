@@ -4,7 +4,7 @@ import type { Locale } from "@/constants/locales";
 import { locales } from "@/constants/locales";
 import { inter, playfairDisplay } from "@/styles/fonts";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Providers } from "@/components/providers/Providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -42,7 +42,10 @@ export default async function LocaleLayout({
   // Must run before `getMessages()` / any `getTranslations()` call.
   setRequestLocale(locale);
 
-  const messages = await getMessages();
+  const [messages, t] = await Promise.all([
+    getMessages(),
+    getTranslations("common"),
+  ]);
 
   return (
     <html
@@ -51,10 +54,19 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-body antialiased">
+        {/* Skip link: the first focusable element, so keyboard and screen-reader
+            users can bypass the header/nav straight to the page content
+            (WCAG 2.4.1). Visually hidden until focused. */}
+        <a
+          href="#main-content"
+          className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-background focus-visible:px-4 focus-visible:py-2 focus-visible:font-medium focus-visible:text-text-primary focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+        >
+          {t("skipToContent")}
+        </a>
         <Providers locale={locale} messages={messages}>
           <div className="flex min-h-screen flex-col">
             <Header locale={locale} />
-            <main className="flex-1" id="main-content">
+            <main className="flex-1" id="main-content" tabIndex={-1}>
               {children}
             </main>
             <Footer />

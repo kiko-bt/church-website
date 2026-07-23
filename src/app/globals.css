@@ -7,6 +7,16 @@
   --warm-bg: #f5f1e9;
   --soft-gold: #e6d7a3;
   --accent-gold: #c9a227;
+  /* Accessible gold for INTERACTIVE TEXT (links) on light backgrounds: the
+     brand --accent-gold (#c9a227) is only ~2.4:1 on white and fails WCAG AA as
+     text, so links use this darker gold (≥5:1 on white and warm). In dark mode
+     the brand gold already passes on the dark background, so it is restored
+     below. Decorative fills/icons keep --accent-gold. */
+  --accent-gold-strong: #806309;
+  /* Fixed dark foreground for text ON a gold fill (buttons). The gold button
+     background is the same #c9a227 in both themes, so this stays dark in both
+     (7.38:1). It intentionally does NOT flip with the theme. */
+  --accent-gold-foreground: #0f172a;
   --text-primary: #2d2d2d;
   --deep-dark: #0f172a;
 }
@@ -15,6 +25,9 @@
   --background: #0f172a;
   --warm-bg: #1a2540;
   --soft-gold: #3a4a6b;
+  /* Brand gold already meets AA on the dark background (7.4:1), so interactive
+     text can use the full-brightness gold here. */
+  --accent-gold-strong: #c9a227;
   --text-primary: #e2e8f0;
   --deep-dark: #f8fafc;
 }
@@ -29,6 +42,8 @@
   --color-warm-bg: var(--warm-bg);
   --color-soft-gold: var(--soft-gold);
   --color-accent-gold: var(--accent-gold);
+  --color-accent-gold-strong: var(--accent-gold-strong);
+  --color-accent-gold-foreground: var(--accent-gold-foreground);
   --color-text-primary: var(--text-primary);
   --color-deep-dark: var(--deep-dark);
 
@@ -76,6 +91,26 @@ h6 {
   outline: 2px solid var(--accent-gold);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────────────
+   Honor the user's OS "reduce motion" setting: neutralize animations,
+   transitions, and smooth scrolling site-wide (WCAG 2.3.3). Infinite spinners
+   settle after a single iteration rather than looping. */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ── Bible reading optimisation ─────────────────────────────────────────────── */

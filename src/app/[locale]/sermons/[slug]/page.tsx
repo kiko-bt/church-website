@@ -133,7 +133,7 @@ export default async function SermonPage({ params }: SermonPageProps) {
           {/* Scripture references, shown only when the sermon has any. */}
           {sermon.bibleReferences.length > 0 && (
             <div className="mt-8">
-              <h2 className="font-heading text-sm font-semibold uppercase tracking-wide text-text-primary/60">
+              <h2 className="font-heading text-sm font-semibold uppercase tracking-wide text-text-primary/70">
                 {t("references")}
               </h2>
               <ul className="mt-3 flex flex-wrap gap-2">

@@ -58,14 +58,14 @@ export async function BookCard({ book, locale }: BookCardProps) {
         )}
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <h2 className="font-heading text-lg font-semibold text-deep-dark group-hover:text-accent-gold">
+        <h2 className="font-heading text-lg font-semibold text-deep-dark group-hover:text-accent-gold-strong">
           {book.title}
         </h2>
-        <p className="mt-1 text-sm text-text-primary/60">
+        <p className="mt-1 text-sm text-text-primary/70">
           {t("by")}: {book.author}
         </p>
         {formattedDate && (
-          <p className="mt-1 text-xs text-text-primary/50">{formattedDate}</p>
+          <p className="mt-1 text-xs text-text-primary/70">{formattedDate}</p>
         )}
         {!book.pdfDownloadUrl && (
           <p className="mt-3 inline-flex w-fit items-center rounded-sm bg-warm-bg px-2.5 py-1 text-xs font-medium text-text-primary/70">

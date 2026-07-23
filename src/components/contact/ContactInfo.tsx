@@ -67,7 +67,7 @@ export async function ContactInfo() {
               <item.icon size={18} />
             </span>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/55">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/70">
                 {item.label}
               </dt>
               <dd className="mt-0.5 text-base text-text-primary/85">
@@ -86,13 +86,13 @@ export async function ContactInfo() {
               <Phone size={18} />
             </span>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/55">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/70">
                 {t("phoneLabel")}
               </dt>
               <dd className="mt-0.5 text-base">
                 <a
                   href={`tel:${phone.replace(/\s+/g, "")}`}
-                  className="text-accent-gold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+                  className="text-accent-gold-strong underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
                 >
                   {phone}
                 </a>
@@ -109,13 +109,13 @@ export async function ContactInfo() {
             <Mail size={18} />
           </span>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/55">
+            <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/70">
               {t("emailLabel")}
             </dt>
             <dd className="mt-0.5 text-base">
               <a
                 href={`mailto:${email}`}
-                className="text-accent-gold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+                className="text-accent-gold-strong underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
               >
                 {email}
               </a>
@@ -132,7 +132,7 @@ export async function ContactInfo() {
               <Share2 size={18} />
             </span>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/55">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-text-primary/70">
                 {t("followLabel")}
               </dt>
               <dd className="mt-1 flex flex-wrap gap-4 text-base">
@@ -142,7 +142,7 @@ export async function ContactInfo() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent-gold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+                    className="text-accent-gold-strong underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
                   >
                     {link.label}
                   </a>

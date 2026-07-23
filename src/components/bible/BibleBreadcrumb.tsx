@@ -16,7 +16,7 @@ type BibleBreadcrumbProps = {
 // the current page and carries aria-current="page".
 export function BibleBreadcrumb({ items, ariaLabel }: BibleBreadcrumbProps) {
   return (
-    <nav aria-label={ariaLabel} className="mb-6 text-sm text-text-primary/60">
+    <nav aria-label={ariaLabel} className="mb-6 text-sm text-text-primary/70">
       <ol className="flex flex-wrap items-center gap-1">
         {items.map((item, index) => (
           <Fragment key={`${item.label}-${index}`}>
@@ -29,7 +29,7 @@ export function BibleBreadcrumb({ items, ariaLabel }: BibleBreadcrumbProps) {
               {item.href ? (
                 <Link
                   href={item.href}
-                  className="rounded-sm transition-colors hover:text-accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+                  className="rounded-sm transition-colors hover:text-accent-gold-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
                 >
                   {item.label}
                 </Link>

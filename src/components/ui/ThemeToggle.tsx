@@ -29,7 +29,7 @@ export function ThemeToggle() {
       title={isDark ? t("light") : t("dark")}
       className={cn(
         "flex h-11 w-11 shrink-0 items-center justify-center rounded-sm transition-colors",
-        "text-text-primary hover:bg-warm-bg hover:text-accent-gold",
+        "text-text-primary hover:bg-warm-bg hover:text-accent-gold-strong",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
       )}
     >

@@ -21,7 +21,7 @@ export async function VerseList({ verses, ariaLabel }: VerseListProps) {
           className="flex gap-4 scroll-mt-24"
         >
           <span
-            className="mt-1 shrink-0 text-xs font-semibold text-accent-gold"
+            className="mt-1 shrink-0 text-xs font-semibold text-accent-gold-strong"
             aria-label={`${t("verse")} ${verse.number}`}
           >
             {verse.number}

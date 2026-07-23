@@ -121,7 +121,7 @@ export function ContactForm() {
   };
 
   const inputClasses =
-    "w-full rounded-sm border border-soft-gold bg-transparent px-4 py-2.5 text-text-primary placeholder:text-text-primary/40 focus-visible:border-accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
+    "w-full rounded-sm border border-soft-gold bg-transparent px-4 py-2.5 text-text-primary placeholder:text-text-primary/70 focus-visible:border-accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
   const labelClasses = "mb-1.5 block text-sm font-medium text-text-primary/85";
   const errorClasses = "mt-1.5 text-sm text-red-700 dark:text-red-400";
 
@@ -286,7 +286,7 @@ export function ContactForm() {
             )}
             <span
               aria-live="polite"
-              className="shrink-0 text-sm tabular-nums text-text-primary/50"
+              className="shrink-0 text-sm tabular-nums text-text-primary/70"
             >
               {t("messageCounter", {
                 count: values.message.length,

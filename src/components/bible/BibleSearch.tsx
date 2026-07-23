@@ -128,11 +128,11 @@ export function BibleSearch({
         placeholder={placeholder}
         aria-label={ariaLabel}
         autoComplete="off"
-        className="w-full rounded-sm border border-soft-gold bg-transparent px-4 py-2.5 text-text-primary placeholder:text-text-primary/40 focus-visible:border-accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+        className="w-full rounded-sm border border-soft-gold bg-transparent px-4 py-2.5 text-text-primary placeholder:text-text-primary/70 focus-visible:border-accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
       />
 
       <div aria-live="polite" className="mt-4">
-        {isLoading && <p className="text-sm text-text-primary/60">…</p>}
+        {isLoading && <p className="text-sm text-text-primary/70">…</p>}
 
         {!isLoading && hasError && (
           <p className="text-sm text-text-primary/70">{errorLabel}</p>
@@ -153,7 +153,7 @@ export function BibleSearch({
                     href={`/${locale}/bible/${ref.bookId}/${ref.chapter}#v${ref.verse}`}
                     className="block px-4 py-3 transition-colors hover:bg-warm-bg focus-visible:bg-warm-bg focus-visible:outline-none"
                   >
-                    <span className="text-sm font-semibold text-accent-gold">
+                    <span className="text-sm font-semibold text-accent-gold-strong">
                       {entry.bookName} {ref.chapter}:{ref.verse}
                     </span>
                     <span className="mt-1 block text-sm text-text-primary/80">

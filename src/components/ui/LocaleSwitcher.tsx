@@ -37,8 +37,8 @@ export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
               "flex min-h-11 min-w-11 items-center justify-center rounded-sm px-2 text-xs font-semibold uppercase transition-colors",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold",
               isActive
-                ? "cursor-default text-accent-gold"
-                : "text-text-primary/50 hover:text-text-primary"
+                ? "cursor-default text-accent-gold-strong"
+                : "text-text-primary/70 hover:text-text-primary"
             )}
           >
             {locale}

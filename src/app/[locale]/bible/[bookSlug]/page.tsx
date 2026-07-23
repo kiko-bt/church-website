@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { Locale } from "@/constants/locales";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
+import { buildBreadcrumbSchema } from "@/lib/seo/structured-data";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BibleBreadcrumb } from "@/components/bible/BibleBreadcrumb";
@@ -26,8 +29,15 @@ export async function generateMetadata({
   params,
 }: BibleBookPageProps): Promise<Metadata> {
   const { locale, bookSlug } = await params;
-  const book = await getBook(locale, bookSlug);
-  return { title: book?.name ?? bookSlug };
+  const [book, t] = await Promise.all([
+    getBook(locale, bookSlug),
+    getTranslations({ locale, namespace: "bible" }),
+  ]);
+  const name = book?.name ?? bookSlug;
+  return generateBaseMetadata(locale, `/bible/${bookSlug}`, {
+    title: name,
+    description: t("bookMetaDescription", { book: name }),
+  });
 }
 
 export default async function BibleBookPage({ params }: BibleBookPageProps) {
@@ -42,6 +52,12 @@ export default async function BibleBookPage({ params }: BibleBookPageProps) {
 
   return (
     <LayoutShell>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: t("breadcrumb"), path: `/${locale}/bible` },
+          { name: book.name },
+        ])}
+      />
       <BibleBreadcrumb
         ariaLabel={t("aria.breadcrumb")}
         items={[

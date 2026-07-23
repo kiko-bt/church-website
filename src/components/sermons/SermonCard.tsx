@@ -31,7 +31,7 @@ export async function SermonCard({ sermon, locale }: SermonCardProps) {
       href={`/${locale}/sermons/${sermon.slug}`}
       className="group flex flex-col rounded-md border border-soft-gold/40 bg-background p-6 transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
     >
-      <div className="flex items-center gap-3 text-xs font-medium text-text-primary/60">
+      <div className="flex items-center gap-3 text-xs font-medium text-text-primary/70">
         <span>{formattedDate}</span>
         <span aria-hidden="true">·</span>
         <span>
@@ -39,7 +39,7 @@ export async function SermonCard({ sermon, locale }: SermonCardProps) {
         </span>
       </div>
 
-      <h2 className="mt-3 font-heading text-lg font-semibold text-deep-dark group-hover:text-accent-gold">
+      <h2 className="mt-3 font-heading text-lg font-semibold text-deep-dark group-hover:text-accent-gold-strong">
         {sermon.title}
       </h2>
 

@@ -6,6 +6,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Locale } from "@/constants/locales";
 import { getBooks, getBookBySlug } from "@/features/books";
 import { generateBaseMetadata, toMetaDescription } from "@/lib/seo/metadata";
+import {
+  buildBookSchema,
+  buildBreadcrumbSchema,
+} from "@/lib/seo/structured-data";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { Button } from "@/components/ui/Button";
 
@@ -51,6 +56,14 @@ export default async function BookPage({ params }: BookPageProps) {
   const book = await getBookBySlug(slug);
   if (!book) notFound();
 
+  const structuredData = [
+    buildBreadcrumbSchema([
+      { name: t("title"), path: `/${locale}/books` },
+      { name: book.title },
+    ]),
+    buildBookSchema(book, locale),
+  ];
+
   const formattedDate = book.publishedAt
     ? new Intl.DateTimeFormat(locale, {
         year: "numeric",
@@ -61,6 +74,7 @@ export default async function BookPage({ params }: BookPageProps) {
 
   return (
     <LayoutShell>
+      <JsonLd data={structuredData} />
       <article className="py-8">
         <div className="grid gap-8 md:grid-cols-[minmax(0,18rem)_1fr] md:gap-10">
           <div className="relative aspect-[3/4] w-full max-w-xs overflow-hidden rounded-md border border-soft-gold/40 bg-warm-bg">
@@ -91,7 +105,7 @@ export default async function BookPage({ params }: BookPageProps) {
               {t("by")}: {book.author}
             </p>
             {formattedDate && (
-              <p className="mt-1 text-sm text-text-primary/60">
+              <p className="mt-1 text-sm text-text-primary/70">
                 {formattedDate}
               </p>
             )}

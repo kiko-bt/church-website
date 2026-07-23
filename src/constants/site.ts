@@ -14,8 +14,30 @@ export const siteConfig = {
   // churchSettings.email CMS field when set; RESEND_TO_EMAIL is the fallback.
   email: process.env.RESEND_TO_EMAIL ?? "contact@hristovoevangelie.org",
   address: "Битола, Македонија",
+  // Locale/region for the place of worship (used by structured data & OG).
+  addressLocality: "Битола",
+  addressCountry: "MK",
   social: {
     facebook: "",
     youtube: "",
   },
+  // Meta keywords. Note: Google has ignored the keywords meta tag since 2009 and
+  // it carries no ranking weight; it is included only for completeness and the
+  // few crawlers that still read it. Kept short and relevant (never stuffed).
+  keywords: [
+    "црква",
+    "Битола",
+    "евангелие",
+    "христијанство",
+    "Библија",
+    "проповеди",
+  ],
+  keywordsEn: [
+    "church",
+    "Bitola",
+    "gospel",
+    "Christianity",
+    "Bible",
+    "sermons",
+  ],
 } as const;

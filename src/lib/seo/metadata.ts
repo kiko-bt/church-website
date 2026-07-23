@@ -87,25 +87,40 @@ export async function generateBaseMetadata(
   return {
     title,
     description,
+    keywords: [...(isEn ? siteConfig.keywordsEn : siteConfig.keywords)],
+    // Author/publisher = the church itself (the single content authority).
+    authors: [{ name: brandName }],
+    publisher: brandName,
     metadataBase: new URL(siteConfig.url),
     openGraph: {
       type: "website",
       locale: isEn ? "en_US" : "mk_MK",
+      // Advertise the other language so scrapers can surface the alternate.
+      alternateLocale: isEn ? "mk_MK" : "en_US",
       siteName: brandName,
       title: ogTitle,
       description,
       url: canonicalUrl,
       images: ogImages,
     },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description,
+      images: ogImages,
+    },
     robots: {
       index: true,
       follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large" },
     },
     alternates: {
       canonical: canonicalUrl,
       languages: {
         mk: `${siteConfig.url}/mk${path}`,
         en: `${siteConfig.url}/en${path}`,
+        // x-default points crawlers to the default-locale (mk) URL.
+        "x-default": `${siteConfig.url}/mk${path}`,
       },
     },
   };

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TestamentSection } from "@/components/bible/TestamentSection";
@@ -16,10 +17,10 @@ export async function generateMetadata({
 }: BiblePageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "bible" });
-  return {
+  return generateBaseMetadata(locale, "/bible", {
     title: t("title"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function BiblePage({ params }: BiblePageProps) {
