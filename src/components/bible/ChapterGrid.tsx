@@ -22,7 +22,7 @@ export async function ChapterGrid({ locale, bookId, chapterCount }: ChapterGridP
             <Link
               href={`/${locale}/bible/${bookId}/${chapterNumber}`}
               aria-label={`${t("chapter")} ${chapterNumber}`}
-              className="flex h-10 w-full items-center justify-center rounded-sm border border-soft-gold text-sm font-medium text-text-primary transition-colors hover:border-accent-gold hover:bg-accent-gold hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+              className="flex h-10 w-full items-center justify-center rounded-sm border border-soft-gold text-sm font-medium text-text-primary transition-colors hover:border-accent-gold hover:bg-accent-gold hover:text-accent-gold-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
               {chapterNumber}
             </Link>

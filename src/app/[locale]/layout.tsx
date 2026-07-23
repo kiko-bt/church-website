@@ -59,7 +59,7 @@ export default async function LocaleLayout({
             (WCAG 2.4.1). Visually hidden until focused. */}
         <a
           href="#main-content"
-          className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:bg-background focus-visible:px-4 focus-visible:py-2 focus-visible:font-medium focus-visible:text-text-primary focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-sm focus:bg-background focus:px-4 focus:py-2 focus:font-medium focus:text-text-primary focus:shadow-md focus:outline-none focus:ring-2 focus:ring-accent-gold"
         >
           {t("skipToContent")}
         </a>

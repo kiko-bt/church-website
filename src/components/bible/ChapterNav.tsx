@@ -42,7 +42,7 @@ export async function ChapterNav({ locale, bookId, chapter }: ChapterNavProps) {
         : null;
 
   const linkClass =
-    "inline-flex items-center gap-1 rounded-sm border border-soft-gold px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-accent-gold hover:bg-accent-gold hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold";
+    "inline-flex items-center gap-1 rounded-sm border border-soft-gold px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-accent-gold hover:bg-accent-gold hover:text-accent-gold-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold";
 
   return (
     <nav

@@ -23,7 +23,7 @@ export function TestamentSection({ locale, title, books }: TestamentSectionProps
           <li key={book.id}>
             <Link
               href={`/${locale}/bible/${book.id}`}
-              className="block rounded-sm border border-soft-gold/60 px-3 py-2 text-sm text-text-primary transition-colors hover:border-accent-gold hover:bg-accent-gold hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+              className="block rounded-sm border border-soft-gold/60 px-3 py-2 text-sm text-text-primary transition-colors hover:border-accent-gold hover:bg-accent-gold hover:text-accent-gold-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
             >
               {book.name}
             </Link>
