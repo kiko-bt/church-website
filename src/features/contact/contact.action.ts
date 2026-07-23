@@ -1,6 +1,7 @@
 "use server";
 
 import { getContactEmailConfig, sendEmail } from "@/lib/resend";
+import { isLikelySpam } from "./contact.antispam";
 import { renderContactEmail } from "./contact.email";
 import { collectFieldErrors, contactFormSchema } from "./contact.schema";
 import type { ContactActionResult } from "./contact.types";
@@ -19,6 +20,15 @@ const SERVER_ERROR_KEY = "error";
 export async function submitContactForm(
   input: unknown
 ): Promise<ContactActionResult> {
+  // Silent anti-abuse gate (honeypot + submit timing). A hit is acknowledged as
+  // success — so a bot learns nothing about the trap — but no email is sent.
+  if (isLikelySpam(input)) {
+    console.warn(
+      "[contact] Submission blocked by anti-spam gate (honeypot/timing). No email sent."
+    );
+    return { status: "success" };
+  }
+
   const parsed = contactFormSchema.safeParse(input);
   if (!parsed.success) {
     return {

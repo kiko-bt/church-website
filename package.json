@@ -11,6 +11,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node --test --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types \"src/**/*.test.ts\" \"sanity/**/*.test.ts\"",
     "typecheck:test": "tsc -p tsconfig.test.json",
     "bible:generate": "node scripts/generate-placeholder-bible.mjs && node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/build-bible-artifacts.ts placeholder && npm run bible:validate",

@@ -4,6 +4,7 @@ import { useId, useRef, useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
+  ANTISPAM,
   CONTACT_LIMITS,
   collectFieldErrors,
   contactFormSchema,
@@ -35,6 +36,16 @@ export function ContactForm() {
   const [errors, setErrors] = useState<ContactFieldErrors>({});
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [isPending, startTransition] = useTransition();
+
+  // Anti-spam signals (see features/contact/contact.antispam.ts). The honeypot
+  // is a hidden field a human never fills; `mountedAtRef` marks when the form
+  // rendered — on submit we send the elapsed duration so the server can reject
+  // bot-speed submissions. We use the MONOTONIC `performance.now()` and send a
+  // duration (not a timestamp) so the check is immune to client/server clock
+  // skew. Neither signal is part of the validated ContactFormData — they ride
+  // alongside it in the action call.
+  const [honeypot, setHoneypot] = useState("");
+  const mountedAtRef = useRef<number>(performance.now());
 
   const statusRef = useRef<HTMLDivElement>(null);
   const fieldRefs = useRef<Record<FieldName, HTMLElement | null>>({
@@ -83,7 +94,11 @@ export function ContactForm() {
     setErrors({});
 
     startTransition(async () => {
-      const result = await submitContactForm(parsed.data);
+      const result = await submitContactForm({
+        ...parsed.data,
+        [ANTISPAM.honeypotField]: honeypot,
+        elapsedMs: Math.round(performance.now() - mountedAtRef.current),
+      });
 
       if (result.status === "success") {
         setValues(EMPTY_VALUES);
@@ -120,6 +135,33 @@ export function ContactForm() {
       </h2>
 
       <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-5">
+        {/* Honeypot: hidden from users and assistive tech, out of the tab order,
+            and not autofilled. A real submission always leaves it empty; any
+            value marks the sender as a bot (see contact.antispam.ts). */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: "-9999px",
+            width: 1,
+            height: 1,
+            overflow: "hidden",
+          }}
+        >
+          <label htmlFor={`${baseId}-${ANTISPAM.honeypotField}`}>
+            {t("name")}
+          </label>
+          <input
+            id={`${baseId}-${ANTISPAM.honeypotField}`}
+            name={ANTISPAM.honeypotField}
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(event) => setHoneypot(event.target.value)}
+          />
+        </div>
+
         <div>
           <label htmlFor={fieldId("name")} className={labelClasses}>
             {t("name")}

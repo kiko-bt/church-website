@@ -9,6 +9,10 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.test.ts", "scripts/**/*.ts"],
+  "include": [
+    "src/**/*.test.ts",
+    "sanity/**/*.test.ts",
+    "scripts/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }
