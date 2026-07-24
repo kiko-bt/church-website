@@ -76,6 +76,18 @@ const EN_API_NAMES: Record<string, string> = {
   "song-of-solomon": "Song of Solomon",
 };
 
+// For SINGLE-CHAPTER books the WEB is queried as a verse range (`Book 1:1-N`,
+// see fetchWebChapter). N normally comes from the Macedonian verse count, but
+// when a realignment SPLITS a WEB verse the mk count exceeds what the WEB
+// actually holds, and bible-api.com returns "not found" for an out-of-range
+// end. This override pins the request to the WEB's real verse count; the
+// realignment then restores the mk numbering afterward. Like EN_API_NAMES, this
+// is an external-API lookup detail, decoupled from the dataset.
+//   3 John: WEB has 14 verses; this edition's mk splits v14 into 14+15 (=15).
+const WEB_SINGLE_CHAPTER_VERSES: Record<string, number> = {
+  "3-john": 14,
+};
+
 const LATIN_E_GRAVE = "è"; // è
 const CYRILLIC_E_GRAVE = "ѐ"; // ѐ
 const CYRILLIC_RE = /[Ѐ-ӿ]/;
@@ -285,9 +297,13 @@ async function fetchWebBook(
   if (existsSync(cachePath)) {
     chapters = JSON.parse(readFileSync(cachePath, "utf8")).chapters;
   } else {
-    // One-chapter books need a verse-range request (see fetchWebChapter).
+    // One-chapter books need a verse-range request (see fetchWebChapter). The
+    // upper bound is the WEB's own verse count — normally equal to the mk count,
+    // but overridden where a realignment makes them differ (WEB_SINGLE_CHAPTER_VERSES).
     const singleChapterVerses =
-      chapterCount === 1 ? mkBook.chapters[0]!.verses.length : null;
+      chapterCount === 1
+        ? (WEB_SINGLE_CHAPTER_VERSES[id] ?? mkBook.chapters[0]!.verses.length)
+        : null;
     chapters = [];
     for (let chapter = 1; chapter <= chapterCount; chapter++) {
       chapters.push({

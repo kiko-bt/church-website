@@ -4,13 +4,17 @@
 //
 // Why this is needed
 // ------------------
-// The preacher's Macedonian New Testament follows the critical text
-// (Nestle-Aland 28). The World English Bible follows a more traditional
-// division. In five chapters the two disagree about WHERE one verse ends and
-// the next begins. The project derives ONE manifest from the Macedonian side
-// and requires every other locale to match it chapter for chapter and verse
-// for verse (.claude/bible-module.md §2), so the English must be renumbered to
-// the same scheme or the dataset cannot validate.
+// The preacher's Macedonian New Testament and the World English Bible divide a
+// handful of chapters differently — they disagree about WHERE one verse ends
+// and the next begins. The project derives ONE manifest from the Macedonian
+// side and requires every other locale to match it chapter for chapter and
+// verse for verse (.claude/bible-module.md §2), so the English must be
+// renumbered to the same scheme or the dataset cannot validate.
+//
+// This table is DELIVERY-SPECIFIC: it is tuned to the exact edition the client
+// supplied. The current edition matches the WEB in 2 Corinthians 13 and
+// Revelation 12 (so those need no realignment) but diverges in 3 John, Romans,
+// and Acts 14 (handled below).
 //
 // What this is NOT
 // ----------------
@@ -80,63 +84,27 @@ export const ENGLISH_REALIGNMENTS: Record<string, (chapters: Chapter[]) => Chapt
     return [{ number: 1, verses: renumber(verses) }];
   },
 
-  // 2 Corinthians 13 — the WEB has 14 verses; NA28 has 13, joining the WEB's
-  // v12 ("Greet one another with a holy kiss.") and v13 ("All the saints greet
-  // you.") into a single verse 12, which shifts the benediction to v13.
-  "2-corinthians": (chapters) => {
-    const book = "2-corinthians";
-    const target = chapters[12]!;
-    if (target.verses.length !== 14) fail(`${book} 13: expected 14 WEB verses, got ${target.verses.length}`);
+  // Acts 14 — the WEB divides the close of the chapter into 27 ("…opened a door
+  // of faith to the Gentiles.") and 28 ("They stayed there with the disciples
+  // for a long time."); this edition's Macedonian joins them into a single
+  // verse 27. Merge the WEB's v27 and v28 into v27 so the two agree.
+  acts: (chapters) => {
+    const book = "acts";
+    const target = chapters[13]!; // chapter 14
+    if (target.verses.length !== 28) fail(`${book} 14: expected 28 WEB verses, got ${target.verses.length}`);
 
-    const v12 = verseAt(chapters, 13, 12, book);
-    const v13 = verseAt(chapters, 13, 13, book);
-    const v14 = verseAt(chapters, 13, 14, book);
-    expect(v12.text, "holy kiss", book, "13:12");
-    expect(v13.text, "saints greet you", book, "13:13");
-    expect(v14.text, "fellowship of the Holy Spirit", book, "13:14");
+    const v27 = verseAt(chapters, 14, 27, book);
+    const v28 = verseAt(chapters, 14, 28, book);
+    expect(v27.text, "door of faith", book, "14:27");
+    expect(v28.text, "stayed there", book, "14:28");
 
     const verses = target.verses
-      .filter((v) => v.number < 12)
-      .concat([
-        { number: 12, text: `${v12.text} ${v13.text}`.replace(/\s+/g, " ").trim() },
-        { number: 13, text: v14.text },
-      ]);
+      .filter((v) => v.number < 27)
+      .concat([{ number: 27, text: `${v27.text} ${v28.text}`.replace(/\s+/g, " ").trim() }]);
 
     return chapters.map((chapter, index) =>
-      index === 12 ? { number: chapter.number, verses: renumber(verses) } : chapter
+      index === 13 ? { number: chapter.number, verses: renumber(verses) } : chapter
     );
-  },
-
-  // Revelation 12/13 — NA28 ends chapter 12 with v18 ("And he stood on the
-  // sand of the sea."); the WEB folds that same sentence into the opening of
-  // 13:1. Move the sentence back to 12:18; chapter 13 keeps its own count.
-  revelation: (chapters) => {
-    const book = "revelation";
-    const ch12 = chapters[11]!;
-    const ch13 = chapters[12]!;
-    if (ch12.verses.length !== 17) fail(`${book} 12: expected 17 WEB verses, got ${ch12.verses.length}`);
-
-    const first = verseAt(chapters, 13, 1, book);
-    expect(first.text, "sand of the sea", book, "13:1");
-    const [moved, remainder] = splitVerse(first.text, "I saw a beast", book, "13:1");
-
-    const newCh12: Chapter = {
-      number: 12,
-      verses: renumber([...ch12.verses, { number: 18, text: moved }]),
-    };
-    const newCh13: Chapter = {
-      number: 13,
-      verses: renumber([
-        { number: 1, text: remainder },
-        ...ch13.verses.filter((v) => v.number !== 1),
-      ]),
-    };
-
-    return chapters.map((chapter, index) => {
-      if (index === 11) return newCh12;
-      if (index === 12) return newCh13;
-      return chapter;
-    });
   },
 
   // Romans 14/16 — the doxology ("Now to him who is able to establish you…").

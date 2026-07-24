@@ -1,764 +1,502 @@
 {
-  "description": "Provenance record of the preacher's original two-file Bible delivery. The verse text itself now lives in src/data/bible/{mk,en}/. This file preserves the delivery metadata and the per-book fields the dataset schema does not allow (shortName, slug, order), so the original 9 MB files did not have to be committed.",
-  "extractedAt": "2026-07-21T16:13:47.911Z",
-  "migratedInto": "src/data/bible/mk/*.json (see docs/bible-module.md §11.2)",
+  "description": "Provenance record of the preacher's three-file Bible delivery (starzavet1.json + starzavet2.json = Old Testament; novzavet.json = New Testament). The verse text now lives in src/data/bible/{mk,en}/. Unlike the earlier single-file delivery, these files carry no per-book extra fields (no shortName, slug, or order) and no file-level metadata block — only book name + chapters — so this record preserves the delivery's structural facts (source-file hashes and per-book chapter/verse counts) for audit.",
+  "extractedAt": "2026-07-24T18:32:27.797Z",
+  "migratedInto": "src/data/bible/{mk,en}/*.json (see docs/bible-module.md §11.2)",
+  "migratedVerses": 31102,
   "sourceFiles": [
     {
-      "file": "starzavet.json",
-      "sha256": "9a5953e762d9d289005d97fe2d1d2cddbfc1f94cb585dafeaf3009ba2c16c0cb",
-      "bytes": 6940350,
-      "metadata": {
-        "title": "Библија — Стар Завет",
-        "language": "mk",
-        "testament": "old",
-        "formatVersion": "1.1",
-        "booksCount": 39,
-        "chaptersCount": 929,
-        "versesCount": 23145
-      }
+      "file": "starzavet1.json",
+      "sha256": "4fd784d6a31d10991ec859791c1d6f15b85401dcb9e5858f9c2458a33f6e59ba",
+      "bytes": 5167974,
+      "testament": "old",
+      "booksCount": 34,
+      "chaptersCount": 742,
+      "versesCount": 17293,
+      "note": "Old Testament, part 1 (Joshua–Malachi)"
+    },
+    {
+      "file": "starzavet2.json",
+      "sha256": "2c2a2b45ebede4826342a02231a1d8cca9eaf359c6a80284ba28d314d3c74b58",
+      "bytes": 1763517,
+      "testament": "old",
+      "booksCount": 5,
+      "chaptersCount": 187,
+      "versesCount": 5852,
+      "note": "Old Testament, part 2 (Genesis–Deuteronomy)"
     },
     {
       "file": "novzavet.json",
-      "sha256": "ef46720aeb3788a3a465790df766d5262e69293e22dccdf4d4f41cfe0f32f411",
-      "bytes": 2214637,
-      "metadata": {
-        "title": "Библија — Нов Завет",
-        "language": "mk",
-        "testament": "new",
-        "textBasis": "Nestle-Aland 28 — современо јазично прочистена верзија",
-        "formatVersion": "1.2",
-        "booksCount": 27,
-        "chaptersCount": 260,
-        "versesCount": 7942
-      }
+      "sha256": "828ab7881a7ca6abc845f6d81429f30dd0fe79b4fae697e68e3613fd774bc4d3",
+      "bytes": 2114650,
+      "testament": "new",
+      "booksCount": 27,
+      "chaptersCount": 260,
+      "versesCount": 7957,
+      "note": "New Testament (single top-level array)"
     }
   ],
   "books": [
     {
       "canonicalId": "genesis",
-      "deliveredId": "genesis",
       "name": "Битие",
-      "shortName": "1 Мој.",
-      "slug": "bitie",
-      "deliveredOrder": 1,
       "testament": "OT",
       "chapters": 50,
       "verses": 1533
     },
     {
       "canonicalId": "exodus",
-      "deliveredId": "exodus",
       "name": "Излез",
-      "shortName": "2 Мој.",
-      "slug": "izlez",
-      "deliveredOrder": 2,
       "testament": "OT",
       "chapters": 40,
       "verses": 1213
     },
     {
       "canonicalId": "leviticus",
-      "deliveredId": "leviticus",
       "name": "Левит",
-      "shortName": "3 Мој.",
-      "slug": "levit",
-      "deliveredOrder": 3,
       "testament": "OT",
       "chapters": 27,
       "verses": 859
     },
     {
       "canonicalId": "numbers",
-      "deliveredId": "numbers",
       "name": "Броеви",
-      "shortName": "4 Мој.",
-      "slug": "broevi",
-      "deliveredOrder": 4,
       "testament": "OT",
       "chapters": 36,
       "verses": 1288
     },
     {
       "canonicalId": "deuteronomy",
-      "deliveredId": "deuteronomy",
       "name": "Второзаконие",
-      "shortName": "5 Мој.",
-      "slug": "vtorozakonie",
-      "deliveredOrder": 5,
       "testament": "OT",
       "chapters": 34,
       "verses": 959
     },
     {
       "canonicalId": "joshua",
-      "deliveredId": "joshua",
       "name": "Исус Навин",
-      "shortName": "Ис. Нав.",
-      "slug": "isus-navin",
-      "deliveredOrder": 6,
       "testament": "OT",
       "chapters": 24,
       "verses": 658
     },
     {
       "canonicalId": "judges",
-      "deliveredId": "judges",
       "name": "Судии",
-      "shortName": "Суд.",
-      "slug": "sudii",
-      "deliveredOrder": 7,
       "testament": "OT",
       "chapters": 21,
       "verses": 618
     },
     {
       "canonicalId": "ruth",
-      "deliveredId": "ruth",
       "name": "Рута",
-      "shortName": "Рут.",
-      "slug": "ruta",
-      "deliveredOrder": 8,
       "testament": "OT",
       "chapters": 4,
       "verses": 85
     },
     {
       "canonicalId": "1-samuel",
-      "deliveredId": "1-samuel",
       "name": "Прва книга Самуилова",
-      "shortName": "1 Сам.",
-      "slug": "1-samuilova",
-      "deliveredOrder": 9,
       "testament": "OT",
       "chapters": 31,
       "verses": 810
     },
     {
       "canonicalId": "2-samuel",
-      "deliveredId": "2-samuel",
       "name": "Втора книга Самуилова",
-      "shortName": "2 Сам.",
-      "slug": "2-samuilova",
-      "deliveredOrder": 10,
       "testament": "OT",
       "chapters": 24,
       "verses": 695
     },
     {
       "canonicalId": "1-kings",
-      "deliveredId": "1-kings",
       "name": "Прва книга за царевите",
-      "shortName": "1 Цар.",
-      "slug": "1-carevite",
-      "deliveredOrder": 11,
       "testament": "OT",
       "chapters": 22,
       "verses": 816
     },
     {
       "canonicalId": "2-kings",
-      "deliveredId": "2-kings",
       "name": "Втора книга за царевите",
-      "shortName": "2 Цар.",
-      "slug": "2-carevite",
-      "deliveredOrder": 12,
       "testament": "OT",
       "chapters": 25,
       "verses": 719
     },
     {
       "canonicalId": "1-chronicles",
-      "deliveredId": "1-chronicles",
       "name": "Прва книга Летописи",
-      "shortName": "1 Лет.",
-      "slug": "1-letopisi",
-      "deliveredOrder": 13,
       "testament": "OT",
       "chapters": 29,
       "verses": 942
     },
     {
       "canonicalId": "2-chronicles",
-      "deliveredId": "2-chronicles",
       "name": "Втора книга Летописи",
-      "shortName": "2 Лет.",
-      "slug": "2-letopisi",
-      "deliveredOrder": 14,
       "testament": "OT",
       "chapters": 36,
       "verses": 822
     },
     {
       "canonicalId": "ezra",
-      "deliveredId": "ezra",
       "name": "Ездра",
-      "shortName": "Езд.",
-      "slug": "ezdra",
-      "deliveredOrder": 15,
       "testament": "OT",
       "chapters": 10,
       "verses": 280
     },
     {
       "canonicalId": "nehemiah",
-      "deliveredId": "nehemiah",
       "name": "Неемија",
-      "shortName": "Неем.",
-      "slug": "neemija",
-      "deliveredOrder": 16,
       "testament": "OT",
       "chapters": 13,
       "verses": 406
     },
     {
       "canonicalId": "esther",
-      "deliveredId": "esther",
       "name": "Естира",
-      "shortName": "Ест.",
-      "slug": "estira",
-      "deliveredOrder": 17,
       "testament": "OT",
       "chapters": 10,
       "verses": 167
     },
     {
       "canonicalId": "job",
-      "deliveredId": "job",
       "name": "Јов",
-      "shortName": "Јов",
-      "slug": "jov",
-      "deliveredOrder": 18,
       "testament": "OT",
       "chapters": 42,
       "verses": 1070
     },
     {
       "canonicalId": "psalms",
-      "deliveredId": "psalms",
       "name": "Псалми",
-      "shortName": "Пс.",
-      "slug": "psalmi",
-      "deliveredOrder": 19,
       "testament": "OT",
       "chapters": 150,
       "verses": 2461
     },
     {
       "canonicalId": "proverbs",
-      "deliveredId": "proverbs",
       "name": "Изреки",
-      "shortName": "Изр.",
-      "slug": "izreki",
-      "deliveredOrder": 20,
       "testament": "OT",
       "chapters": 31,
       "verses": 915
     },
     {
       "canonicalId": "ecclesiastes",
-      "deliveredId": "ecclesiastes",
       "name": "Проповедник",
-      "shortName": "Проп.",
-      "slug": "propovednik",
-      "deliveredOrder": 21,
       "testament": "OT",
       "chapters": 12,
       "verses": 222
     },
     {
       "canonicalId": "song-of-solomon",
-      "deliveredId": "song-of-songs",
       "name": "Песна над песните",
-      "shortName": "Песна",
-      "slug": "pesna-nad-pesnite",
-      "deliveredOrder": 22,
       "testament": "OT",
       "chapters": 8,
       "verses": 117
     },
     {
       "canonicalId": "isaiah",
-      "deliveredId": "isaiah",
       "name": "Исаија",
-      "shortName": "Ис.",
-      "slug": "isaija",
-      "deliveredOrder": 23,
       "testament": "OT",
       "chapters": 66,
       "verses": 1292
     },
     {
       "canonicalId": "jeremiah",
-      "deliveredId": "jeremiah",
       "name": "Еремија",
-      "shortName": "Ер.",
-      "slug": "eremija",
-      "deliveredOrder": 24,
       "testament": "OT",
       "chapters": 52,
       "verses": 1364
     },
     {
       "canonicalId": "lamentations",
-      "deliveredId": "lamentations",
       "name": "Плач Еремиин",
-      "shortName": "Плач",
-      "slug": "plac-eremiin",
-      "deliveredOrder": 25,
       "testament": "OT",
       "chapters": 5,
       "verses": 154
     },
     {
       "canonicalId": "ezekiel",
-      "deliveredId": "ezekiel",
       "name": "Езекиел",
-      "shortName": "Езек.",
-      "slug": "ezekiel",
-      "deliveredOrder": 26,
       "testament": "OT",
       "chapters": 48,
       "verses": 1273
     },
     {
       "canonicalId": "daniel",
-      "deliveredId": "daniel",
       "name": "Данаил",
-      "shortName": "Дан.",
-      "slug": "danail",
-      "deliveredOrder": 27,
       "testament": "OT",
       "chapters": 12,
       "verses": 357
     },
     {
       "canonicalId": "hosea",
-      "deliveredId": "hosea",
       "name": "Осија",
-      "shortName": "Ос.",
-      "slug": "osija",
-      "deliveredOrder": 28,
       "testament": "OT",
       "chapters": 14,
       "verses": 197
     },
     {
       "canonicalId": "joel",
-      "deliveredId": "joel",
       "name": "Јоил",
-      "shortName": "Јоил",
-      "slug": "joil",
-      "deliveredOrder": 29,
       "testament": "OT",
       "chapters": 3,
       "verses": 73
     },
     {
       "canonicalId": "amos",
-      "deliveredId": "amos",
       "name": "Амос",
-      "shortName": "Ам.",
-      "slug": "amos",
-      "deliveredOrder": 30,
       "testament": "OT",
       "chapters": 9,
       "verses": 146
     },
     {
       "canonicalId": "obadiah",
-      "deliveredId": "obadiah",
       "name": "Авдија",
-      "shortName": "Авд.",
-      "slug": "avdija",
-      "deliveredOrder": 31,
       "testament": "OT",
       "chapters": 1,
       "verses": 21
     },
     {
       "canonicalId": "jonah",
-      "deliveredId": "jonah",
       "name": "Јона",
-      "shortName": "Јона",
-      "slug": "jona",
-      "deliveredOrder": 32,
       "testament": "OT",
       "chapters": 4,
       "verses": 48
     },
     {
       "canonicalId": "micah",
-      "deliveredId": "micah",
       "name": "Михеј",
-      "shortName": "Мих.",
-      "slug": "mihej",
-      "deliveredOrder": 33,
       "testament": "OT",
       "chapters": 7,
       "verses": 105
     },
     {
       "canonicalId": "nahum",
-      "deliveredId": "nahum",
       "name": "Наум",
-      "shortName": "Наум",
-      "slug": "naum",
-      "deliveredOrder": 34,
       "testament": "OT",
       "chapters": 3,
       "verses": 47
     },
     {
       "canonicalId": "habakkuk",
-      "deliveredId": "habakkuk",
       "name": "Авакум",
-      "shortName": "Авак.",
-      "slug": "avakum",
-      "deliveredOrder": 35,
       "testament": "OT",
       "chapters": 3,
       "verses": 56
     },
     {
       "canonicalId": "zephaniah",
-      "deliveredId": "zephaniah",
       "name": "Софонија",
-      "shortName": "Соф.",
-      "slug": "sofonija",
-      "deliveredOrder": 36,
       "testament": "OT",
       "chapters": 3,
       "verses": 53
     },
     {
       "canonicalId": "haggai",
-      "deliveredId": "haggai",
       "name": "Агеј",
-      "shortName": "Агеј",
-      "slug": "agej",
-      "deliveredOrder": 37,
       "testament": "OT",
       "chapters": 2,
       "verses": 38
     },
     {
       "canonicalId": "zechariah",
-      "deliveredId": "zechariah",
       "name": "Захарија",
-      "shortName": "Зах.",
-      "slug": "zaharija",
-      "deliveredOrder": 38,
       "testament": "OT",
       "chapters": 14,
       "verses": 211
     },
     {
       "canonicalId": "malachi",
-      "deliveredId": "malachi",
       "name": "Малахија",
-      "shortName": "Мал.",
-      "slug": "malahija",
-      "deliveredOrder": 39,
       "testament": "OT",
       "chapters": 4,
       "verses": 55
     },
     {
       "canonicalId": "matthew",
-      "deliveredId": "matthew",
       "name": "Евангелие според Матеј",
-      "shortName": "Мт.",
-      "slug": "matej",
-      "deliveredOrder": 1,
       "testament": "NT",
       "chapters": 28,
-      "verses": 1068
+      "verses": 1071
     },
     {
       "canonicalId": "mark",
-      "deliveredId": "mark",
       "name": "Евангелие според Марко",
-      "shortName": "Мк.",
-      "slug": "marko",
-      "deliveredOrder": 2,
       "testament": "NT",
       "chapters": 16,
-      "verses": 673
+      "verses": 678
     },
     {
       "canonicalId": "luke",
-      "deliveredId": "luke",
       "name": "Евангелие според Лука",
-      "shortName": "Лк.",
-      "slug": "luka",
-      "deliveredOrder": 3,
       "testament": "NT",
       "chapters": 24,
-      "verses": 1149
+      "verses": 1151
     },
     {
       "canonicalId": "john",
-      "deliveredId": "john",
       "name": "Евангелие според Јован",
-      "shortName": "Јн.",
-      "slug": "jovan",
-      "deliveredOrder": 4,
       "testament": "NT",
       "chapters": 21,
-      "verses": 878
+      "verses": 879
     },
     {
       "canonicalId": "acts",
-      "deliveredId": "acts",
       "name": "Дела на апостолите",
-      "shortName": "Дела",
-      "slug": "dela",
-      "deliveredOrder": 5,
       "testament": "NT",
       "chapters": 28,
-      "verses": 1003
+      "verses": 1006
     },
     {
       "canonicalId": "romans",
-      "deliveredId": "romans",
       "name": "Послание до Римјаните",
-      "shortName": "Рим.",
-      "slug": "rimjanite",
-      "deliveredOrder": 6,
       "testament": "NT",
       "chapters": 16,
-      "verses": 432
+      "verses": 433
     },
     {
       "canonicalId": "1-corinthians",
-      "deliveredId": "1-corinthians",
       "name": "Прво послание до Коринтјаните",
-      "shortName": "1 Кор.",
-      "slug": "1-korintjanite",
-      "deliveredOrder": 7,
       "testament": "NT",
       "chapters": 16,
       "verses": 437
     },
     {
       "canonicalId": "2-corinthians",
-      "deliveredId": "2-corinthians",
       "name": "Второ послание до Коринтјаните",
-      "shortName": "2 Кор.",
-      "slug": "2-korintjanite",
-      "deliveredOrder": 8,
       "testament": "NT",
       "chapters": 13,
-      "verses": 256
+      "verses": 257
     },
     {
       "canonicalId": "galatians",
-      "deliveredId": "galatians",
       "name": "Послание до Галатјаните",
-      "shortName": "Гал.",
-      "slug": "galatjanite",
-      "deliveredOrder": 9,
       "testament": "NT",
       "chapters": 6,
       "verses": 149
     },
     {
       "canonicalId": "ephesians",
-      "deliveredId": "ephesians",
       "name": "Послание до Ефесјаните",
-      "shortName": "Еф.",
-      "slug": "efesjanite",
-      "deliveredOrder": 10,
       "testament": "NT",
       "chapters": 6,
       "verses": 155
     },
     {
       "canonicalId": "philippians",
-      "deliveredId": "philippians",
       "name": "Послание до Филипјаните",
-      "shortName": "Фил.",
-      "slug": "filipjanite",
-      "deliveredOrder": 11,
       "testament": "NT",
       "chapters": 4,
       "verses": 104
     },
     {
       "canonicalId": "colossians",
-      "deliveredId": "colossians",
       "name": "Послание до Колосјаните",
-      "shortName": "Кол.",
-      "slug": "kolosjanite",
-      "deliveredOrder": 12,
       "testament": "NT",
       "chapters": 4,
       "verses": 95
     },
     {
       "canonicalId": "1-thessalonians",
-      "deliveredId": "1-thessalonians",
       "name": "Прво послание до Солунјаните",
-      "shortName": "1 Сол.",
-      "slug": "1-solunjanite",
-      "deliveredOrder": 13,
       "testament": "NT",
       "chapters": 5,
       "verses": 89
     },
     {
       "canonicalId": "2-thessalonians",
-      "deliveredId": "2-thessalonians",
       "name": "Второ послание до Солунјаните",
-      "shortName": "2 Сол.",
-      "slug": "2-solunjanite",
-      "deliveredOrder": 14,
       "testament": "NT",
       "chapters": 3,
       "verses": 47
     },
     {
       "canonicalId": "1-timothy",
-      "deliveredId": "1-timothy",
       "name": "Прво послание до Тимотеј",
-      "shortName": "1 Тим.",
-      "slug": "1-timotej",
-      "deliveredOrder": 15,
       "testament": "NT",
       "chapters": 6,
       "verses": 113
     },
     {
       "canonicalId": "2-timothy",
-      "deliveredId": "2-timothy",
       "name": "Второ послание до Тимотеј",
-      "shortName": "2 Тим.",
-      "slug": "2-timotej",
-      "deliveredOrder": 16,
       "testament": "NT",
       "chapters": 4,
       "verses": 83
     },
     {
       "canonicalId": "titus",
-      "deliveredId": "titus",
       "name": "Послание до Тит",
-      "shortName": "Тит",
-      "slug": "tit",
-      "deliveredOrder": 17,
       "testament": "NT",
       "chapters": 3,
       "verses": 46
     },
     {
       "canonicalId": "philemon",
-      "deliveredId": "philemon",
       "name": "Послание до Филимон",
-      "shortName": "Филм.",
-      "slug": "filimon",
-      "deliveredOrder": 18,
       "testament": "NT",
       "chapters": 1,
       "verses": 25
     },
     {
       "canonicalId": "hebrews",
-      "deliveredId": "hebrews",
       "name": "Послание до Евреите",
-      "shortName": "Евр.",
-      "slug": "evreite",
-      "deliveredOrder": 19,
       "testament": "NT",
       "chapters": 13,
       "verses": 303
     },
     {
       "canonicalId": "james",
-      "deliveredId": "james",
       "name": "Послание на Јаков",
-      "shortName": "Јак.",
-      "slug": "jakov",
-      "deliveredOrder": 20,
       "testament": "NT",
       "chapters": 5,
       "verses": 108
     },
     {
       "canonicalId": "1-peter",
-      "deliveredId": "1-peter",
       "name": "Прво послание на Петар",
-      "shortName": "1 Пет.",
-      "slug": "1-petar",
-      "deliveredOrder": 21,
       "testament": "NT",
       "chapters": 5,
       "verses": 105
     },
     {
       "canonicalId": "2-peter",
-      "deliveredId": "2-peter",
       "name": "Второ послание на Петар",
-      "shortName": "2 Пет.",
-      "slug": "2-petar",
-      "deliveredOrder": 22,
       "testament": "NT",
       "chapters": 3,
       "verses": 61
     },
     {
       "canonicalId": "1-john",
-      "deliveredId": "1-john",
       "name": "Прво послание на Јован",
-      "shortName": "1 Јн.",
-      "slug": "1-jovan",
-      "deliveredOrder": 23,
       "testament": "NT",
       "chapters": 5,
       "verses": 105
     },
     {
       "canonicalId": "2-john",
-      "deliveredId": "2-john",
       "name": "Второ послание на Јован",
-      "shortName": "2 Јн.",
-      "slug": "2-jovan",
-      "deliveredOrder": 24,
       "testament": "NT",
       "chapters": 1,
       "verses": 13
     },
     {
       "canonicalId": "3-john",
-      "deliveredId": "3-john",
       "name": "Трето послание на Јован",
-      "shortName": "3 Јн.",
-      "slug": "3-jovan",
-      "deliveredOrder": 25,
       "testament": "NT",
       "chapters": 1,
       "verses": 15
     },
     {
       "canonicalId": "jude",
-      "deliveredId": "jude",
       "name": "Послание на Јуда",
-      "shortName": "Јуда",
-      "slug": "juda",
-      "deliveredOrder": 26,
       "testament": "NT",
       "chapters": 1,
       "verses": 25
     },
     {
       "canonicalId": "revelation",
-      "deliveredId": "revelation",
-      "name": "Откровение на Јован",
-      "shortName": "Отк.",
-      "slug": "otkrovenie",
-      "deliveredOrder": 27,
+      "name": "Откровение",
       "testament": "NT",
       "chapters": 22,
-      "verses": 405
+      "verses": 404
     }
   ]
 }

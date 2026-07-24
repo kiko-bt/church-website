@@ -1084,10 +1084,14 @@
         },
         {
           "number": 12,
-          "text": "Greet one another with a holy kiss. All the saints greet you."
+          "text": "Greet one another with a holy kiss."
         },
         {
           "number": 13,
+          "text": "All the saints greet you."
+        },
+        {
+          "number": 14,
           "text": "The grace of the Lord Jesus Christ, God’s love, and the fellowship of the Holy Spirit, be with you all. Amen."
         }
       ]
