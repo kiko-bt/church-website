@@ -9,42 +9,30 @@ import { manifestSchema, bookFileSchema } from "./bible.schema";
 import manifestJson from "@/data/bible/manifest.json";
 
 // ---------------------------------------------------------------------------
-// Bible data layer — the ONLY module that reads the Bible JSON files.
+// The ONLY module that reads the Bible JSON files.
 //
 // Routing and metadata read the MANIFEST only (tiny, no verse text), so
 // `generateStaticParams` never touches the verse corpus. Verse text is loaded
-// lazily, per book, per locale — never as one monolithic file — and each book
-// is parsed and validated at most once, then cached for the lifetime of the
-// process. (The cache is not evicted, so a full build ends up holding the books
-// it rendered; that is expected and bounded by the dataset size.)
+// lazily, per book, per locale, and each book is parsed and validated at most
+// once per process, then cached. The cache is never evicted, so a full build
+// ends up holding the books it rendered; that is expected and bounded by the
+// dataset size.
 //
-// Every file is validated with the shared Zod schemas as it is read, so a
-// malformed dataset fails the build here too — a second gate behind the
-// standalone `bible:validate` prebuild check.
+// Files are validated with the shared Zod schemas as they are read — a second
+// gate behind the standalone `bible:validate` prebuild check.
 // ---------------------------------------------------------------------------
 
-// Validate the manifest shape once, at module load.
 const manifest: BibleManifest = manifestSchema.parse(manifestJson);
 
 const bookMetaById = new Map<string, BibleManifestBook>(
   manifest.books.map((book) => [book.id, book])
 );
 
-// --- Manifest accessors (routing / static params — no verse text) ---
-
-export function getManifest(): BibleManifest {
-  return manifest;
-}
-
+// Routing / static params — no verse text.
 export function getAllBookMeta(): readonly BibleManifestBook[] {
   return manifest.books;
 }
 
-// --- Verse-text accessors (lazy, cached, validated) ---
-
-// Cache of validated book files, keyed by `${locale}:${bookId}`. Persists for
-// the lifetime of the process (build), so a book is read and validated at most
-// once even though it backs many chapter pages.
 const bookCache = new Map<string, BibleBook>();
 
 // A single dynamic segment inside a fixed directory keeps the bundler's dynamic
@@ -58,7 +46,7 @@ function importBookModule(
     : import(`../../data/bible/mk/${bookId}.json`);
 }
 
-export async function getBook(
+async function getBook(
   locale: Locale,
   bookId: string
 ): Promise<BibleBook | undefined> {
@@ -82,16 +70,4 @@ export async function getChapter(
 ): Promise<BibleChapter | undefined> {
   const book = await getBook(locale, bookId);
   return book?.chapters.find((chapter) => chapter.number === chapterNumber);
-}
-
-// Loads every book for a locale (in canonical order). Used by the Bible landing
-// page, which needs localized book names. Backed by the same cache, so it does
-// not cost more than the chapter pages already do.
-export async function getAllBooks(
-  locale: Locale
-): Promise<readonly BibleBook[]> {
-  const books = await Promise.all(
-    manifest.books.map((meta) => getBook(locale, meta.id))
-  );
-  return books.filter((book): book is BibleBook => book !== undefined);
 }

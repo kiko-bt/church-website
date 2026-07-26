@@ -18,13 +18,11 @@ type Canon = Parameters<typeof validateDataset>[0]["canon"];
 
 function makeBook(
   id: string,
-  name: string,
   testament: "OT" | "NT",
   verseCounts: readonly number[]
 ): ParsedBookFile {
   return {
     id,
-    name,
     testament,
     chapters: verseCounts.map((count, chapterIndex) => ({
       number: chapterIndex + 1,
@@ -53,8 +51,8 @@ function makeValid() {
   };
   const filesByLocale: Record<string, Record<string, ParsedBookFile>> = {
     en: {
-      genesis: makeBook("genesis", "Genesis", "OT", [2, 3]),
-      john: makeBook("john", "John", "NT", [1]),
+      genesis: makeBook("genesis", "OT", [2, 3]),
+      john: makeBook("john", "NT", [1]),
     },
   };
   return { canon, manifest, filesByLocale, expectedLocales: ["en"] as const };
@@ -78,17 +76,15 @@ test("verseSchema rejects non-positive / non-integer verse numbers", () => {
 });
 
 test("bookFileSchema rejects extra and missing fields (strict)", () => {
-  const base = makeBook("john", "John", "NT", [1]);
+  const base = makeBook("john", "NT", [1]);
   assert.ok(bookFileSchema.safeParse(base).success);
   // extra field
   assert.ok(!bookFileSchema.safeParse({ ...base, color: "gold" }).success);
-  // missing field (no `name`)
-  const withoutName = {
-    id: base.id,
-    testament: base.testament,
-    chapters: base.chapters,
-  };
-  assert.ok(!bookFileSchema.safeParse(withoutName).success);
+  // a display name in a book file is a rejected extra field — names belong to
+  // bible.display-names.ts only
+  assert.ok(!bookFileSchema.safeParse({ ...base, name: "John" }).success);
+  // missing field
+  assert.ok(!bookFileSchema.safeParse({ id: base.id, testament: base.testament }).success);
   // invalid testament
   assert.ok(!bookFileSchema.safeParse({ ...base, testament: "XX" }).success);
 });
@@ -137,26 +133,26 @@ test("rejects an unknown book slug", () => {
   const books = [...d.manifest.books];
   books[1] = { ...books[1], id: "not-a-book" };
   d.manifest = { ...d.manifest, books };
-  d.filesByLocale.en["not-a-book"] = makeBook("not-a-book", "Nope", "NT", [1]);
+  d.filesByLocale.en["not-a-book"] = makeBook("not-a-book", "NT", [1]);
   delete d.filesByLocale.en.john;
   assert.ok(validateDataset(d).some((e) => e.includes("unknown book slug")));
 });
 
 test("rejects a manifest/file chapter-count mismatch", () => {
   const d = makeValid();
-  d.filesByLocale.en.genesis = makeBook("genesis", "Genesis", "OT", [2, 3, 4]);
+  d.filesByLocale.en.genesis = makeBook("genesis", "OT", [2, 3, 4]);
   assert.ok(validateDataset(d).some((e) => e.includes("chapters")));
 });
 
 test("rejects a manifest/file verse-count mismatch", () => {
   const d = makeValid();
-  d.filesByLocale.en.genesis = makeBook("genesis", "Genesis", "OT", [2, 5]);
+  d.filesByLocale.en.genesis = makeBook("genesis", "OT", [2, 5]);
   assert.ok(validateDataset(d).some((e) => e.includes("verses")));
 });
 
 test("rejects non-contiguous verse numbering (a duplicated verse)", () => {
   const d = makeValid();
-  const book = makeBook("john", "John", "NT", [1]);
+  const book = makeBook("john", "NT", [1]);
   const patched: ParsedBookFile = {
     ...book,
     chapters: [
@@ -185,7 +181,7 @@ test("rejects a missing locale", () => {
 
 test("rejects an unknown locale", () => {
   const d = makeValid();
-  d.filesByLocale.de = { genesis: makeBook("genesis", "Genesis", "OT", [2, 3]) };
+  d.filesByLocale.de = { genesis: makeBook("genesis", "OT", [2, 3]) };
   assert.ok(validateDataset(d).some((e) => e.includes('unknown locale "de"')));
 });
 
@@ -202,6 +198,10 @@ const VALID_REFERENCES = [
   "genesis.2.3",
   "john.1.1",
 ];
+
+// makeSearchIndex stamps the bookId as the book name, so the expected registry
+// for these fixtures is the identity mapping.
+const NAMES: Record<string, string> = { genesis: "genesis", john: "john" };
 
 function makeSearchIndex(
   locale: string,
@@ -220,14 +220,14 @@ function makeSearchIndex(
 test("accepts a well-formed search index", () => {
   const { manifest } = makeValid();
   const index = makeSearchIndex("en", VALID_REFERENCES);
-  assert.deepEqual(validateSearchIndex(manifest, index, "en"), []);
+  assert.deepEqual(validateSearchIndex(manifest, index, "en", NAMES), []);
 });
 
 test("rejects a search index whose entry count != verse count", () => {
   const { manifest } = makeValid();
   const index = makeSearchIndex("en", VALID_REFERENCES.slice(0, 5));
   assert.ok(
-    validateSearchIndex(manifest, index, "en").some((e) =>
+    validateSearchIndex(manifest, index, "en", NAMES).some((e) =>
       e.includes("expected 6")
     )
   );
@@ -238,7 +238,7 @@ test("rejects a search index with an out-of-range reference", () => {
   const broken = [...VALID_REFERENCES.slice(0, 5), "genesis.9.9"];
   const index = makeSearchIndex("en", broken);
   assert.ok(
-    validateSearchIndex(manifest, index, "en").some((e) =>
+    validateSearchIndex(manifest, index, "en", NAMES).some((e) =>
       e.includes("do not resolve")
     )
   );
@@ -257,7 +257,7 @@ test("rejects a search index with a duplicate + a missing verse (same count)", (
     "john.1.1",
   ];
   const index = makeSearchIndex("en", broken);
-  const errors = validateSearchIndex(manifest, index, "en");
+  const errors = validateSearchIndex(manifest, index, "en", NAMES);
   assert.ok(errors.some((e) => e.includes("duplicate reference")));
   assert.ok(errors.some((e) => e.includes("missing")));
 });
@@ -266,6 +266,32 @@ test("rejects a search index whose locale field is wrong", () => {
   const { manifest } = makeValid();
   const index = makeSearchIndex("de", VALID_REFERENCES);
   assert.ok(
-    validateSearchIndex(manifest, index, "en").some((e) => e.includes("locale field"))
+    validateSearchIndex(manifest, index, "en", NAMES).some((e) => e.includes("locale field"))
+  );
+});
+
+test("rejects a search index whose book name is stale", () => {
+  const { manifest } = makeValid();
+  const index = makeSearchIndex("en", VALID_REFERENCES);
+  const renamed = { ...NAMES, john: "The Gospel of John" };
+  assert.ok(
+    validateSearchIndex(manifest, index, "en", renamed).some((e) =>
+      e.includes("bible:build")
+    )
+  );
+});
+
+// A partial rewrite is the nastier case: most entries are correct, so a check
+// that only sampled one entry per book would miss it.
+test("rejects a search index where only SOME entries carry the stale name", () => {
+  const { manifest } = makeValid();
+  const index = makeSearchIndex("en", VALID_REFERENCES);
+  const entries = index.entries.map((entry, i) =>
+    i === 1 ? { ...entry, bookName: "Old Name" } : entry
+  );
+  const errors = validateSearchIndex(manifest, { ...index, entries }, "en", NAMES);
+  assert.ok(
+    errors.some((e) => e.includes('"genesis"') && e.includes("Old Name")),
+    `expected a stale-name error, got: ${errors.join(" | ")}`
   );
 });

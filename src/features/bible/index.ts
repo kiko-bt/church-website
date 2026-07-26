@@ -1,14 +1,10 @@
-// Public API of the Bible feature (server-oriented).
+// Public API of the Bible feature, for Server Components.
 //
-// This barrel re-exports the data layer (`bible.data`), which imports the
-// manifest and validates on load — so it belongs in Server Components. Client
-// Components must NOT import from this barrel; they should import the pure,
-// dependency-free `bible.reference` module directly.
-//
-// NOTE: bible-search.ts is deliberately excluded — it is a Client Component
-// dependency (Fuse.js) and must be imported directly where needed. bible.schema
-// is likewise internal to the data/validation layer and not re-exported.
+// `bible.data` imports the manifest and validates on load, so this barrel is
+// server-oriented. Client Components must not import it — they import the
+// dependency-free `bible.reference` / `bible.display-names` modules directly.
+// `bible-search` (Fuse.js) and `bible.schema` are deliberately not re-exported.
 export * from "./bible.constants";
 export * from "./bible.data";
-export * from "./bible.reference";
+export * from "./bible.display-names";
 export type * from "./bible.types";

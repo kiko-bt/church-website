@@ -9,7 +9,7 @@ import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BibleBreadcrumb } from "@/components/bible/BibleBreadcrumb";
 import { ChapterGrid } from "@/components/bible/ChapterGrid";
-import { getAllBookMeta, getBook } from "@/features/bible";
+import { getAllBookMeta, getDisplayName } from "@/features/bible";
 
 type BibleBookPageProps = {
   params: Promise<{ locale: Locale; bookSlug: string }>;
@@ -29,11 +29,8 @@ export async function generateMetadata({
   params,
 }: BibleBookPageProps): Promise<Metadata> {
   const { locale, bookSlug } = await params;
-  const [book, t] = await Promise.all([
-    getBook(locale, bookSlug),
-    getTranslations({ locale, namespace: "bible" }),
-  ]);
-  const name = book?.name ?? bookSlug;
+  const t = await getTranslations({ locale, namespace: "bible" });
+  const name = getDisplayName(locale, bookSlug);
   return generateBaseMetadata(locale, `/bible/${bookSlug}`, {
     title: name,
     description: t("bookMetaDescription", { book: name }),
@@ -44,28 +41,33 @@ export default async function BibleBookPage({ params }: BibleBookPageProps) {
   const { locale, bookSlug } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("bible");
-  const book = await getBook(locale, bookSlug);
+
+  // The manifest is enough for this page — chapter count and nothing else — so
+  // it renders without loading any verse text.
+  const book = getAllBookMeta().find((entry) => entry.id === bookSlug);
 
   // With dynamicParams=false this is defensive only — the slug is guaranteed to
   // be a real book — but it keeps the type non-nullable and fails safe.
   if (!book) notFound();
+
+  const name = getDisplayName(locale, book.id);
 
   return (
     <LayoutShell>
       <JsonLd
         data={buildBreadcrumbSchema([
           { name: t("breadcrumb"), path: `/${locale}/bible` },
-          { name: book.name },
+          { name },
         ])}
       />
       <BibleBreadcrumb
         ariaLabel={t("aria.breadcrumb")}
         items={[
           { label: t("breadcrumb"), href: `/${locale}/bible` },
-          { label: book.name },
+          { label: name },
         ]}
       />
-      <PageHeader title={book.name} className="pt-0" />
+      <PageHeader title={name} className="pt-0" />
       <ChapterGrid
         locale={locale}
         bookId={book.id}

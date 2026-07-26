@@ -1,34 +1,24 @@
-// Canonical, language-INDEPENDENT registry of the Bible module.
+// The canonical book ORDER and identity of the Bible module.
 //
-// Nothing in this file is localized. Book display names ("Битие" / "Genesis")
-// live inside the per-locale data files (data/bible/<locale>/<id>.json) so the
-// application stays translation-agnostic: swapping the dataset never touches
-// this file. What lives here are the *facts* that define routing and identity —
-// canonical slugs, canonical order, and testament — which are stable across any
-// translation of the Protestant 66-book canon.
+// Nothing here is localized — display names live in bible.display-names.ts.
+// This file holds only the facts that define routing and identity: the stable
+// URL slug (`id`), the 1-based position in the canon (`order`), and the
+// testament. Those are the same for any translation of the 66-book canon.
+//
+// This order is FIXED. `scripts/validate-bible.ts` fails the build if the
+// manifest disagrees with it, and bible.display-names.test.ts asserts it.
 
-export const TESTAMENTS = {
-  OT: { mk: "Стар Завет", en: "Old Testament" },
-  NT: { mk: "Нов Завет", en: "New Testament" },
-} as const;
+export type Testament = "OT" | "NT";
 
-export type Testament = keyof typeof TESTAMENTS;
-
-export const BIBLE_DATA_PATH = "src/data/bible" as const;
-
-// A single canonical book: its stable URL slug (`id`), its 1-based position in
-// the canon (`order`), and the testament it belongs to. `id` is the identifier
-// used everywhere — URLs, the manifest, references, future sermon links — and is
-// NEVER translated.
-export type CanonBook = {
+type CanonBook = {
   readonly id: string;
   readonly order: number;
   readonly testament: Testament;
 };
 
-// The Protestant 66-book canon in canonical order (39 OT + 27 NT).
-// Slugs are lowercase, hyphen-separated, and derived from the conventional
-// English book names purely to serve as stable identifiers.
+// The Protestant 66-book canon in canonical order (39 OT + 27 NT). Slugs are
+// lowercase and hyphen-separated; they are identifiers, never display text, and
+// are NEVER translated.
 export const BIBLE_CANON: readonly CanonBook[] = [
   // --- Old Testament (39) ---
   { id: "genesis", order: 1, testament: "OT" },
@@ -99,8 +89,3 @@ export const BIBLE_CANON: readonly CanonBook[] = [
   { id: "jude", order: 65, testament: "NT" },
   { id: "revelation", order: 66, testament: "NT" },
 ] as const;
-
-// Convenience: the set of valid canonical book ids, for O(1) membership checks.
-export const BIBLE_BOOK_IDS: ReadonlySet<string> = new Set(
-  BIBLE_CANON.map((book) => book.id)
-);

@@ -4,7 +4,10 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import type Fuse from "fuse.js";
 import type { Locale } from "@/constants/locales";
-import type { BibleSearchEntry, BibleSearchIndex } from "@/features/bible";
+import type {
+  BibleSearchEntry,
+  BibleSearchIndex,
+} from "@/features/bible/bible.types";
 import { parseReference } from "@/features/bible/bible.reference";
 import { createBibleSearch, searchBible } from "@/features/bible/bible-search";
 

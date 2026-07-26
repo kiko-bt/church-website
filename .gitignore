@@ -39,9 +39,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# local download cache for the English (WEB) Bible used by `npm run bible:migrate`
-.bible-web-cache
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts

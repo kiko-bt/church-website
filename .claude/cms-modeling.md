@@ -57,8 +57,10 @@ NOT inside Sanity.
 
 ```txt
 src/data/bible/
-├── bible-hierarchical.json
-└── bible-search-index.json
+├── mk/<bookId>.json        hand-owned: Macedonian verse text
+├── en/<bookId>.json        hand-owned: English verse text
+├── manifest.json           derived — routing shape, no verse text
+└── search/<locale>.json    derived — Fuse.js index, one entry per verse
 ```
 
 ---

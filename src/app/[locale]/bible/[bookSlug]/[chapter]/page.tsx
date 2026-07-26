@@ -9,7 +9,7 @@ import { ChapterNav } from "@/components/bible/ChapterNav";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbSchema } from "@/lib/seo/structured-data";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getAllBookMeta, getBook, getChapter } from "@/features/bible";
+import { getAllBookMeta, getChapter, getDisplayName } from "@/features/bible";
 
 type BibleChapterPageProps = {
   params: Promise<{ locale: Locale; bookSlug: string; chapter: string }>;
@@ -37,11 +37,8 @@ export async function generateMetadata({
   params,
 }: BibleChapterPageProps): Promise<Metadata> {
   const { locale, bookSlug, chapter } = await params;
-  const [book, t] = await Promise.all([
-    getBook(locale, bookSlug),
-    getTranslations({ locale, namespace: "bible" }),
-  ]);
-  const name = book?.name ?? bookSlug;
+  const t = await getTranslations({ locale, namespace: "bible" });
+  const name = getDisplayName(locale, bookSlug);
   return generateBaseMetadata(locale, `/bible/${bookSlug}/${chapter}`, {
     title: `${name} ${chapter}`,
     description: t("chapterMetaDescription", { book: name, chapter }),
@@ -55,19 +52,20 @@ export default async function BibleChapterPage({
   setRequestLocale(locale);
   const t = await getTranslations("bible");
   const chapterNumber = Number(chapter);
-  const book = await getBook(locale, bookSlug);
   const chapterData = await getChapter(locale, bookSlug, chapterNumber);
 
   // Defensive with dynamicParams=false — the params are guaranteed valid — but
   // it keeps the types non-nullable and fails safe.
-  if (!book || !chapterData) notFound();
+  if (!chapterData) notFound();
+
+  const name = getDisplayName(locale, bookSlug);
 
   return (
     <LayoutShell>
       <JsonLd
         data={buildBreadcrumbSchema([
           { name: t("breadcrumb"), path: `/${locale}/bible` },
-          { name: book.name, path: `/${locale}/bible/${bookSlug}` },
+          { name, path: `/${locale}/bible/${bookSlug}` },
           { name: `${t("chapter")} ${chapter}` },
         ])}
       />
@@ -75,24 +73,21 @@ export default async function BibleChapterPage({
         ariaLabel={t("aria.breadcrumb")}
         items={[
           { label: t("breadcrumb"), href: `/${locale}/bible` },
-          { label: book.name, href: `/${locale}/bible/${bookSlug}` },
+          { label: name, href: `/${locale}/bible/${bookSlug}` },
           { label: `${t("chapter")} ${chapter}` },
         ]}
       />
 
       <header className="mb-8">
         <h1 className="font-heading text-3xl font-bold text-deep-dark sm:text-4xl">
-          {book.name}
+          {name}
         </h1>
         <p className="mt-2 text-lg text-text-primary/70">
           {t("chapter")} {chapter}
         </p>
       </header>
 
-      <VerseList
-        verses={chapterData.verses}
-        ariaLabel={`${book.name} ${chapter}`}
-      />
+      <VerseList verses={chapterData.verses} ariaLabel={`${name} ${chapter}`} />
 
       <ChapterNav locale={locale} bookId={bookSlug} chapter={chapterNumber} />
     </LayoutShell>

@@ -1,30 +1,20 @@
-// LOCKED canonical Bible book display names — the permanent source of truth.
+// THE Bible book display names. This file is the only place they exist.
 //
-// These names and their order are FIXED and MUST NOT be changed. They were
-// approved by the content owner (the preacher) and are what production ships.
-// Order is defined by BIBLE_CANON (bible.constants.ts); this file defines the
-// localized *display name* for every book in every locale.
+// The names below were approved by the content owner and are what production
+// ships. The book JSON files hold no name — pages resolve one by book id at
+// render time — so this is both the lock and the edit point.
 //
-// Why this file exists (do not delete it):
-//   The Bible dataset is (re)generated from the preacher's raw delivery by
-//   `scripts/migrate-client-bible.ts`. That raw delivery uses DIFFERENT, longer
-//   book names (e.g. "Евангелие според Матеј", "Послание до Римјаните"), so
-//   every re-migration or re-import USED TO overwrite the approved names and
-//   silently revert them. This registry is the single authority the migration
-//   stamps into the book files, and `scripts/validate-bible.ts` fails the build
-//   if any book file's name drifts from it. Together that makes the names
-//   immutable: a wrong name can never reach production, and a re-migration
-//   produces the correct names automatically.
+// To rename a book: edit it here, then run `npm run bible:build`. The build is
+// required, not optional: the search index stamps a copy of each name in so
+// Fuse can match on it, and the validator fails until that copy is refreshed.
 //
-// To change a name you MUST edit it here (and only here), then run
-// `npm run bible:build`. Nowhere else. See .claude/bible-module.md §3.
+// The book ORDER is separate and lives in bible.constants.ts (BIBLE_CANON).
 
 import type { Locale } from "@/constants/locales";
 
-// Per-locale display name for every canonical book id. Every id in BIBLE_CANON
-// MUST have an entry in every locale — enforced by assertDisplayNamesComplete()
-// (called by the validator and the build script) so a newly added book cannot
-// be forgotten here.
+// Every id in BIBLE_CANON must have an entry in every locale — enforced by
+// assertDisplayNamesComplete() below, which the validator and the build script
+// both call, so a book can never be silently missing a name.
 export const BIBLE_DISPLAY_NAMES: Record<Locale, Record<string, string>> = {
   mk: {
     // --- Old Testament ---
@@ -168,26 +158,24 @@ export const BIBLE_DISPLAY_NAMES: Record<Locale, Record<string, string>> = {
   },
 };
 
-// The locked display name for one book in one locale. Throws if either the
-// locale or the book id is unknown — callers rely on this being total over the
-// canon, so a missing entry is a programming error, not a runtime fallback.
+// Throws on an unknown locale or book id: callers rely on this being total over
+// the canon, so a missing entry is a programming error, not something to paper
+// over with a fallback.
 export function getDisplayName(locale: Locale, bookId: string): string {
   const name = BIBLE_DISPLAY_NAMES[locale]?.[bookId];
   if (name === undefined) {
     throw new Error(
-      `No locked display name for book "${bookId}" in locale "${locale}" ` +
+      `No display name for book "${bookId}" in locale "${locale}" ` +
         `(add it to src/features/bible/bible.display-names.ts).`
     );
   }
   return name;
 }
 
-// Guards that the registry covers exactly the canon, in every locale: every
-// canonical book has a name, and there are no stray entries for unknown ids.
-// Returns human-readable error strings (empty = OK) so the validator can fold
-// them into its report. Also called by the build script. `canonBookIds` is the
-// list of BIBLE_CANON ids, passed in so this module has no runtime dependency
-// on bible.constants (keeping it safe to run under the plain Node scripts).
+// Guards that the registry covers exactly the canon, in every locale. Returns
+// human-readable error strings (empty = OK) so the validator can fold them into
+// its report. `canonBookIds` is passed in rather than imported so this module
+// keeps zero runtime dependencies and stays cheap for a Client Component.
 export function assertDisplayNamesComplete(
   locales: readonly Locale[],
   canonBookIds: readonly string[]

@@ -4,17 +4,17 @@ import type { Testament } from "./bible.constants";
 // ---------------------------------------------------------------------------
 // Validation for the Bible dataset (single source of truth).
 //
-// This module intentionally has only ONE value import (zod). Everything else is
-// a type-only import, which Node's type-stripping erases — so this file can be
-// consumed both by the app/build typecheck AND by the standalone Node validator
-// (`scripts/validate-bible.ts`) without module-resolution friction.
-//
-// Two layers of checking:
+// Two layers:
 //   1. Zod schemas  — per-file SHAPE and field validity (strict objects reject
 //      unexpected fields; verse text may not be empty/whitespace).
-//   2. validateDataset() — holistic, cross-file integrity that Zod cannot express
-//      on its own (canonical ordering, duplicates, contiguity, missing/extra
-//      chapters & verses, and manifest ↔ file agreement).
+//   2. validateDataset() — cross-file integrity Zod cannot express on its own
+//      (canonical ordering, duplicates, contiguity, missing/extra chapters &
+//      verses, and manifest ↔ file agreement).
+//
+// Keep zod as this module's ONLY value import. Everything else must stay a
+// type-only import, which Node's type-stripping erases — that is what lets the
+// standalone validator (`scripts/validate-bible.ts`) run this file under plain
+// Node without module-resolution friction.
 // ---------------------------------------------------------------------------
 
 // A non-empty, non-whitespace-only string.
@@ -33,21 +33,23 @@ export const verseSchema = z.strictObject({
   text: nonBlankString,
 });
 
-export const chapterSchema = z.strictObject({
+const chapterSchema = z.strictObject({
   number: z.number().int().positive(),
   verses: z.array(verseSchema).min(1),
 });
 
+// A book file carries text and structure only — no display name. Names live in
+// bible.display-names.ts (the single definition) and are resolved by id when
+// rendering, so a name can never drift between the registry and the data.
 export const bookFileSchema = z.strictObject({
   id: nonBlankString,
-  name: nonBlankString,
   testament: testamentSchema,
   chapters: z.array(chapterSchema).min(1),
 });
 
 // --- Manifest (data/bible/manifest.json) ---
 
-export const manifestBookSchema = z.strictObject({
+const manifestBookSchema = z.strictObject({
   id: nonBlankString,
   order: z.number().int().positive(),
   testament: testamentSchema,
@@ -67,7 +69,7 @@ export const manifestSchema = z.strictObject({
 
 // --- Search index (data/bible/search/<locale>.json) ---
 
-export const searchEntrySchema = z.strictObject({
+const searchEntrySchema = z.strictObject({
   reference: nonBlankString, // canonical "bookId.chapter.verse"
   bookName: nonBlankString,
   text: nonBlankString,
@@ -92,7 +94,7 @@ type CanonEntry = {
   readonly testament: Testament;
 };
 
-export type ValidateDatasetInput = {
+type ValidateDatasetInput = {
   readonly canon: readonly CanonEntry[];
   readonly manifest: ParsedManifest;
   // filesByLocale[locale][bookId] = the parsed per-book file.
@@ -220,16 +222,21 @@ export function validateDataset(input: ValidateDatasetInput): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Search-index integrity — every entry references a real verse, and the index
-// covers every verse exactly once (no out-of-canon references, duplicates, or
-// gaps). References are compared as strings against the exact expected set, so
-// no reference parsing is needed here.
+// Search-index integrity — every entry references a real verse, the index covers
+// every verse exactly once (no out-of-canon references, duplicates, or gaps),
+// and the book names it carries are in step with the display-name registry.
+// References are compared as strings against the exact expected set, so no
+// reference parsing is needed here.
+//
+// `expectedBookNames` is passed in (rather than imported) to keep zod this
+// module's only value import — see the note at the top of the file.
 // ---------------------------------------------------------------------------
 
 export function validateSearchIndex(
   manifest: ParsedManifest,
   index: ParsedSearchIndex,
-  locale: string
+  locale: string,
+  expectedBookNames: Readonly<Record<string, string>>
 ): string[] {
   const errors: string[] = [];
   const label = `search/${locale}.json`;
@@ -259,7 +266,19 @@ export function validateSearchIndex(
   const invalid: string[] = [];
   const duplicated: string[] = [];
   const seen = new Set<string>();
+  // bookId -> the first name the index carries that disagrees with the registry.
+  // Recording the first mismatch (not the last name seen) means a partially
+  // rewritten index is caught too, not just a wholesale stale one.
+  const staleNames = new Map<string, string>();
   for (const entry of index.entries) {
+    const dot = entry.reference.indexOf(".");
+    if (dot > 0) {
+      const bookId = entry.reference.slice(0, dot);
+      const want = expectedBookNames[bookId];
+      if (want !== undefined && entry.bookName !== want && !staleNames.has(bookId)) {
+        staleNames.set(bookId, entry.bookName);
+      }
+    }
     if (!expected.has(entry.reference)) {
       if (invalid.length < 5) invalid.push(entry.reference);
     } else if (seen.has(entry.reference)) {
@@ -267,6 +286,16 @@ export function validateSearchIndex(
     } else {
       seen.add(entry.reference);
     }
+  }
+
+  // The index denormalizes each book's display name so Fuse can match on it. If
+  // a name was edited without re-running `bible:build`, pages would show the new
+  // name while search results still showed the old one.
+  for (const [bookId, got] of staleNames) {
+    errors.push(
+      `${label}: book name for "${bookId}" is "${got}" but the registry says ` +
+        `"${expectedBookNames[bookId]}" — run \`npm run bible:build\``
+    );
   }
 
   if (invalid.length > 0) {

@@ -1,17 +1,13 @@
 # Bible integrity gate.
 #
-# The Bible book display names and canonical order are approved by the content
-# owner and are FIXED (see README "Book names & order are immutable" and
-# .claude/bible-module.md §3.1). This workflow makes that guarantee hold on the
-# shared branches: it fails any pull request or push that would change a book
-# name or the order, so such a change can never be merged into `main`.
+# The book order is fixed and the display names are the content owner's to
+# change, not a developer's (.claude/bible-module.md §2). This workflow makes
+# that hold on the shared branches: neither can reach `main` without failing the
+# check, unless the change is an explicit, reviewed edit to BIBLE_CANON or
+# bible.display-names.ts.
 #
-# What it runs:
-#   - npm run bible:validate  → fails if any book file name differs from the
-#     locked registry (src/features/bible/bible.display-names.ts) or the dataset
-#     is otherwise invalid.
-#   - npm test                → the unit tests, including bible.display-names.test.ts
-#     which locks names, order, and the on-disk files.
+# It also catches a dataset edit that would break the site — a missing verse, a
+# broken number, malformed JSON — before it can be merged.
 
 name: Bible integrity guard
 
@@ -36,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Validate Bible dataset (locked names + order)
+      - name: Validate Bible dataset
         run: npm run bible:validate
 
       - name: Run unit tests (name/order locks)

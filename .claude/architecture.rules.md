@@ -95,7 +95,7 @@ NEVER:
 
 - place GROQ queries in `lib/`
 - place domain/feature logic in `lib/` (infrastructure clients only)
-- import `bible-hierarchical.json` directly in a page or component
+- import a Bible JSON file directly in a page or component
 - duplicate the Bible data-loading/cast pattern across pages
 - re-export `bible-search.ts` (or any `"use client"` module) from a feature barrel
 
@@ -226,54 +226,28 @@ Because:
 
 # BIBLE JSON STRUCTURE
 
-Claude MUST assume:
+One file per book, per locale — never one monolithic file, and never a bilingual
+verse pair (`mk` and `en` are two independent translations):
 
-````txt
+```txt
 /src/data/bible/
-
-contains:
-
-- bible-hierarchical.json
-- bible-search-index.json
-
-
-# HIERARCHICAL STRUCTURE
+  mk/<bookId>.json      hand-owned: verse text
+  en/<bookId>.json      hand-owned: verse text
+  manifest.json         derived — routing shape, no verse text
+  search/<locale>.json  derived — one entry per verse
+```
 
 ```json
 {
-  "books": [
-    {
-      "id": "matej",
-      "name": "Свето Евангелие според Матеј",
-      "testament": "NT",
-      "chapters": [
-        {
-          "number": 1,
-          "verses": [
-            { "number": 1, "text": "Родословието на Исус Христос...", "text_en": "..." }
-          ]
-        }
-      ]
-    }
-  ]
+  "id": "matthew",
+  "testament": "NT",
+  "chapters": [{ "number": 1, "verses": [{ "number": 1, "text": "…" }] }]
 }
+```
 
-# SEARCH INDEX STRUCTURE
+Book ids are canonical English slugs (`matthew`, `1-john`) and are never
+translated. A book file carries **no display name** — names live only in
+`src/features/bible/bible.display-names.ts`.
 
-{
-  "searchIndex": [
-    {
-      "id": "matej_1_1",
-      "bookId": "matej",
-      "bookName": "Свето Евангелие според Матеј",
-      "chapter": 1,
-      "verse": 1,
-      "text": "Родословието на Исус Христос...",
-      "fullReference": "Матеј 1:1"
-    }
-  ],
-  "booksMetadata": [
-    { "id": "matej", "name": "Свето Евангелие според Матеј", "testament": "NT" }
-  ]
-}
-````
+The full model, validation rules and commands: **docs/bible-module.md**.
+Binding rules: **.claude/bible-module.md**.

@@ -19,8 +19,8 @@ Start here — the deep guides live in `docs/`:
 | Document | What it covers |
 |---|---|
 | **[docs/cms-architecture.md](docs/cms-architecture.md)** | The publish → live content pipeline, stage by stage, plus the Studio setup and the invariants it depends on |
-| **[docs/bible-module.md](docs/bible-module.md)** | The Bible module — design, data structure, flow, validation, search, and how to swap the placeholder text for the real Bible with no code changes |
-| **[docs/bible-dataset-guide.md](docs/bible-dataset-guide.md)** | Plain-language instructions for the content owner on how to structure the Bible text files (hand this to the preacher) |
+| **[docs/bible-module.md](docs/bible-module.md)** | The Bible module — data structure, book names & order, rendering, validation, search, provenance |
+| **[docs/bible-editing-guide.md](docs/bible-editing-guide.md)** | Plain-language instructions for correcting the Bible text (hand this to the preacher) |
 | **[docs/deployment.md](docs/deployment.md)** | Production runbook: Vercel, Porkbun DNS, HTTPS, environment variables, the Sanity webhook, smoke tests, rollback, troubleshooting, routine operations |
 | **[.env.example](.env.example)** | Every environment variable, annotated (local vs Vercel, public vs secret) |
 | `CLAUDE.md`, `.claude/*.md` | Engineering rules and non-negotiable architectural constraints (`.claude/bible-module.md` is the binding spec for the Bible) |
@@ -255,38 +255,32 @@ and never hand-edited. All JSON access goes through `src/features/bible/bible.da
 Full design, data model, validation, and rationale live in
 **[docs/bible-module.md](docs/bible-module.md)** (binding rules: `.claude/bible-module.md`).
 
-### Book names & order are immutable — do not change them
+### Book names & order
 
-The **66-book canonical order** and the **localized display names** (Macedonian
-and English) are approved by the content owner and are **fixed**. They must stay
-identical across every future commit, on any branch, in perpetuity. This is
-enforced in code so no developer or automated re-import can revert them:
+The **66-book canonical order** and the **localized display names** are approved
+by the content owner and are fixed. Each has exactly one definition:
 
-| Layer | File | Guarantee |
+| What | Where | How it stays fixed |
 |---|---|---|
-| **Single source of truth** | `src/features/bible/bible.display-names.ts` | The one place a name is defined. Editing a name anywhere else is overwritten or rejected. |
-| **Canonical order** | `src/features/bible/bible.constants.ts` (`BIBLE_CANON`) | The 66-book order used for routing, the manifest, and the landing page. |
-| **Build stamps names in** | `scripts/build-bible-artifacts.ts` | `bible:build` writes the locked names into every book file before deriving artifacts. |
-| **Build fails on drift** | `scripts/validate-bible.ts` | `bible:validate` (runs on `prebuild`) fails if any book file name differs from the registry — so a wrong name **cannot deploy**. |
-| **Migration respects the lock** | `scripts/migrate-client-bible.ts` | Re-importing the preacher's raw delivery stamps the locked names, not the delivery's names. |
-| **Test suite locks it** | `src/features/bible/bible.display-names.test.ts` | Names, order, and on-disk files are asserted in `npm test`. |
-| **CI blocks the merge** | `.github/workflows/bible-guard.yml` | Validation + tests run on every PR and push to `main`; a change to a name or the order fails the check. |
+| Book names | `src/features/bible/bible.display-names.ts` | The only place a name exists — book files carry none, so a name cannot drift. Renaming is a one-line edit here. |
+| Book order | `src/features/bible/bible.constants.ts` (`BIBLE_CANON`) | `bible:validate` rejects a manifest that disagrees; the test suite asserts the 66 ids literally. |
 
-> **To change a name (rarely, and only with content-owner approval):** edit it in
-> `src/features/bible/bible.display-names.ts` **only**, run `npm run bible:build`,
-> then commit. Every other path is a no-op or a hard error. See
-> `.claude/bible-module.md` §3.1.
+`.github/workflows/bible-guard.yml` runs the validator and tests on every PR and
+push to `main`, so neither can change without an explicit, reviewed diff.
 
-### Replacing the Bible translation — no code changes
+> **To change a name** (content-owner decision, not a developer's): edit
+> `bible.display-names.ts`, run `npm run bible:build`, then commit. The rebuild
+> is required — the build fails until the search index is refreshed, so a
+> half-applied rename cannot deploy.
+
+### Replacing the Bible text — no code changes
 
 1. Replace the files in `src/data/bible/mk/` and `src/data/bible/en/`.
-2. Run `npm run bible:build` — re-derives the manifest + search indexes, **re-stamps
-   the locked display names** (`bible.display-names.ts`), and validates. The new
-   translation's own book names are ignored; the approved names are preserved.
+2. Run `npm run bible:build` — re-derives the manifest + search indexes, then
+   validates.
 3. If validation passes, commit and deploy. Nothing else changes.
 
-Hand the content owner **[docs/bible-dataset-guide.md](docs/bible-dataset-guide.md)** —
-plain-language instructions for structuring the files.
+Hand the content owner **[docs/bible-editing-guide.md](docs/bible-editing-guide.md)**.
 
 ---
 
@@ -297,9 +291,8 @@ npm run dev              # Development server (http://localhost:3000)
 npm run build            # Production build (runs bible:validate first via prebuild)
 npm run start            # Serve the production build
 npm run lint             # ESLint
-npm test                 # Unit tests (Bible reference/value objects, schema/validation, search)
+npm test                 # Unit tests (Bible name/order locks, schema/validation, search)
 npm run bible:build      # Re-derive manifest + search indexes from the book files, then validate
-npm run bible:generate   # Regenerate the placeholder book files, then bible:build
 npm run bible:validate   # Validate the Bible dataset (also runs automatically before every build)
 ```
 

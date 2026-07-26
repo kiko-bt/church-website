@@ -6,7 +6,7 @@ import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TestamentSection } from "@/components/bible/TestamentSection";
 import { BibleSearch } from "@/components/bible/BibleSearch";
-import { getAllBooks } from "@/features/bible";
+import { getAllBookMeta, getDisplayName } from "@/features/bible";
 
 type BiblePageProps = {
   params: Promise<{ locale: Locale }>;
@@ -28,14 +28,15 @@ export default async function BiblePage({ params }: BiblePageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("bible");
 
-  // getAllBooks returns books in canonical order; filtering preserves it.
-  const books = await getAllBooks(locale);
-  const oldTestament = books
-    .filter((book) => book.testament === "OT")
-    .map((book) => ({ id: book.id, name: book.name }));
-  const newTestament = books
-    .filter((book) => book.testament === "NT")
-    .map((book) => ({ id: book.id, name: book.name }));
+  // The manifest is in canonical order and carries no verse text, so listing
+  // every book costs nothing; filtering preserves the order.
+  const books = getAllBookMeta().map((book) => ({
+    id: book.id,
+    name: getDisplayName(locale, book.id),
+    testament: book.testament,
+  }));
+  const oldTestament = books.filter((book) => book.testament === "OT");
+  const newTestament = books.filter((book) => book.testament === "NT");
 
   return (
     <LayoutShell>

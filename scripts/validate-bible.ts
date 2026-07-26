@@ -37,7 +37,7 @@ function readJson(path: string): unknown {
 const manifestPath = join(DATA_DIR, "manifest.json");
 let manifest: ParsedManifest | null = null;
 if (!existsSync(manifestPath)) {
-  errors.push("manifest.json is missing (run `npm run bible:generate`)");
+  errors.push("manifest.json is missing (run `npm run bible:build`)");
 } else {
   const parsed = manifestSchema.safeParse(readJsonSafe(manifestPath));
   if (!parsed.success) {
@@ -77,6 +77,16 @@ for (const locale of locales) {
     const parsed = bookFileSchema.safeParse(readJsonSafe(join(localeDir, fileName)));
     if (!parsed.success) {
       for (const issue of parsed.error.issues) {
+        // Book files carry no display name; a "name" here is almost always
+        // someone trying to rename a book in the wrong place, so say where to
+        // do it instead of leaving them with Zod's generic wording.
+        if (issue.code === "unrecognized_keys" && issue.keys.includes("name")) {
+          errors.push(
+            `${locale}/${fileName}: remove the "name" field — book names are set in ` +
+              `src/features/bible/bible.display-names.ts, not in the book files`
+          );
+          continue;
+        }
         errors.push(`${locale}/${fileName}: ${issue.path.join(".")} — ${issue.message}`);
       }
       continue;
@@ -85,25 +95,8 @@ for (const locale of locales) {
   }
 }
 
-// --- Locked display names (the permanent, approved book names) ---
-// The registry must cover the canon exactly, and every book file's `name` must
-// match it. This is what makes the names immutable: a re-migration or any edit
-// that changes a name fails the build here, before it can reach production.
-// See src/features/bible/bible.display-names.ts and .claude/bible-module.md §3.
+// --- Display names: the registry must cover the canon exactly ---
 errors.push(...assertDisplayNamesComplete(locales, BIBLE_CANON.map((b) => b.id)));
-for (const locale of locales) {
-  const expected = BIBLE_DISPLAY_NAMES[locale] ?? {};
-  for (const [bookId, book] of Object.entries(filesByLocale[locale] ?? {})) {
-    const want = expected[bookId];
-    if (want !== undefined && book.name !== want) {
-      errors.push(
-        `${locale}/${bookId}.json: display name "${book.name}" does not match the ` +
-          `locked name "${want}" (edit only bible.display-names.ts, then ` +
-          `\`npm run bible:build\`)`
-      );
-    }
-  }
-}
 
 // --- Holistic cross-file validation (only if the manifest parsed) ---
 if (manifest) {
@@ -130,7 +123,14 @@ if (manifest) {
       }
       continue;
     }
-    errors.push(...validateSearchIndex(manifest, parsed.data, locale));
+    errors.push(
+      ...validateSearchIndex(
+        manifest,
+        parsed.data,
+        locale,
+        BIBLE_DISPLAY_NAMES[locale] ?? {}
+      )
+    );
   }
 }
 
