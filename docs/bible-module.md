@@ -255,9 +255,38 @@ Every guarantee, explicitly:
 - ✓ manifest ↔ file mismatch (a data file that disagrees with the manifest)
 - ✓ search index: exactly one entry per verse (no out-of-canon references, duplicates, or gaps)
 - ✓ locale consistency (each locale conforms to the same manifest)
+- ✓ **display name lock** — every book file's `name` must equal the approved name
+  in `bible.display-names.ts` (see §9.1)
 
 This is the safety net that makes swapping the dataset low-risk: **if the new files are wrong,
 the site will not build.**
+
+### 9.1 Locked display names & order (immutable)
+
+The **canonical 66-book order** (`BIBLE_CANON`) and the **localized display names**
+(Macedonian + English) are approved by the content owner and are **fixed forever**.
+They must not change across future commits, on any branch. Three mechanisms make
+this an invariant rather than a convention:
+
+1. **Single source of truth** — `src/features/bible/bible.display-names.ts` holds
+   the approved name for every book in every locale. It is the only place a name
+   is ever edited.
+2. **Stamp + enforce** — `bible:build` stamps those names into every book file
+   before deriving the manifest/search; `bible:validate` (run on `prebuild`, so
+   before any deploy) fails if a book file's name has drifted from the registry.
+3. **Migration + CI** — `migrate-client-bible.ts` stamps the locked names (never
+   the raw delivery's), `bible.display-names.test.ts` asserts the lock in the test
+   suite, and `.github/workflows/bible-guard.yml` runs validation + tests on every
+   PR and push to `main`, blocking any change to a name or the order from merging.
+
+**Why this exists:** the preacher's raw delivery uses different, longer book names
+(e.g. `Евангелие според Матеј`, `Послание до Римјаните`). Before this lock, every
+re-import silently reverted the approved names. Now a re-import — or any stray edit
+— either produces the correct names or fails the build.
+
+**To change a name** (rare, content-owner approval required): edit
+`bible.display-names.ts` only, run `npm run bible:build`, commit. Binding rules:
+`.claude/bible-module.md` §3.1.
 
 ---
 
@@ -305,7 +334,8 @@ Then run:
 npm run bible:build
 ```
 
-`bible:build` re-derives `manifest.json` and `search/*.json` from the new book files and then
+`bible:build` re-derives `manifest.json` and `search/*.json` from the new book files, **re-stamps
+the locked display names** (§9.1 — the new files' own book names are ignored), and then
 validates the whole dataset.
 
 - If validation **succeeds** → commit and deploy. Nothing else changes.

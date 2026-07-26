@@ -255,10 +255,34 @@ and never hand-edited. All JSON access goes through `src/features/bible/bible.da
 Full design, data model, validation, and rationale live in
 **[docs/bible-module.md](docs/bible-module.md)** (binding rules: `.claude/bible-module.md`).
 
+### Book names & order are immutable — do not change them
+
+The **66-book canonical order** and the **localized display names** (Macedonian
+and English) are approved by the content owner and are **fixed**. They must stay
+identical across every future commit, on any branch, in perpetuity. This is
+enforced in code so no developer or automated re-import can revert them:
+
+| Layer | File | Guarantee |
+|---|---|---|
+| **Single source of truth** | `src/features/bible/bible.display-names.ts` | The one place a name is defined. Editing a name anywhere else is overwritten or rejected. |
+| **Canonical order** | `src/features/bible/bible.constants.ts` (`BIBLE_CANON`) | The 66-book order used for routing, the manifest, and the landing page. |
+| **Build stamps names in** | `scripts/build-bible-artifacts.ts` | `bible:build` writes the locked names into every book file before deriving artifacts. |
+| **Build fails on drift** | `scripts/validate-bible.ts` | `bible:validate` (runs on `prebuild`) fails if any book file name differs from the registry — so a wrong name **cannot deploy**. |
+| **Migration respects the lock** | `scripts/migrate-client-bible.ts` | Re-importing the preacher's raw delivery stamps the locked names, not the delivery's names. |
+| **Test suite locks it** | `src/features/bible/bible.display-names.test.ts` | Names, order, and on-disk files are asserted in `npm test`. |
+| **CI blocks the merge** | `.github/workflows/bible-guard.yml` | Validation + tests run on every PR and push to `main`; a change to a name or the order fails the check. |
+
+> **To change a name (rarely, and only with content-owner approval):** edit it in
+> `src/features/bible/bible.display-names.ts` **only**, run `npm run bible:build`,
+> then commit. Every other path is a no-op or a hard error. See
+> `.claude/bible-module.md` §3.1.
+
 ### Replacing the Bible translation — no code changes
 
 1. Replace the files in `src/data/bible/mk/` and `src/data/bible/en/`.
-2. Run `npm run bible:build` — re-derives the manifest + search indexes and validates.
+2. Run `npm run bible:build` — re-derives the manifest + search indexes, **re-stamps
+   the locked display names** (`bible.display-names.ts`), and validates. The new
+   translation's own book names are ignored; the approved names are preserved.
 3. If validation passes, commit and deploy. Nothing else changes.
 
 Hand the content owner **[docs/bible-dataset-guide.md](docs/bible-dataset-guide.md)** —
