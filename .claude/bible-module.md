@@ -97,6 +97,32 @@ from them by `scripts/build-bible-artifacts.ts` (`npm run bible:build`).
   files; `bible:build` then derives the rest — the same derivation used for real
   data, so the two paths never diverge.
 
+### 3.1 Book display names & order are LOCKED (never revert them)
+
+The book **order** (`BIBLE_CANON` in `bible.constants.ts`) and the localized
+**display names** are **fixed, approved by the content owner, and MUST NOT
+change**. This is what production ships and it is intentional.
+
+- The **single source of truth for names** is
+  `src/features/bible/bible.display-names.ts` (`BIBLE_DISPLAY_NAMES`). A name is
+  edited **there and nowhere else**, then `npm run bible:build` stamps it into
+  every book file and regenerates the derived artifacts.
+- **`bible:build` stamps the locked names into the book files** before deriving
+  the manifest/search, and **`bible:validate` fails the build** if any book
+  file's `name` differs from the registry. Since `bible:validate` runs on
+  `prebuild`, a wrong name can **never reach production**.
+- **The migration writes the locked names, not the client's.** The preacher's
+  raw delivery uses different, longer names (e.g. `Евангелие според Матеј`,
+  `Послание до Римјаните`). `scripts/migrate-client-bible.ts` therefore stamps
+  names from the registry via `getDisplayName(locale, id)` — this is why
+  re-running `bible:migrate` no longer reverts the approved names.
+- `src/features/bible/bible.display-names.test.ts` locks the names, order, and
+  on-disk book files in the test suite as a second guard.
+
+> Practical rule for any future change or new commit: **do not touch book names
+> or order.** They are already correct. If a genuinely new name is ever needed,
+> edit only `bible.display-names.ts`, run `npm run bible:build`, and commit.
+
 ---
 
 ## 4. Placeholder content rules (until the licensed dataset arrives)

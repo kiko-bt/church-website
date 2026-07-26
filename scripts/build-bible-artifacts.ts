@@ -22,6 +22,10 @@ import {
   type ParsedBookFile,
 } from "../src/features/bible/bible.schema.ts";
 import { BIBLE_CANON } from "../src/features/bible/bible.constants.ts";
+import {
+  BIBLE_DISPLAY_NAMES,
+  assertDisplayNamesComplete,
+} from "../src/features/bible/bible.display-names.ts";
 import { locales, defaultLocale } from "../src/constants/locales.ts";
 
 const DATA_DIR = join(process.cwd(), "src", "data", "bible");
@@ -49,7 +53,45 @@ function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
+// Stamps the LOCKED display name (bible.display-names.ts) into every book file,
+// rewriting the file only when its name differs. This makes the registry the
+// one place a name is ever edited: change it there, run `npm run bible:build`,
+// and every book file is updated to match (the validator then enforces it).
+function stampDisplayNames(): number {
+  let changed = 0;
+  for (const locale of locales) {
+    for (const canonBook of BIBLE_CANON) {
+      const want = BIBLE_DISPLAY_NAMES[locale][canonBook.id];
+      if (want === undefined) {
+        throw new Error(
+          `no locked display name for ${locale}/${canonBook.id} ` +
+            `(add it to bible.display-names.ts)`
+        );
+      }
+      const path = join(DATA_DIR, locale, `${canonBook.id}.json`);
+      const book = readBook(locale, canonBook.id);
+      if (book.name === want) continue;
+      writeJson(path, { ...book, name: want });
+      changed++;
+    }
+  }
+  return changed;
+}
+
 function main(): void {
+  // Enforce and apply the locked names before deriving anything from the books.
+  const nameErrors = assertDisplayNamesComplete(
+    locales,
+    BIBLE_CANON.map((b) => b.id)
+  );
+  if (nameErrors.length > 0) {
+    throw new Error(`display-name registry is incomplete:\n  - ${nameErrors.join("\n  - ")}`);
+  }
+  const renamed = stampDisplayNames();
+  if (renamed > 0) {
+    console.log(`Stamped ${renamed} locked display name(s) into book files.`);
+  }
+
   // Manifest: canonical order/testament come from the registry; verse counts
   // come from the default-locale files. `bible:validate` then confirms every
   // other locale matches this shape.

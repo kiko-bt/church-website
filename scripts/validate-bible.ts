@@ -19,6 +19,10 @@ import {
   type ParsedManifest,
 } from "../src/features/bible/bible.schema.ts";
 import { BIBLE_CANON } from "../src/features/bible/bible.constants.ts";
+import {
+  BIBLE_DISPLAY_NAMES,
+  assertDisplayNamesComplete,
+} from "../src/features/bible/bible.display-names.ts";
 import { locales } from "../src/constants/locales.ts";
 
 const DATA_DIR = join(process.cwd(), "src", "data", "bible");
@@ -78,6 +82,26 @@ for (const locale of locales) {
       continue;
     }
     filesByLocale[locale][bookId] = parsed.data;
+  }
+}
+
+// --- Locked display names (the permanent, approved book names) ---
+// The registry must cover the canon exactly, and every book file's `name` must
+// match it. This is what makes the names immutable: a re-migration or any edit
+// that changes a name fails the build here, before it can reach production.
+// See src/features/bible/bible.display-names.ts and .claude/bible-module.md §3.
+errors.push(...assertDisplayNamesComplete(locales, BIBLE_CANON.map((b) => b.id)));
+for (const locale of locales) {
+  const expected = BIBLE_DISPLAY_NAMES[locale] ?? {};
+  for (const [bookId, book] of Object.entries(filesByLocale[locale] ?? {})) {
+    const want = expected[bookId];
+    if (want !== undefined && book.name !== want) {
+      errors.push(
+        `${locale}/${bookId}.json: display name "${book.name}" does not match the ` +
+          `locked name "${want}" (edit only bible.display-names.ts, then ` +
+          `\`npm run bible:build\`)`
+      );
+    }
   }
 }
 

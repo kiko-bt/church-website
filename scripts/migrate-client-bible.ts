@@ -40,6 +40,7 @@ import {
   type ParsedBookFile,
 } from "../src/features/bible/bible.schema.ts";
 import { BIBLE_CANON, type Testament } from "../src/features/bible/bible.constants.ts";
+import { getDisplayName } from "../src/features/bible/bible.display-names.ts";
 import { KNOWN_OMITTED_VERSES, OMITTED_NOTE_MK, OMITTED_NOTE_EN } from "./bible-omissions.ts";
 import { ENGLISH_REALIGNMENTS } from "./bible-versification.ts";
 
@@ -213,9 +214,13 @@ function migrateBook(
     return { number: chapter.chapter, verses };
   });
 
+  // Display name comes from the LOCKED registry, never from the client's raw
+  // delivery — the raw names are the long forms (e.g. "Евангелие според Матеј")
+  // and stamping them here is exactly what used to revert the approved names.
+  // See bible.display-names.ts and .claude/bible-module.md §3.
   const parsed = bookFileSchema.safeParse({
     id,
-    name: src.name.trim(),
+    name: getDisplayName("mk", id),
     testament,
     chapters,
   });
@@ -342,7 +347,14 @@ async function fetchWebBook(
     }
   }
 
-  const parsed = bookFileSchema.safeParse({ id, name: apiBookName, testament, chapters });
+  // Display name from the LOCKED registry (apiBookName is only the API query
+  // key, not a display name). See bible.display-names.ts.
+  const parsed = bookFileSchema.safeParse({
+    id,
+    name: getDisplayName("en", id),
+    testament,
+    chapters,
+  });
   if (!parsed.success) {
     fail(
       `en/${id} failed schema validation:\n` +
