@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run bible:validate",
+    "prebuild": "npm run bible:build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
