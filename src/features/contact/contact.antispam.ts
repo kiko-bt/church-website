@@ -1,7 +1,8 @@
-// Dependency-free anti-abuse gate for the contact form (see .claude/security-
-// rules.md — "rate limiting for contact forms"). A durable per-IP limiter needs
-// a shared store (a new dependency + infra); this is the no-dependency layer
-// that stops the common, naive bot traffic within the existing architecture:
+// Dependency-free anti-abuse gate for the contact form. This is the BOT layer;
+// the companion `contact.ratelimit.ts` is the VOLUME layer (per-IP limiting, as
+// required by .claude/security-rules.md). They are complementary: this module
+// detects automation regardless of rate, the limiter bounds how much any single
+// client can send regardless of how human it looks. Two signals here:
 //
 //   1. Honeypot — a hidden field a human never sees or fills. Any value in it
 //      means an automated agent filled every input on the form.

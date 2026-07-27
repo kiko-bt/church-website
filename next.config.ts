@@ -7,6 +7,14 @@ const withNextIntl = createNextIntlPlugin("./src/lib/i18n/request.ts");
 // Content-Security-Policy here: a CSP needs per-site tuning (Sanity image CDN,
 // OG scrapers, future embeds) and a wrong one silently breaks the site — add it
 // as a dedicated, tested change if a security review requires it.
+//
+// IF A CSP IS EVER ADDED it must allow Vercel Analytics and Speed Insights,
+// which inject <script src="/_vercel/insights/script.js"> and
+// "/_vercel/speed-insights/script.js" at runtime and beacon back to the same
+// origin. They are same-origin (served by Vercel's edge, not a third-party CDN),
+// so `script-src 'self'` covers them — but a stricter nonce/hash-only policy
+// would block them silently: no error on the site, just an analytics dashboard
+// that quietly stays empty.
 //   - HSTS: force HTTPS for a year incl. subdomains (safe: the site is HTTPS-only
 //     on Vercel; the apex + www both serve over TLS).
 //   - X-Content-Type-Options: block MIME sniffing.

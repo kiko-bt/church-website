@@ -42,7 +42,7 @@ This project is:
 | Internationalization | next-intl                    |
 | Theme System         | next-themes                  |
 | Search               | Fuse.js                      |
-| Analytics            | Vercel Analytics             |
+| Analytics            | Vercel Analytics + Speed Insights |
 | Hosting              | Vercel                       |
 | Rendering Strategy   | Static Site Generation (SSG) |
 | Architecture Style   | Content-driven               |

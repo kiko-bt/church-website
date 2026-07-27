@@ -5,6 +5,8 @@ import { locales } from "@/constants/locales";
 import { inter, playfairDisplay } from "@/styles/fonts";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers/Providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -72,6 +74,15 @@ export default async function LocaleLayout({
             <Footer />
           </div>
         </Providers>
+        {/* Vercel Web Analytics + Speed Insights. Both render null and ship
+            their own "use client" directive and Suspense boundary, so this
+            layout stays a Server Component and no wrapper is needed. Mounted
+            here (not in app/layout.tsx) because this layout owns <body>; every
+            user-facing route is locale-prefixed, so this covers the whole site
+            exactly once — no duplicate initialization. Neither sets cookies.
+            Both no-op outside Vercel, so local dev and tests are unaffected. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

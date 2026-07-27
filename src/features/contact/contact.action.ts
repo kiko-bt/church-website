@@ -1,8 +1,10 @@
 "use server";
 
+import { headers } from "next/headers";
 import { getContactEmailConfig, sendEmail } from "@/lib/resend";
 import { isLikelySpam } from "./contact.antispam";
 import { renderContactEmail } from "./contact.email";
+import { checkRateLimit } from "./contact.ratelimit";
 import { collectFieldErrors, contactFormSchema } from "./contact.schema";
 import type { ContactActionResult } from "./contact.types";
 
@@ -17,9 +19,29 @@ import type { ContactActionResult } from "./contact.types";
 // Stable, user-safe i18n key the client resolves against `contact.error`.
 const SERVER_ERROR_KEY = "error";
 
+// Client IP as reported by the platform edge. Vercel always sets
+// `x-forwarded-for`; the first entry is the originating client. Returns null
+// when no address can be determined, which `checkRateLimit` treats as
+// "unlimited" rather than lumping every such caller into one shared bucket.
+async function getClientIp(): Promise<string | null> {
+  const headerList = await headers();
+  const forwarded = headerList.get("x-forwarded-for");
+  const first = forwarded?.split(",")[0]?.trim();
+  return first || headerList.get("x-real-ip") || null;
+}
+
 export async function submitContactForm(
   input: unknown
 ): Promise<ContactActionResult> {
+  // Rate limit BEFORE any parsing or I/O, so a flood costs as little as
+  // possible. A blocked caller gets the generic server error — never a hint
+  // that a limit exists, and never a silent "success" that would make a genuine
+  // sender believe an unsent message went through.
+  if (!checkRateLimit(await getClientIp())) {
+    console.warn("[contact] Submission blocked by rate limit. No email sent.");
+    return { status: "server-error", message: SERVER_ERROR_KEY };
+  }
+
   // Silent anti-abuse gate (honeypot + submit timing). A hit is acknowledged as
   // success — so a bot learns nothing about the trap — but no email is sent.
   if (isLikelySpam(input)) {

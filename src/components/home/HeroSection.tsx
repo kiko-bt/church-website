@@ -43,6 +43,12 @@ export async function HeroSection({ locale }: HeroSectionProps) {
             width={1536}
             height={406}
             priority
+            // `priority` alone only makes the image eager and emits the preload
+            // link — Next passes `fetchPriority` through verbatim, so the high
+            // hint must be explicit. This is the homepage LCP element; without
+            // it Lighthouse reports "fetchpriority=high should be applied to the
+            // image preload request" (lcp-discovery).
+            fetchPriority="high"
             sizes="(min-width: 1536px) 1152px, (min-width: 1280px) 1024px, (min-width: 1024px) 896px, 100vw"
             alt=""
             className="h-auto w-full object-cover"

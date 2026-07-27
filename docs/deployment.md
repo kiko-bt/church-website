@@ -215,11 +215,20 @@ once DNS resolves. No action beyond DNS. HTTP is auto-redirected to HTTPS, and
 the app additionally sends **HSTS** (`next.config.ts`) to force HTTPS on repeat
 visits. Verification can take minutes to a couple of hours for propagation.
 
-### 6d. Sanity CORS (only if you deploy the Studio to a URL)
-The **website** needs no CORS entry (server-side CDN reads). The **Studio** does,
-when hosted (e.g. `sanity deploy` → `*.sanity.studio`, or a Vercel-hosted Studio):
-Sanity → **API → CORS origins → Add** the Studio origin(s) with credentials
-allowed, plus `http://localhost:3333` for local Studio dev.
+### 6d. Sanity CORS (Studio origins)
+The **website** needs no CORS entry (server-side CDN reads). The **Studio** does.
+
+**As deployed:** the Studio is hosted by Sanity at
+**`https://church-website.sanity.studio/`**, and it loads content correctly.
+
+**Verified with `npx sanity cors list` — the only registered origin is
+`http://localhost:3333`** (for local Studio dev). The Sanity-hosted Studio needs
+no explicit entry: it runs on Sanity's own hosting and is permitted without one.
+Do not "fix" its absence from the list — nothing is missing.
+
+If a Studio is ever hosted somewhere else (Vercel, a custom domain), that origin
+**does** need adding: Sanity → **API → CORS origins → Add**, with credentials
+allowed.
 
 ---
 
@@ -356,6 +365,16 @@ Diagnose in order:
   errors are logged, never returned to the browser.
 - **Input validation:** `/api/revalidate` Zod-parses its body and returns generic
   errors (no internals leaked).
+- **Constant-time secret comparison:** the webhook secret is compared with
+  `crypto.timingSafeEqual` after a length check, so the check leaks nothing
+  through response timing.
+- **Contact-form abuse controls, two layers:** a honeypot + submit-timing gate
+  (`contact.antispam.ts`) catches automation, and a per-IP fixed-window limiter
+  (`contact.ratelimit.ts`, 5 submissions / 10 minutes) bounds volume from any
+  single client. The limiter is in-memory and therefore per serverless instance
+  and reset by cold starts — it stops a single script hammering the endpoint,
+  not a distributed flood. Upgrading to a shared store means replacing the body
+  of `checkRateLimit()`; no caller changes.
 
 ---
 
@@ -379,10 +398,17 @@ as of go-live** — keep the list for re-deployments and audits.
 - [x] Porkbun DNS: `A @ → 76.76.21.21`, `CNAME www → cname.vercel-dns.com`;
       parking records removed (§6b)
 - [x] HTTPS padlock live on `https://www.hristovoevangelie.org` (§6c)
-- [ ] Sanity CORS added **iff** the Studio is hosted (§6d) — *N/A while the Studio
-      runs locally only*
+- [x] Studio deployed to `https://church-website.sanity.studio/`; CORS origin
+      registered automatically by `sanity deploy` (§6d, §13)
 - [x] Smoke test A–D pass, incl. **publish → live** (§7)
 - [x] Rollback path confirmed (know where the button is) (§8)
+- [ ] **Enable Web Analytics and Speed Insights** in Vercel → project →
+      *Analytics* / *Speed Insights*. The code is already integrated in
+      `src/app/[locale]/layout.tsx`; both stay dormant until switched on in the
+      dashboard. See [operations-runbook.md §4](./operations-runbook.md)
+- [ ] **Uptime monitoring** (Better Stack) — external, manual, no code; the one
+      thing that reports the site being *down*
+      ([operations-runbook.md §4.4](./operations-runbook.md))
 
 The pipeline is live: the preacher edits in Sanity, clicks Publish, and visitors
 see the update with no developer involvement.
@@ -400,6 +426,39 @@ see the update with no developer involvement.
   → Vercel ships production.
 - **Changing an env var** → edit in Vercel → **Redeploy** (env vars are read at
   build time; a change without a redeploy has no effect).
-- **The Studio (`studio-church-ehb`)** → runs locally against the same Sanity
-  project. It does **not** need to be deployed or committed for content updates
-  to work. Commit it to its own repo when convenient, for backup/versioning.
+- **The Studio (`studio-church-ehb`)** → hosted at
+  **`https://church-website.sanity.studio/`**; this is what the preacher uses.
+  It runs against the same Sanity project. Content updates do not depend on the
+  Studio being deployed (the webhook is a property of the Sanity project), but
+  the hosted Studio is how the editor reaches the content model.
+
+---
+
+## 13. Deploying the Studio (schema changes)
+
+The Studio serves a **pre-built bundle**. Changing a schema in
+`church-website/sanity/` does **not** reach the hosted Studio until it is
+redeployed — until then editors see *"Unknown field found"* for any new field
+whose data already exists.
+
+```bash
+cd ../studio-church-ehb
+npm run deploy          # sanity deploy → church-website.sanity.studio
+```
+
+- `sanity.cli.ts` pins `appId`, so the deploy targets the existing Studio and
+  never prompts for a hostname. **Never create a new hostname** — that leaves a
+  second, stale Studio live at a different URL.
+- `sanity deploy` also publishes the schema manifest (`Deployed 1/1 schemas`),
+  which is what `sanity schema list` and Sanity's agent tooling read.
+- `autoUpdates: true` means the hosted Studio pulls newer Sanity runtimes on its
+  own. If the CLI warns that local packages are behind the runtime, either
+  upgrade locally first or choose *Continue anyway* — the deployed Studio runs
+  the newer runtime regardless.
+- **Local check before deploying:** `npm run dev` in the Studio repo compiles the
+  schema from your working files, so it shows schema changes immediately. A
+  field that appears locally but not in production means only that the deploy
+  step is outstanding.
+
+**Whenever a schema field is added, do both:** deploy the Studio (so the editor
+can see the field) and deploy the website (so the field is read and rendered).

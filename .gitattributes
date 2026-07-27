@@ -1,0 +1,28 @@
+# Line-ending policy — deliberately committed, not left to local git config.
+#
+# Without this file, normalization depends on each contributor's `core.autocrlf`
+# setting. That is a real hazard for THIS project: the content owner edits Bible
+# JSON on Windows and publishes with `git add .` (docs/bible-editing-guide.md).
+# On a machine where autocrlf is not enabled, an editor saving CRLF would turn a
+# one-verse correction into a whole-file rewrite — a ~31,000-line diff that
+# buries the actual change and makes review impossible.
+#
+# `text=auto` stores every text file with LF in the repository regardless of the
+# platform it was authored on, while leaving the working copy native. The result
+# is deterministic history on every machine, with no setup step to remember.
+* text=auto
+
+# Binary assets must never be normalized — doing so corrupts them.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.tar.gz binary

@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { revalidateTag } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
@@ -32,6 +33,17 @@ const webhookBodySchema = z.object({
   _type: z.string().min(1),
 });
 
+// Length-independent, constant-time secret comparison. `timingSafeEqual` throws
+// unless both buffers are the same length, so the length check comes first —
+// that leak (the length of the expected secret) is accepted and standard, while
+// the byte-by-byte comparison itself reveals nothing through timing.
+function secretsMatch(provided: string, expected: string): boolean {
+  const a = Buffer.from(provided, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
 function isAuthorized(request: NextRequest): boolean {
   const secret = process.env.SANITY_REVALIDATE_SECRET;
   if (!secret) return false;
@@ -46,7 +58,8 @@ function isAuthorized(request: NextRequest): boolean {
       : new URL(request.url).searchParams.get("secret");
 
   const provided = headerSecret ?? querySecret;
-  return provided === secret;
+  if (!provided) return false;
+  return secretsMatch(provided, secret);
 }
 
 export async function POST(request: NextRequest) {

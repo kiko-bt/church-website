@@ -22,6 +22,8 @@ Start here — the deep guides live in `docs/`:
 | **[docs/bible-module.md](docs/bible-module.md)** | The Bible module — data structure, book names & order, rendering, validation, search, provenance |
 | **[docs/bible-editing-guide.md](docs/bible-editing-guide.md)** | Plain-language instructions for correcting the Bible text (hand this to the preacher) |
 | **[docs/deployment.md](docs/deployment.md)** | Production runbook: Vercel, Porkbun DNS, HTTPS, environment variables, the Sanity webhook, smoke tests, rollback, troubleshooting, routine operations |
+| **[docs/backup-restore.md](docs/backup-restore.md)** | What to back up, how often, and the tested restore procedure for each part of the system |
+| **[docs/operations-runbook.md](docs/operations-runbook.md)** | Owner/maintainer handbook: account ownership, disaster-recovery checklist, maintenance schedule, upgrade path |
 | **[.env.example](.env.example)** | Every environment variable, annotated (local vs Vercel, public vs secret) |
 | `CLAUDE.md`, `.claude/*.md` | Engineering rules and non-negotiable architectural constraints (`.claude/bible-module.md` is the binding spec for the Bible) |
 
@@ -40,6 +42,7 @@ Start here — the deep guides live in `docs/`:
 | Theme | next-themes |
 | Rendering | SSG + ISR (on-demand revalidation) |
 | Hosting | Vercel |
+| Monitoring | Vercel Analytics + Speed Insights (cookieless) |
 
 Content modules and their data sources:
 
@@ -288,21 +291,30 @@ Hand the content owner **[docs/bible-editing-guide.md](docs/bible-editing-guide.
 
 ```bash
 npm run dev              # Development server (http://localhost:3000)
-npm run build            # Production build (runs bible:validate first via prebuild)
+npm run build            # Production build (prebuild re-derives + validates the Bible data)
 npm run start            # Serve the production build
 npm run lint             # ESLint
+npm run typecheck        # Strict type check (src/ + sanity/) — must be 0 errors
+npm run typecheck:test   # Type check the test files (separate tsconfig)
 npm test                 # Unit tests (Bible name/order locks, schema/validation, search)
 npm run bible:build      # Re-derive manifest + search indexes from the book files, then validate
-npm run bible:validate   # Validate the Bible dataset (also runs automatically before every build)
+npm run bible:validate   # Validate the Bible dataset only (no rebuild)
 ```
+
+> **`prebuild` runs `bible:build`, not just `bible:validate`.** Every production
+> build re-derives `manifest.json` and `search/*.json` from the book files before
+> compiling. This is deliberate: the content owner edits verse text and commits
+> without running anything, so the derived search index must never depend on a
+> human remembering to rebuild it. A stale index would otherwise pass validation
+> silently — reading pages would show the new text while search returned the old.
 
 Before committing anything non-trivial:
 
 ```bash
-npx tsc --noEmit  # strict type check — must be 0 errors
-npm run lint      # must be clean
-npm test          # unit tests — must pass
-npm run build     # must succeed; content routes are ○/● (static), not ƒ
+npm run typecheck  # strict type check — must be 0 errors
+npm run lint       # must be clean
+npm test           # unit tests — must pass
+npm run build      # must succeed; content routes are ○/● (static), not ƒ
 ```
 
 Only `/api/revalidate` should be a dynamic (`ƒ`) route. If a content page turns
