@@ -64,6 +64,22 @@ git push
 
 That is all. The website rebuilds and publishes the change automatically.
 
+**You do not need to run anything else.** The search is rebuilt from your text
+every time the website publishes, so a corrected verse becomes searchable at the
+same moment it appears on the page. There is no separate step to remember.
+
+**Optional — check your change before you publish it.** If you would like to be
+sure the file is still valid before pushing, run this in the project folder:
+
+```bash
+npm run bible:validate
+```
+
+It prints `✔ Bible dataset is valid.` when all is well, or names the exact file
+and verse if something is wrong. Skipping it is safe: the same check runs again
+automatically when the website publishes, and a mistake stops the publish
+instead of reaching visitors.
+
 ---
 
 ## 4. The four rules
