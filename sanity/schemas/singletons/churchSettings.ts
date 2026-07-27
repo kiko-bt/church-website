@@ -7,7 +7,8 @@ import { Settings } from "lucide-react";
 // the church name, address, email, or social links.
 //
 // Localization: address/email/phone are language-neutral and single-valued;
-// the service schedule is visitor-facing copy, so it is bilingual (`_en`).
+// the church name and the service schedule are visitor-facing copy, so they are
+// bilingual (`_en`).
 export const churchSettings = defineType({
   name: "churchSettings",
   title: "Church Settings",
@@ -22,9 +23,20 @@ export const churchSettings = defineType({
   fields: [
     defineField({
       name: "churchName",
-      title: "Church name",
+      title: "Church name (MK)",
       type: "string",
       group: "general",
+      description:
+        "The official church name. Shown in the header and footer, and used in page titles and search-engine listings.",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "churchName_en",
+      title: "Church name (EN)",
+      type: "string",
+      group: "general",
+      description:
+        'English version of the church name, e.g. "Church of the Gospel of Christ - Bitola". Always update this together with the Macedonian name — the English pages read this field only.',
       validation: (rule) => rule.required(),
     }),
     defineField({

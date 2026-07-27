@@ -1,5 +1,6 @@
 // GROQ query for the Church Settings singleton. Both language variants of the
-// service schedule and SEO copy are fetched; the mapper resolves the locale.
+// church name, service schedule and SEO copy are fetched; the mapper resolves
+// the locale.
 //
 // Bound to the fixed document id pinned by the desk structure
 // (sanity/structure.ts) rather than `[0]`, so the query is deterministic even
@@ -9,6 +10,7 @@ export const churchSettingsQuery = `
   *[_id == "churchSettings"][0] {
     _id,
     churchName,
+    churchName_en,
     address,
     email,
     phone,

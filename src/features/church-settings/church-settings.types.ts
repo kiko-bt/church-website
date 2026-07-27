@@ -1,6 +1,6 @@
-// Raw `churchSettings` singleton as returned by GROQ. The service schedule is
-// bilingual (`_en`); other contact fields are language-neutral. SEO defaults
-// and social links are nested objects.
+// Raw `churchSettings` singleton as returned by GROQ. The church name and the
+// service schedule are bilingual (`_en`); the contact fields are
+// language-neutral. SEO defaults and social links are nested objects.
 
 export type SeoDocument = {
   readonly metaTitle?: string;
@@ -13,6 +13,7 @@ export type SeoDocument = {
 export type ChurchSettingsDocument = {
   readonly _id: string;
   readonly churchName: string;
+  readonly churchName_en?: string;
   readonly address: string;
   readonly email: string;
   readonly phone?: string;

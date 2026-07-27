@@ -13,9 +13,12 @@ export async function Footer() {
   const nav = await getTranslations("navigation");
   const privacyT = await getTranslations("privacy");
   const locale = (await getLocale()) as Locale;
-  // Official church name from the CMS singleton; falls back to siteConfig.
+  // Official church name from the CMS singleton (locale-resolved); falls back to
+  // the localized siteConfig name when Sanity is not configured.
   const settings = await getChurchSettings(locale);
-  const name = settings?.churchName ?? siteConfig.name;
+  const name =
+    settings?.churchName ??
+    (locale === "mk" ? siteConfig.name : siteConfig.nameEn);
   const currentYear = new Date().getFullYear();
 
   const linkClass =

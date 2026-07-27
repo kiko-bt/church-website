@@ -12,7 +12,11 @@ export function mapChurchSettings(
 ): ChurchSettings {
   return {
     id: doc._id,
-    churchName: doc.churchName,
+    // `churchName_en` is required in the Studio but optional on the raw document
+    // (it post-dates the first published singleton), so normalize to the
+    // Macedonian name — the brand is never empty on the English pages.
+    churchName:
+      localized(doc.churchName, doc.churchName_en, locale) ?? doc.churchName,
     address: doc.address,
     email: doc.email,
     phone: doc.phone,
