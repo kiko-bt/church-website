@@ -604,30 +604,59 @@ without touching the repository.
 ### 5.1 Node.js 22 end-of-life — ~April 2027 ⚠️ the only dated item
 
 Node 22 leaves LTS maintenance around **April 2027**. Vercel drops end-of-life
-Node versions some time after. Pinned in three places:
+Node versions some time after. Pinned in **four** places, which must move
+together:
 
 | Where | Value |
 |---|---|
 | `package.json` → `engines.node` | `22.x` |
 | `.nvmrc` | `22` |
 | `.github/workflows/bible-guard.yml` | `node-version: "22"` |
+| `.github/workflows/monthly-health-check.yml` | `node-version: "22"` |
+| Vercel → Settings → Build & Deployment → Node.js Version | `22.x` |
 
 **Symptom:** builds start failing with a Node version error, with no code change.
-**Fix:** bump all three to the current LTS, run `npm run typecheck && npm test &&
-npm run build`, deploy. Realistically under an hour.
+**Fix:** bump all of them to the current LTS, run `npm run typecheck && npm test
+&& npm run build`, deploy. Realistically under an hour.
 **Meanwhile the live site keeps serving.** Not an emergency.
 
 **Recommendation:** do this proactively in **early 2027**, at a calm moment,
 rather than reactively when a correction won't publish.
 
-### 5.2 GitHub Actions deprecations
+**Vercel offers a 24.x option in the dashboard. Do not switch it on its own.**
+Changing only the dashboard leaves it contradicting `engines.node: "22.x"`, which
+is the kind of split-brain configuration that produces a build failure nobody can
+explain. Node 24 is a legitimate destination — it would buy roughly another year
+of runway — but it is a stack change under CLAUDE.md, so treat it as the §5.1
+task done early: move all five settings together, run the full check suite, and
+verify a deploy. Not a dashboard toggle.
 
-`bible-guard.yml` uses `actions/checkout@v4` and `actions/setup-node@v4`. GitHub
-deprecates major action versions periodically — first warnings, later hard
-failures.
+### 5.2 GitHub Actions deprecations — actioned 2026-07-28
 
-**Impact if ignored: low.** The workflow is a safety net; a failing workflow does
-not block Vercel from deploying. Bump the `@v4` pins when GitHub warns.
+Both workflows now pin `actions/checkout@v7` and `actions/setup-node@v7`, which
+run on Node 24.
+
+**What prompted it.** The first manual run of the health check emitted:
+
+> *Node.js 20 is deprecated. The following actions target Node.js 20 but are
+> being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4*
+
+Per GitHub's changelog, runners defaulted to Node 24 on **16 June 2026**, and
+Node 20 is **removed entirely in autumn 2026** — at which point `@v4` workflows
+stop working rather than warning. The `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION`
+escape hatch also expires then, so bumping the pins was the only durable fix.
+
+**Do not confuse the two Node versions in these files.** They are unrelated:
+
+| Setting | What it controls | Value |
+|---|---|---|
+| `actions/*@v7` | The Node the *action itself* runs on | 24, chosen by GitHub |
+| `node-version: "22"` | The Node that runs *this project's* code | 22, matching `engines.node` |
+
+Only the second is a project decision, and it stays at 22 — see §5.1.
+
+**Impact if a workflow ever does fail: low.** These are safety nets; a red
+workflow does not block Vercel from deploying. Bump the pins when GitHub warns.
 
 ### 5.3 Next.js 15 → 16
 

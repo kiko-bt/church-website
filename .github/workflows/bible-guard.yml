@@ -21,10 +21,14 @@ jobs:
   bible-guard:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
+      # v7 of both actions runs on Node 24. Node 20 — which v4 targeted — is
+      # being removed from the runners in autumn 2026, after which v4 workflows
+      # fail outright. `node-version` below is unrelated: it is the Node that
+      # runs OUR code, and stays on 22 to match engines.node and .nvmrc.
       - name: Use Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: "npm"
