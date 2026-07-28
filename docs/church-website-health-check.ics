@@ -1,0 +1,29 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Church Website//Operations Runbook//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:church-website-monthly-health-check@hristovoevangelie.org
+DTSTAMP:20260728T170000Z
+DTSTART:20260801T090000
+DURATION:PT10M
+RRULE:FREQ=MONTHLY;BYMONTHDAY=1
+SUMMARY:Church website - monthly health check (10 min)
+LOCATION:https://github.com/kiko-bt/church-website/issues
+DESCRIPTION:The GitHub Action has already run the automated checks and open
+ ed an issue with the results.\n\n1. Open the newest "Monthly health check"
+  issue.\n2. Anything red or yellow - see operations-runbook.md section 2 f
+ or recovery.\n3. Tick the five manual boxes: Vercel Analytics\, Speed Insi
+ ghts\, Sanity usage\, contact form\, Bible search.\n4. Close the issue.\n\
+ nIf the issue did NOT arrive\, the scheduled workflow may have been auto-d
+ isabled after 60 days of repository inactivity. Re-enable it in the Action
+ s tab\, then run: npm run health-check\n\nRunbook: docs/operations-runbook
+ .md
+BEGIN:VALARM
+TRIGGER:-PT15M
+ACTION:DISPLAY
+DESCRIPTION:Church website - monthly health check
+END:VALARM
+END:VEVENT
+END:VCALENDAR

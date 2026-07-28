@@ -165,17 +165,88 @@ Deliberately light. This site is static, has no database, no user accounts, and
 no runtime server logic beyond one webhook route and the contact action. It does
 not need monthly patching to stay safe.
 
-### Monthly — 5 minutes
+### Monthly — 5 minutes, mostly automated
 
-- [ ] Load the site. Check `/mk` and `/en`, one sermon, one Bible chapter.
-- [ ] Submit the contact form once; confirm it arrives.
+**You do not run this list by hand.** On the 1st of each month
+[`monthly-health-check.yml`](../.github/workflows/monthly-health-check.yml) runs
+[`scripts/health-check.ts`](../scripts/health-check.ts) and opens a GitHub issue
+with the automated results already filled in. Open the issue, tick the five
+manual boxes, close it.
+
+To run the same checks yourself at any time:
+
+```bash
+npm run health-check
+```
+
+**Automated — arrive already done**
+
+| Check | Green | Amber | Red |
+|---|---|---|---|
+| Domain expiry (RDAP) | > 90 days | 30–90 days | **< 30 days** |
+| TLS certificate | > 30 days | 14–30 days | **< 14 days** |
+| `/mk` and `/en` reachable | 200 | — | anything else |
+| **Bible text live matches the repository** | matches | — | **mismatch** |
+| `sitemap.xml` | > 500 URLs | 100–500 | < 100 or invalid |
+| `robots.txt` | points at sitemap | no `Sitemap:` line | not served |
+| `npm audit` | no critical | — | any critical |
+
+The domain and certificate thresholds differ on purpose. A domain is renewed by
+a person and a working card, so 90 days of warning is not excessive — §1 calls a
+lapsed domain the one failure with a deadline and no undo. A certificate is
+renewed by Vercel automatically about 30 days out, so under 30 days means the
+automation did not run.
+
+**The Bible-text check is the one to care about.** It reads John 3:16 from the
+committed Macedonian JSON and asserts that exact string appears in the HTML the
+live site serves. It therefore proves the whole chain — commit → `prebuild` →
+static generation → deploy → reader. A mismatch means text in git never reached
+production, which is precisely the failure the content owner cannot see and would
+never think to report.
+
+`npm audit` deliberately only turns red on **critical**. Checked 2026-07-28,
+every one of the 28 `high` advisories was transitive build/CLI tooling
+(`@sanity/cli` → `@oclif/core` → `ejs`, `eslint` → `minimatch`) that never runs
+in a visitor's request path on a static site. Flagging those monthly would make
+the colour meaningless. The counts are still printed; §5.4 is where they get
+acted on.
+
+**Manual — the five with no free API**
+
+| What | Where |
+|---|---|
+| Analytics — traffic sane vs §4.0? | [vercel.com/dashboard](https://vercel.com/dashboard) → project → **Analytics** |
+| Speed Insights — vitals still green? | [vercel.com/dashboard](https://vercel.com/dashboard) → project → **Speed Insights** |
+| Sanity usage | [sanity.io/manage/project/9nwz9xmi](https://www.sanity.io/manage/project/9nwz9xmi) → **Usage** |
+| Contact form — submit one, confirm it arrives | [/mk/contact](https://www.hristovoevangelie.org/mk/contact) |
+| Bible search — type a word, confirm results | [/mk/bible](https://www.hristovoevangelie.org/mk/bible) |
+
+Also monthly, and not automatable:
+
 - [ ] Confirm the preacher has published something recently and it appeared. (If
-      he hasn't published in months, test one yourself — a silently broken
-      webhook is only discovered by publishing.)
-- [ ] Glance at Vercel → Analytics and Speed Insights (§4.1, §4.2).
+      he hasn't published in months, publish something yourself — a silently
+      broken webhook is only discovered by publishing.)
 - [ ] **Once, after the first full month:** replace the assumed figures in §4.0
       with the measured ones. Everything downstream of that table is reasoning
       about free-tier headroom, and it should reason from real numbers.
+
+**Set `VERCEL_SLUG` once.** The two Vercel rows above link to the dashboard root
+because the account slug is not in the repository. Put it at the top of
+`scripts/health-check.ts` (the value between `vercel.com/` and `/church-website`
+in your dashboard URL) and the monthly issue will deep-link straight to the two
+tabs instead.
+
+**Calendar reminder.** Import
+[`church-website-health-check.ics`](./church-website-health-check.ics) into
+Google, Apple, or Outlook Calendar — a 10-minute recurring event on the 1st.
+Import it once; it needs no account and nothing can switch it off.
+
+That last point is not redundant with the workflow. **On public repositories
+GitHub automatically disables scheduled workflows after 60 days without
+repository activity** — plausible for a site that is deliberately quiet. GitHub
+emails the owner first and re-enabling is one click in the Actions tab, but a
+calendar entry is immune to it. If a month passes with no issue, that is the
+first thing to check.
 
 ### Quarterly — 30 minutes
 

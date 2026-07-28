@@ -1,0 +1,63 @@
+# Monthly health check.
+#
+# Runs scripts/health-check.ts on the first of every month and opens an issue
+# containing the results, so the routine checks in docs/operations-runbook.md §3
+# arrive already done. Everything the maintainer still has to do by hand is
+# listed in the same issue as a checklist of dashboard links.
+#
+# This is addressed to the MAINTAINER, not the content owner. The preacher edits
+# Bible and About text and pushes; nothing here is his to action.
+#
+# Cost: one job, well under a minute, once a month. GitHub Actions is free for
+# public repositories and this uses roughly 0.05% of the 2,000 monthly minutes
+# included with a private repository on the Free plan. It cannot bill you.
+#
+# Note there is NO `npm ci` step. The script imports only Node built-ins, so it
+# runs straight from a checkout — nothing to install, nothing to break.
+#
+# ⚠️ On PUBLIC repositories GitHub automatically disables scheduled workflows
+# after 60 days without repository activity. It emails the repository owner
+# first, and re-enabling is one click in the Actions tab. This is exactly why
+# docs/church-website-health-check.ics exists as well: a calendar reminder
+# cannot be switched off by anyone's inactivity policy.
+
+name: Monthly health check
+
+on:
+  schedule:
+    # 06:00 UTC on the 1st of each month. Scheduled runs can be delayed by up to
+    # an hour or so under load — irrelevant for a monthly reminder, which is why
+    # uptime monitoring lives in Better Stack (runbook §4.4) and not here.
+    - cron: "0 6 1 * *"
+  # Lets you run it on demand from the Actions tab to test changes.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run the health check
+        # --silent keeps npm's own banner out of the report. The script always
+        # exits 0 so that a failing check still produces an issue rather than a
+        # silent red workflow nobody sees.
+        run: npm run --silent health-check > health-report.md
+
+      - name: Open the monthly issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Monthly health check — $(date -u '+%B %Y')" \
+            --body-file health-report.md

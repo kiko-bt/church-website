@@ -15,7 +15,8 @@
     "test": "node --test --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types \"src/**/*.test.ts\" \"sanity/**/*.test.ts\"",
     "typecheck:test": "tsc -p tsconfig.test.json",
     "bible:build": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/build-bible-artifacts.ts && npm run bible:validate",
-    "bible:validate": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/validate-bible.ts"
+    "bible:validate": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/validate-bible.ts",
+    "health-check": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/health-check.ts"
   },
   "dependencies": {
     "@portabletext/react": "^6.2.0",

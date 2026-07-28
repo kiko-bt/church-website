@@ -12,6 +12,10 @@
 # is deterministic history on every machine, with no setup step to remember.
 * text=auto
 
+# RFC 5545 requires CRLF line endings in iCalendar files. Most clients tolerate
+# LF, but pinning it removes the guesswork when someone imports the reminder.
+*.ics text eol=crlf
+
 # Binary assets must never be normalized — doing so corrupts them.
 *.png binary
 *.jpg binary
