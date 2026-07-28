@@ -645,6 +645,35 @@ stack change under CLAUDE.md, so do it deliberately: `engines.node` and the thre
 supporting pins together, full check suite, verified deploy. Not by flipping the
 dashboard, which would change nothing at all while `engines.node` is set.
 
+#### The type-stripping flag — removed 2026-07-28 ⚠️ this was a latent build failure
+
+The four `node` scripts in `package.json` used to pass
+`--experimental-strip-types` and `--disable-warning=ExperimentalWarning`. Both
+have been removed. **This mattered more than it looks.**
+
+Node's own timeline: type stripping became the default in **22.18.0**, stable in
+**24.12.0 / 25.2.0**, and `--experimental-strip-types` **no longer exists in Node
+26** — only `--no-strip-types` remains, to switch it off. Node rejects unknown
+command-line flags, so on Node 26 every one of those scripts would have died with
+`bad option`. One of them is `prebuild`, so **the failure mode was "nothing can
+deploy, ever"**, triggered by the routine Node upgrade this very section
+schedules for early 2027.
+
+Verified on Node 22.22 before removing them: the scripts run identically with no
+flags, and no `ExperimentalWarning` is emitted — both flags were already dead
+weight. `--disable-warning=MODULE_TYPELESS_PACKAGE_JSON` is kept because it still
+suppresses a real warning (`package.json` declares no `"type"`, so Node reparses
+these files as ESM). The alternative — adding `"type": "module"` — was rejected
+as a broader change than the noise justifies.
+
+**Consequence:** these scripts now require **Node ≥ 22.18**. `engines.node` stays
+`"22.x"` rather than a tighter range, because Vercel resolves `22.x` to the
+latest 22 release (far past 22.18) while it maps open ranges like `>=22.18.0`
+to the newest major available — the opposite of what is wanted.
+
+Re-verified after the change: `bible:build`, `bible:validate`, `health-check`,
+90/90 tests, and a full `next build` — 2,556 static pages, exit 0.
+
 ### 5.2 GitHub Actions deprecations — actioned 2026-07-28
 
 Both workflows now pin `actions/checkout@v7` and `actions/setup-node@v7`, which
