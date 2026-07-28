@@ -603,33 +603,42 @@ without touching the repository.
 
 ### 5.1 Node.js 22 end-of-life — ~April 2027 ⚠️ the only dated item
 
-Node 22 leaves LTS maintenance around **April 2027**. Vercel drops end-of-life
-Node versions some time after. Pinned in **four** places, which must move
-together:
+Node 22 leaves LTS maintenance around **April 2027**. As of 2026-07-28 Vercel
+still lists **24.x (default), 22.x and 20.x** as available, so 22.x is fully
+supported — it is simply no longer the newest.
 
-| Where | Value |
-|---|---|
-| `package.json` → `engines.node` | `22.x` |
-| `.nvmrc` | `22` |
-| `.github/workflows/bible-guard.yml` | `node-version: "22"` |
-| `.github/workflows/monthly-health-check.yml` | `node-version: "22"` |
-| Vercel → Settings → Build & Deployment → Node.js Version | `22.x` |
+**`package.json` is the authority.** Vercel's documentation is explicit that
+`engines.node` **overrides the Node.js Version chosen in Project Settings**. The
+dashboard dropdown is only the fallback for a project that does not declare one.
+This project declares `22.x`, so that is what builds, whatever the dropdown says.
 
-**Symptom:** builds start failing with a Node version error, with no code change.
-**Fix:** bump all of them to the current LTS, run `npm run typecheck && npm test
-&& npm run build`, deploy. Realistically under an hour.
+| Where | Value | Authority |
+|---|---|---|
+| `package.json` → `engines.node` | `22.x` | **Wins over everything below** |
+| `.nvmrc` | `22` | Local development only |
+| `.github/workflows/bible-guard.yml` | `node-version: "22"` | CI only |
+| `.github/workflows/monthly-health-check.yml` | `node-version: "22"` | CI only |
+| Vercel → Settings → Build & Deployment → Node.js Version | — | Ignored while `engines.node` is set |
+
+**The yellow marker Vercel shows beside 22.x is advisory, not an error.** It
+means the project is not on the current default. Nothing is failing, and it can
+be left alone.
+
+**Symptom of a real problem:** builds start failing with a Node version error,
+with no code change.
+**Fix:** bump `engines.node` first — that alone changes what deploys — then the
+two workflows and `.nvmrc` to match. Run `npm run typecheck && npm test && npm
+run build`, then deploy. Realistically under an hour.
 **Meanwhile the live site keeps serving.** Not an emergency.
 
 **Recommendation:** do this proactively in **early 2027**, at a calm moment,
-rather than reactively when a correction won't publish.
+rather than reactively when a correction will not publish.
 
-**Vercel offers a 24.x option in the dashboard. Do not switch it on its own.**
-Changing only the dashboard leaves it contradicting `engines.node: "22.x"`, which
-is the kind of split-brain configuration that produces a build failure nobody can
-explain. Node 24 is a legitimate destination — it would buy roughly another year
-of runway — but it is a stack change under CLAUDE.md, so treat it as the §5.1
-task done early: move all five settings together, run the full check suite, and
-verify a deploy. Not a dashboard toggle.
+Moving to Node 24 early is defensible — it would buy roughly another year of
+runway, which is worth something on a site meant to run untended. It is still a
+stack change under CLAUDE.md, so do it deliberately: `engines.node` and the three
+supporting pins together, full check suite, verified deploy. Not by flipping the
+dashboard, which would change nothing at all while `engines.node` is set.
 
 ### 5.2 GitHub Actions deprecations — actioned 2026-07-28
 
