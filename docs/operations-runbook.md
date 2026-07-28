@@ -675,44 +675,49 @@ only if you run `tsc` inside the Studio repo, which has no typecheck script.
 Sanity code, not as a standalone task. Re-run `npm run typecheck` afterwards —
 the schema files are type-checked against this package.
 
-### 5.6 Branch naming — ⚠️ do this before handover
+### 5.6 Branch naming — resolved 2026-07-28
 
-**`main` does not exist.** Verified 2026-07-28: the only branch on the remote is
-`feature/project-foundation`, and it is also the repository's default branch.
-The local `master` branch is the untouched `Initial commit from Create Next App`
-and was never pushed.
+**Done.** The repository now has a single branch, `main`, and it is the default.
+Recorded here because the history explains several decisions elsewhere.
 
-Three things follow, and the second is the one that matters:
+**What was wrong.** Until 2026-07-28 no `main` branch existed. The only branch
+was `feature/project-foundation`, which was also the default, and a stale local
+`master` held nothing but `Initial commit from Create Next App`. Three
+consequences followed, and the second was the one that mattered:
 
-1. Production builds from `feature/project-foundation`. This works, but is
-   surprising to anyone inheriting the project.
-2. **The Bible integrity guard has never run.**
+1. Production built from `feature/project-foundation` — workable, but surprising
+   to anyone inheriting the project.
+2. **The Bible integrity guard had never run once.**
    `.github/workflows/bible-guard.yml` triggers on `push`/`pull_request` to
-   `main`. With no `main`, nothing matches, so the guard that is supposed to
-   stop a broken verse reaching production is inert. The `prebuild` validation
-   still fails the Vercel build, so bad data cannot actually ship — but the
-   earlier, cheaper safety net is not there.
-3. The documentation tells the content owner to commit to `main`
+   `main`. With no `main`, nothing matched, so the guard meant to stop a broken
+   verse was inert. The `prebuild` validation still failed the Vercel build, so
+   bad data could not actually ship — but the earlier, cheaper net was absent.
+3. The documentation told the content owner to commit to `main`
    ([bible-editing-guide.md](./bible-editing-guide.md), §2 of
-   [bible-module.md](./bible-module.md)), which he cannot do.
+   [bible-module.md](./bible-module.md)), which he could not do.
 
-**Fix — rename, do not merge.** On GitHub: **Settings → Branches → rename**
-`feature/project-foundation` to `main`. A rename keeps all history, moves the
-default branch automatically, and GitHub prints the one command collaborators
-need for their local clones. Creating a separate `main` and merging would leave
-two branches and re-introduce the same confusion.
+**How it was fixed — renamed, not merged.** GitHub **Settings → Branches →
+rename**. A rename preserves history, moves the default branch in one step, and
+sets up redirects for old links. Creating a separate `main` and merging would
+have left two branches and the same confusion.
 
-Afterwards, in order:
+**Remaining follow-up**
 
-- [ ] Vercel → Settings → Git → set the production branch to **`main`**, then
-      redeploy once and confirm the site still serves.
-- [ ] Confirm `bible-guard.yml` now runs (push anything, check the Actions tab).
-- [ ] Confirm the monthly health check still appears under Actions — scheduled
-      and manually dispatched workflows only run from the **default** branch, so
-      this is the step that switches it on for real.
-- [ ] `git branch -m feature/project-foundation main` locally, then
-      `git fetch origin && git branch -u origin/main main`.
-- [ ] Delete the stale local `master`.
+- [ ] **Vercel production branch → `main`.** Project **Settings → Environments →
+      **Production** → **Branch Tracking** → change the branch → **Save**.
+      (Not under Settings → Git; Vercel moved this into Environments. Verified
+      against Vercel's docs 2026-07-28.) Then redeploy once and confirm the site
+      still serves.
+- [ ] Confirm `bible-guard.yml` now runs — push anything and check the Actions
+      tab. This is the first time it will ever have executed.
+- [ ] Confirm **Monthly health check** appears under Actions. Scheduled and
+      manually dispatched workflows only run from the **default** branch, so the
+      rename is what switched it on.
+
+Note that Vercel does **not** follow a Git branch rename automatically. Its
+branch order of preference (`main`, then `master`, then the repository default)
+applies only when a project is first created, so an existing project keeps
+pointing at the old name until it is changed by hand.
 
 ### 5.7 Studio auto-updates
 
