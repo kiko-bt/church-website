@@ -230,16 +230,16 @@ Also monthly, and not automatable:
       with the measured ones. Everything downstream of that table is reasoning
       about free-tier headroom, and it should reason from real numbers.
 
-**Set `VERCEL_SLUG` once.** The two Vercel rows above link to the dashboard root
-because the account slug is not in the repository. Put it at the top of
-`scripts/health-check.ts` (the value between `vercel.com/` and `/church-website`
-in your dashboard URL) and the monthly issue will deep-link straight to the two
-tabs instead.
-
 **Calendar reminder.** Import
-[`church-website-health-check.ics`](./church-website-health-check.ics) into
-Google, Apple, or Outlook Calendar — a 10-minute recurring event on the 1st.
-Import it once; it needs no account and nothing can switch it off.
+[`church-website-health-check.ics`](./church-website-health-check.ics) — a
+10-minute recurring event on the 1st. Import it once; it needs no account and
+nothing can switch it off.
+
+Use **Google Calendar** (Settings → *Import & export* → select the file) rather
+than Outlook. Windows 11's "Outlook (new)" prompts for a Microsoft 365
+subscription when it opens a calendar file. Creating the event by hand works
+equally well — the file is a convenience, not a requirement; what matters is
+that a reminder exists outside GitHub.
 
 That last point is not redundant with the workflow. **On public repositories
 GitHub automatically disables scheduled workflows after 60 days without

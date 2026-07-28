@@ -33,9 +33,14 @@ const TLS_HOST = SITE_URL.hostname;
 const REGISTRABLE_DOMAIN = TLS_HOST.replace(/^www\./, "");
 
 // Vercel URLs are scoped to an account slug: vercel.com/<slug>/church-website.
-// Paste that slug here once and the two Vercel links below become exact deep
-// links; left empty they fall back to the dashboard root, which always works.
-const VERCEL_SLUG = "";
+// Set it here and the two Vercel links in the report become exact deep links;
+// clear it and they fall back to the dashboard root, which always works.
+//
+// Annotated `: string` on purpose. Without it TypeScript narrows the value to
+// its literal type and then rejects the empty-string fallback below as
+// unreachable — which would force whoever clears this field to also fix a type
+// error somewhere else in the file.
+const VERCEL_SLUG: string = "evangelie";
 const VERCEL_PROJECT = "church-website";
 const SANITY_PROJECT_ID = "9nwz9xmi";
 
