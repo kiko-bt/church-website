@@ -57,6 +57,13 @@ jobs:
         # silent red workflow nobody sees.
         run: npm run --silent health-check > health-report.md
 
+      # Always publish the report to the run summary first, so the results are
+      # readable in the Actions tab even if the issue below cannot be created —
+      # e.g. Issues disabled on the repository, or the default workflow token
+      # restricted to read-only under Settings → Actions → General.
+      - name: Publish the report to the run summary
+        run: cat health-report.md >> "$GITHUB_STEP_SUMMARY"
+
       - name: Open the monthly issue
         env:
           GH_TOKEN: ${{ github.token }}
