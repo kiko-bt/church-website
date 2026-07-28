@@ -7,14 +7,14 @@
   },
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run bible:build",
+    "prebuild": "npm run --silent bible:build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node --test --disable-warning=MODULE_TYPELESS_PACKAGE_JSON \"src/**/*.test.ts\" \"sanity/**/*.test.ts\"",
     "typecheck:test": "tsc -p tsconfig.test.json",
-    "bible:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-bible-artifacts.ts && npm run bible:validate",
+    "bible:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-bible-artifacts.ts && npm run --silent bible:validate",
     "bible:validate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/validate-bible.ts",
     "health-check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/health-check.ts"
   },
