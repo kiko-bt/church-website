@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { renderContactEmail } from "./contact.email.ts";
 import type { ContactFormData } from "./contact.schema.ts";
 
-// Run with:  node --test --experimental-strip-types  (wired up as `npm test`).
+// Run with:  node --test  (wired up as `npm test`).
 
 const baseData: ContactFormData = {
   name: "John Doe",

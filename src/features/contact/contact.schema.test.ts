@@ -6,7 +6,7 @@ import {
   contactFormSchema,
 } from "./contact.schema.ts";
 
-// Run with:  node --test --experimental-strip-types  (wired up as `npm test`).
+// Run with:  node --test  (wired up as `npm test`).
 // Zero external dependencies beyond Zod.
 
 const validInput = {

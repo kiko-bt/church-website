@@ -749,21 +749,30 @@ old dependencies. Guidance:
 The attack surface is genuinely small: no database, no auth, no user input except
 a Zod-validated contact form, no secrets in the client bundle.
 
-### 5.5 Sanity version drift between the two repos
+### 5.5 Sanity version pairing between the two repos
 
-| Repo | `sanity` |
-|---|---|
-| `church-website` (owns the schemas) | **6.2.0** |
-| `studio-church-ehb` (imports them) | **6.6.0** |
+Measured 2026-07-29. Note the distinction between the range each repo *declares*
+and the version actually *installed* — an earlier revision of this section
+conflated the two and reported a drift that does not exist:
 
-**Impact: cosmetic today.** `sanity` is imported only under `sanity/` — never
-from `src/` — so the website's build and runtime are unaffected. The website
-talks to Sanity through `@sanity/client`, a separate package. The drift shows up
-only if you run `tsc` inside the Studio repo, which has no typecheck script.
+| Repo | Declares | Installed |
+|---|---|---|
+| `church-website` (owns the schemas) | `^6.2.0` | **6.6.0** |
+| `studio-church-ehb` (imports them) | `^6.3.0` | **6.6.0** |
 
-**Recommendation:** align them (`church-website` → 6.6.0) the next time you touch
-Sanity code, not as a standalone task. Re-run `npm run typecheck` afterwards —
-the schema files are type-checked against this package.
+**Both run the same Sanity, so there is no drift to fix.** The declared ranges
+differ, but both are caret ranges satisfied by 6.6.0. React is likewise aligned
+in practice (`^19.0.0` and `^19.2.4`, both resolving to React 19).
+
+**Impact of the range difference: none today, and low in future.** `sanity` is
+imported only under `sanity/` — never from `src/` — so the website's build and
+runtime are unaffected; the site talks to Sanity through `@sanity/client`, a
+separate package. The only scenario that bites is a fresh `npm install` in one
+repo resolving to a different 6.x than the other, which could surface as a type
+error when the Studio compiles schemas imported from `church-website`.
+
+**Recommendation:** raise `church-website` to `^6.6.0` next time you touch Sanity
+code, so both declare the same floor. Not worth a standalone change.
 
 ### 5.6 Branch naming — resolved 2026-07-28
 

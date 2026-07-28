@@ -12,7 +12,7 @@ import {
 
 // Proves the dataset validation rejects every failure mode required by the
 // engineering rules (see .claude/bible-module.md §6).
-// Run via `npm test` (node --test --experimental-strip-types).
+// Run via `npm test` (node --test).
 
 type Canon = Parameters<typeof validateDataset>[0]["canon"];
 

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mapBook } from "./books.mappers.ts";
 import type { BookDocument } from "./books.types.ts";
 
-// Run with:  node --test --experimental-strip-types  (wired up as `npm test`).
+// Run with:  node --test  (wired up as `npm test`).
 
 const base: BookDocument = {
   _id: "book-1",

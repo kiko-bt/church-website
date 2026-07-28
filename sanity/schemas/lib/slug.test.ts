@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkSlugify, isValidSlug, SLUG_PATTERN } from "./slug.ts";
 
-// Run with:  node --test --experimental-strip-types  (wired up as `npm test`).
+// Run with:  node --test  (wired up as `npm test`).
 // Guards the Cyrillic→ASCII transliteration that keeps dynamic routes off the
 // non-ASCII 404 path.
 

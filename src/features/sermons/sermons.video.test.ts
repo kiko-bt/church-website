@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { getYouTubeEmbed } from "./sermons.video.ts";
 
-// Run with:  node --test --experimental-strip-types  (wired up as `npm test`).
+// Run with:  node --test  (wired up as `npm test`).
 // Zero external dependencies.
 
 const ID = "dQw4w9WgXcQ"; // 11 chars, a valid YouTube id shape.

@@ -6,7 +6,7 @@ import {
   checkRateLimit,
 } from "./contact.ratelimit.ts";
 
-// Run with:  node --test --experimental-strip-types  (wired up as `npm test`).
+// Run with:  node --test  (wired up as `npm test`).
 
 beforeEach(() => __resetRateLimitForTests());
 

@@ -2,7 +2,7 @@
   // Type-checks the unit test files, which the app/Next build intentionally
   // excludes. Tests import their subject with an explicit `.ts` extension
   // because they run on Node's native TypeScript type-stripping
-  // (`node --test --experimental-strip-types`), so this config enables
+  // (`node --test`), so this config enables
   // `allowImportingTsExtensions`. Run with: npx tsc -p tsconfig.test.json
   "extends": "./tsconfig.json",
   "compilerOptions": {

@@ -12,7 +12,7 @@ deployment months later. Written so another engineer can follow it top to bottom
 - **Primary domain:** **`https://www.hristovoevangelie.org`** — the canonical host.
   The apex `hristovoevangelie.org` **308-redirects to `www`**, so every
   production URL (site URL, canonical tags, the webhook target) uses **`www`**.
-- **Host:** Vercel (GitHub-connected), production branch `feature/project-foundation`.
+- **Host:** Vercel (GitHub-connected), production branch `main`.
 - **CMS:** Sanity (project `9nwz9xmi`, dataset `production`, **public**). Studio is
   the separate `studio-church-ehb` app; it writes to Sanity's hosted Content Lake.
 - **DNS registrar:** Porkbun.
@@ -66,13 +66,10 @@ Vercel auto-detects Next.js — no `vercel.json` is required.
    - Root directory: **`./`** — the repo root **is** the Next.js app. (The Studio
      lives in the *separate* `studio-church-ehb` repo and is **not** deployed
      from here.)
-2. **Production branch:** Settings → Git. **As deployed, this is
-   `feature/project-foundation`** — production currently builds from that branch,
-   so every push to it triggers a production deploy; other branches get preview
-   deployments. *Recommended follow-up:* once the initial build stabilizes, merge
-   `feature/project-foundation` into `main` and switch Vercel's production branch
-   to **`main`** (the conventional long-term default). Whichever branch is chosen,
-   the steps below apply to it.
+2. **Production branch: `main`.** Set under Settings → **Environments** →
+   **Production** → **Branch Tracking** (not under Settings → Git; Vercel moved
+   it). Every push to `main` triggers a production deploy; other branches get
+   preview deployments.
 3. Set environment variables (§3) **before** the first production deploy, or the
    build will bake in fallback values (e.g. a wrong site URL).
 4. Push to the production branch (or click **Redeploy**). Confirm the build log

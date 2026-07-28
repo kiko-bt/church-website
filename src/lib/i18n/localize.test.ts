@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { localized } from "./localize.ts";
 
-// Run with:  node --test --experimental-strip-types  (wired up as `npm test`).
+// Run with:  node --test  (wired up as `npm test`).
 
 test("returns Macedonian for the default locale", () => {
   assert.equal(localized("Здраво", "Hello", "mk"), "Здраво");

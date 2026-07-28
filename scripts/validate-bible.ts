@@ -5,7 +5,7 @@
 // bad dataset fails `next build` before anything is deployed.
 //
 // Run with:  npm run bible:validate
-//   (node --experimental-strip-types scripts/validate-bible.ts)
+//   (node scripts/validate-bible.ts)
 
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
