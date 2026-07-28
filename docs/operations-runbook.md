@@ -289,8 +289,9 @@ only once real usage shows it is needed, not pre-emptively.
 **Shared-account caveat.** Web Analytics events are pooled **across every project
 in the Vercel account**, not per project. If the account also hosts other sites,
 they share the same 50,000 — worth weighing in §1 when deciding whose account
-should own this project. (Speed Insights on Hobby is limited to **one project**
-for the same reason.)
+should own this project. Speed Insights has a separate but equally relevant
+restriction: on Hobby it can be enabled for **one project only**, so if the
+account hosts other sites, this one has to be the chosen project.
 
 **Measured page weight** — production, 2026-07-28, compressed over the wire:
 
@@ -330,18 +331,27 @@ enabled once in the dashboard; the code is already in place.
 | Referrers | Whether Facebook/YouTube links actually bring people |
 | Countries | Diaspora reach — likely justifies the English translation |
 
-**Cost and limits** (from Vercel docs, checked 2026-07-28 — verify if it matters):
+**Cost and limits** — verified 2026-07-28 against
+[vercel.com/docs/analytics](https://vercel.com/docs/analytics) and
+[analytics/limits-and-pricing](https://vercel.com/docs/analytics/limits-and-pricing).
+Re-read those before acting on a number here; Vercel changes them:
 
 | | Hobby | Pro |
 |---|---|---|
 | Included events / month | **50,000** | none included; **$0.03 per 1,000** |
 | Reporting window | 1 month | 12 months |
+| Custom events | **Not available** | Included |
 | Can you be charged? | **No** | Yes, per event |
 
 **On Hobby you cannot be billed for this.** Hobby teams cannot purchase extra
 events: on exceeding 50,000 there is a 3-day grace period, then collection pauses
-and resumes about 7 days later (or next cycle). The **website itself is never
-affected** — only the statistics pause.
+and resumes about 7 days later. The **website itself is never affected** — only
+the statistics pause.
+
+*(Vercel's own docs are slightly inconsistent about the resumption: one passage
+says collection restarts after 7 days, another says at the next billing cycle.
+Either way it is a pause, never a charge, so the distinction does not matter
+operationally.)*
 
 Against the traffic profile in §4.0 that is roughly **32% of the allowance at the
 expected level**, reaching 100% only at the top of the plausible range. Note the
@@ -351,6 +361,17 @@ allowance is pooled across every project in the account (§4.0).
 why no consent banner is required and why the Privacy Policy can state plainly
 that the site sets no tracking cookies.
 
+The mechanism, per Vercel's documentation, is worth knowing if anyone ever
+challenges that claim: a visitor is identified by a **hash derived from the
+incoming request, not a cookie**, and that hash **resets every day**. A visitor
+therefore cannot be tracked from one day to the next, or across different
+websites. Only anonymized data is stored.
+
+**Bot traffic is excluded.** Vercel inspects the User-Agent and does not count
+automated traffic. Search-engine crawlers and uptime monitors (§4.4) therefore
+consume no events, which makes the §4.0 headroom estimates conservative rather
+than optimistic — a useful direction for the error to run in.
+
 ### 4.2 Vercel Speed Insights
 
 **Purpose.** Core Web Vitals measured on **real visitors' devices** — as opposed
@@ -359,19 +380,22 @@ data in Bitola is the honest test, and only this shows it.
 
 **Dashboard.** Vercel → project → **Speed Insights** tab. Also enable once.
 
-**Cost and limits — read before enabling** (Vercel docs, checked 2026-07-28):
+**Cost and limits — read before enabling.** Verified 2026-07-28 against
+[speed-insights/limits-and-pricing](https://vercel.com/docs/speed-insights/limits-and-pricing)
+and [speed-insights/metrics](https://vercel.com/docs/speed-insights/metrics):
 
 | | Hobby | Pro |
 |---|---|---|
-| Cost | **Free, 1 project only** | **$10.00 per project per month** |
-| Included events / month | 10,000 | unmetered above the base fee |
+| Cost | **Free, 1 project only** | **$10.00 per project per month** base fee |
+| Included events / month | First 10,000 (hard cap) | No cap — **$0.65 per 10,000 events** on demand |
 | Reporting window | **7 days** | 30 days |
-| Can you be charged? | **No** | **Yes — billed immediately on enabling, prorated** |
+| Can you be charged? | **No** | **Yes** — base fee immediately on enabling (prorated), plus per-event |
 
 ⚠️ **Speed Insights is the one feature in this stack that costs money on a paid
 plan.** On Pro the $10/project/month base fee is charged the moment it is
-enabled. On Hobby it is free and cannot bill you. **Confirm the plan before
-enabling** (Vercel → Settings → Billing).
+enabled, **and events are billed on top of it** at $0.65 per 10,000 — the base
+fee does not include an event allowance. On Hobby it is free and cannot bill you.
+**Confirm the plan before enabling** (Vercel → Settings → Billing).
 
 On Hobby, exceeding 10,000 events pauses recording until the next day; existing
 data stays viewable. The 7-day reporting window means Hobby shows recent trends,
