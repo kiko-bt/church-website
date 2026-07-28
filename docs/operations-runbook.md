@@ -629,6 +629,22 @@ This project declares `22.x`, so that is what builds, whatever the dropdown says
 means the project is not on the current default. Nothing is failing, and it can
 be left alone.
 
+Every build also logs, harmlessly:
+
+> *Due to `"engines": { "node": "22.x" }` in your `package.json` file, the
+> Node.js Version defined in your Project Settings ("24.x") will not apply,
+> Node.js Version "22.x" will be used instead.*
+
+That is Vercel confirming the override is working as intended. To silence it, set
+**Settings → Build & Deployment → Node.js Version** to **22.x** so the two agree.
+Purely cosmetic — 22.x builds either way.
+
+**Not everything in a build log is a problem.** Lines beginning `> name@version
+script` or `> node …` are npm echoing the command it is about to run, and appear
+in every Node project. They are worth keeping: when a build does fail, they are
+what shows which step it failed in. Only `Error:`, `Command failed`, or a
+non-zero exit indicate an actual fault.
+
 **Symptom of a real problem:** builds start failing with a Node version error,
 with no code change.
 **Fix:** bump `engines.node` first — that alone changes what deploys — then the
