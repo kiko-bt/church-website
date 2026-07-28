@@ -172,6 +172,10 @@ not need monthly patching to stay safe.
 - [ ] Confirm the preacher has published something recently and it appeared. (If
       he hasn't published in months, test one yourself — a silently broken
       webhook is only discovered by publishing.)
+- [ ] Glance at Vercel → Analytics and Speed Insights (§4.1, §4.2).
+- [ ] **Once, after the first full month:** replace the assumed figures in §4.0
+      with the measured ones. Everything downstream of that table is reasoning
+      about free-tier headroom, and it should reason from real numbers.
 
 ### Quarterly — 30 minutes
 
@@ -211,6 +215,7 @@ hand (Better Stack).
 
 | What you want to know | Where to look |
 |---|---|
+| How much traffic should I expect, and does it fit the free tiers? | §4.0 |
 | Is anyone visiting? Which pages? | Vercel → **Analytics** (§4.1) |
 | Is the site fast for real visitors? | Vercel → **Speed Insights** (§4.2) |
 | Am I near Sanity's free limits? | sanity.io/manage → **Usage** (§4.3) |
@@ -218,6 +223,94 @@ hand (Better Stack).
 
 > The first three tell you about a site that is working. Only the fourth tells
 > you it has stopped. That gap is why §4.4 matters most.
+
+### 4.0 Expected traffic profile — the baseline every limit below is judged against
+
+The figures here are **planning assumptions, not measurements** — the site had no
+analytics before this document was written. Their purpose is to turn *"the free
+tiers are sufficient"* from an opinion into a claim that can be checked.
+**Replace them with real numbers from Vercel → Analytics after the first full
+month** (it is already part of the §3 monthly check).
+
+| | Conservative | Expected | Upper bound |
+|---|---|---|---|
+| Daily visits | 50 | 130 | 500 |
+| Monthly visits | 1,000 | 4,000 | 10,000 |
+| Pages per visit | 3 | 4 | 5 |
+| **Monthly page views** | 3,000 | 16,000 | 50,000 |
+| Sanity publishes per month | 2 | 5 | 10 |
+| Git pushes (Bible text edits) per month | 2 | 5 | 10 |
+
+Pages per visit is deliberately higher than a brochure site would assume: the
+Bible reader invites chapter-to-chapter navigation, so one reading session is
+several page views.
+
+Note that a Sanity publish does **not** trigger a deployment — it fires the
+revalidation webhook ([cms-architecture.md](./cms-architecture.md)). Only git
+pushes cause builds.
+
+**Headroom against the free tiers**
+
+| Resource | Hobby allowance | Expected | Upper bound | Verdict |
+|---|---|---|---|---|
+| Web Analytics events | 50,000 / month | ~16,000 (32%) | ~50,000 (100%) | Fits, except at the very top of the range |
+| **Speed Insights events** | **10,000 / month** | **~18,000 (180%)** | **~45,000 (450%)** | **⚠️ the one allowance this site outgrows** |
+| Fast Data Transfer | 100 GB / month | ~3 GB (3%) | ~10 GB (10%) | Never close |
+| Deployments | 100 / day | ~5 / month | ~10 / month | Irrelevant |
+| Sanity API requests | traffic-independent | — | — | Irrelevant — see §4.3 |
+
+**Why the two Vercel numbers differ so sharply.** They count different things:
+
+- A **Web Analytics event** is one page view — roughly `visits × pages per visit`.
+- A **Speed Insights event** is one Web Vital data point, and Vercel collects
+  **3–6 per visit**. They are gathered only on *hard* navigations, which in a
+  Next.js app means the first page of a session — so it is roughly
+  `visits × 4.5`, regardless of how many pages are then read.
+
+That is why 16,000 page views produce ~16,000 Analytics events but ~18,000 Speed
+Insights events, against a cap five times smaller.
+
+**What exceeding it actually does: nothing harmful.** On Hobby, Speed Insights
+pauses recording once 10,000 events are reached and resumes the next day.
+Existing data stays visible, **the website itself is unaffected, and Hobby cannot
+be billed**. The only consequence is a dashboard showing a partial month.
+
+If that becomes annoying, the fix is one prop rather than a paid plan:
+
+```tsx
+// src/app/[locale]/layout.tsx
+<SpeedInsights sampleRate={0.25} />
+```
+
+A 25% sample keeps roughly 11,000 events even at the upper bound — still far more
+than enough to spot a Core Web Vitals regression on a site this size. Do this
+only once real usage shows it is needed, not pre-emptively.
+
+**Shared-account caveat.** Web Analytics events are pooled **across every project
+in the Vercel account**, not per project. If the account also hosts other sites,
+they share the same 50,000 — worth weighing in §1 when deciding whose account
+should own this project. (Speed Insights on Hobby is limited to **one project**
+for the same reason.)
+
+**Measured page weight** — production, 2026-07-28, compressed over the wire:
+
+| Asset | Size | Notes |
+|---|---|---|
+| Homepage HTML | 14 KB | |
+| Bible chapter HTML | 16 KB | e.g. `/mk/bible/john/3` |
+| Gallery HTML | 13 KB | |
+| First-load JS | 185 KB across 12 files | Cached for the rest of the session and later visits |
+| **Bible search index** | **~1.5 MB (MK), ~1.4 MB (EN)** | By far the largest download on the site |
+
+The search index is the only heavy asset, and it is deliberately behind a dynamic
+`import()` in `BibleSearch.tsx` — **it downloads only when a visitor focuses the
+search box**, then stays in the browser cache. Even pessimistically, if every
+visitor at the upper bound searched, that is 10,000 × 1.5 MB ≈ 15 GB — still
+comfortably inside the 100 GB allowance.
+
+This is the figure to remember if the Bible text ever grows substantially: the
+index grows with it, and it is the only measurement here with a realistic path to
+mattering.
 
 ### 4.1 Vercel Web Analytics
 
@@ -237,11 +330,22 @@ enabled once in the dashboard; the code is already in place.
 | Referrers | Whether Facebook/YouTube links actually bring people |
 | Countries | Diaspora reach — likely justifies the English translation |
 
-**Expected usage.** Hobby plans include a capped number of events per month
-(historically ~2,500 — **check the current figure in the dashboard**, it
-changes). A church site with hundreds of visitors a month sits far below the cap.
-If it is ever exceeded, collection simply stops until the next month; nothing
-breaks and the site is unaffected.
+**Cost and limits** (from Vercel docs, checked 2026-07-28 — verify if it matters):
+
+| | Hobby | Pro |
+|---|---|---|
+| Included events / month | **50,000** | none included; **$0.03 per 1,000** |
+| Reporting window | 1 month | 12 months |
+| Can you be charged? | **No** | Yes, per event |
+
+**On Hobby you cannot be billed for this.** Hobby teams cannot purchase extra
+events: on exceeding 50,000 there is a 3-day grace period, then collection pauses
+and resumes about 7 days later (or next cycle). The **website itself is never
+affected** — only the statistics pause.
+
+Against the traffic profile in §4.0 that is roughly **32% of the allowance at the
+expected level**, reaching 100% only at the top of the plausible range. Note the
+allowance is pooled across every project in the account (§4.0).
 
 **Privacy.** Cookieless, no personal identification, no advertising use. This is
 why no consent banner is required and why the Privacy Policy can state plainly
@@ -254,6 +358,32 @@ to Lighthouse, which is one synthetic run from one machine. A phone on mobile
 data in Bitola is the honest test, and only this shows it.
 
 **Dashboard.** Vercel → project → **Speed Insights** tab. Also enable once.
+
+**Cost and limits — read before enabling** (Vercel docs, checked 2026-07-28):
+
+| | Hobby | Pro |
+|---|---|---|
+| Cost | **Free, 1 project only** | **$10.00 per project per month** |
+| Included events / month | 10,000 | unmetered above the base fee |
+| Reporting window | **7 days** | 30 days |
+| Can you be charged? | **No** | **Yes — billed immediately on enabling, prorated** |
+
+⚠️ **Speed Insights is the one feature in this stack that costs money on a paid
+plan.** On Pro the $10/project/month base fee is charged the moment it is
+enabled. On Hobby it is free and cannot bill you. **Confirm the plan before
+enabling** (Vercel → Settings → Billing).
+
+On Hobby, exceeding 10,000 events pauses recording until the next day; existing
+data stays viewable. The 7-day reporting window means Hobby shows recent trends,
+not long-term history — fine for spotting a regression, not for year-over-year
+comparison.
+
+⚠️ **This is the one allowance the site is expected to exceed.** A Speed Insights
+event is a Web Vital data point, and Vercel collects 3–6 per visit, so the
+expected ~4,000 monthly visits produce roughly 18,000 events against a 10,000
+cap — see §4.0 for the arithmetic. Nothing breaks and nothing bills; recording
+simply pauses and resumes daily. The fix, if the partial-month view becomes
+annoying, is `<SpeedInsights sampleRate={0.25} />` — not a paid plan.
 
 **Core Web Vitals, in plain terms**
 
