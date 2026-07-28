@@ -629,15 +629,17 @@ This project declares `22.x`, so that is what builds, whatever the dropdown says
 means the project is not on the current default. Nothing is failing, and it can
 be left alone.
 
-Every build also logs, harmlessly:
+**Both are now set to 22.x** (dashboard aligned 2026-07-28), so builds are clean.
+Until then Vercel logged, harmlessly, on every build:
 
 > *Due to `"engines": { "node": "22.x" }` in your `package.json` file, the
 > Node.js Version defined in your Project Settings ("24.x") will not apply,
 > Node.js Version "22.x" will be used instead.*
 
-That is Vercel confirming the override is working as intended. To silence it, set
-**Settings → Build & Deployment → Node.js Version** to **22.x** so the two agree.
-Purely cosmetic — 22.x builds either way.
+That was Vercel confirming the override worked as intended, not a fault. If it
+reappears, the two settings have drifted apart again — and note that
+`engines.node` is the one that decides, so the notice tells you which value is
+actually building.
 
 **Not everything in a build log is a problem.** Lines beginning `> name@version
 script` or `> node …` are npm echoing the command it is about to run, and appear
