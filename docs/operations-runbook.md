@@ -173,6 +173,11 @@ not need monthly patching to stay safe.
 with the automated results already filled in. Open the issue, tick the five
 manual boxes, close it.
 
+**Verified working end to end on 2026-07-28** by manual dispatch: eight checks
+green, issue created, report also written to the Actions run summary. Manually
+re-running in the same month creates a second issue — expected, since the title
+is keyed to the month. Close the spares.
+
 To run the same checks yourself at any time:
 
 ```bash
