@@ -7,7 +7,13 @@
 //
 // Run: npm run bible:build
 
-import { writeFileSync, readFileSync, rmSync, mkdirSync, existsSync } from "node:fs";
+import {
+  writeFileSync,
+  readFileSync,
+  rmSync,
+  mkdirSync,
+  existsSync,
+} from "node:fs";
 import { join } from "node:path";
 import {
   bookFileSchema,
@@ -29,12 +35,39 @@ const TRANSLATION =
   "mk: content owner's Macedonian edition (Nestle-Aland 28 basis) · " +
   "en: World English Bible (public domain)";
 
+// Every failure here must name the file. This is the first thing that runs on a
+// content owner's push, so its message is the only clue he gets — and "Unexpected
+// token" with no filename is useless when there are 132 book files.
 function readBook(locale: string, id: string): ParsedBookFile {
+  const label = `${locale}/${id}.json`;
   const path = join(DATA_DIR, locale, `${id}.json`);
   if (!existsSync(path)) {
-    throw new Error(`missing book file: ${locale}/${id}.json`);
+    throw new Error(`missing book file: ${label}`);
   }
-  return bookFileSchema.parse(JSON.parse(readFileSync(path, "utf8")));
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(readFileSync(path, "utf8"));
+  } catch (error) {
+    throw new Error(
+      `${label} is not valid JSON — ${(error as Error).message}\n` +
+        `  Check for a missing quote, comma, or bracket near that position.`
+    );
+  }
+
+  // safeParse, not parse: a thrown ZodError stringifies to a JSON dump of the
+  // issue objects, which is unreadable. Same one-line-per-issue shape as
+  // scripts/validate-bible.ts.
+  const parsed = bookFileSchema.safeParse(raw);
+  if (!parsed.success) {
+    const issues = parsed.error.issues
+      .map(
+        (issue) => `  • ${label}: ${issue.path.join(".")} — ${issue.message}`
+      )
+      .join("\n");
+    throw new Error(`${label} does not match the expected shape:\n${issues}`);
+  }
+  return parsed.data;
 }
 
 function writeJson(path: string, value: unknown): void {
@@ -113,6 +146,8 @@ function main(): void {
 try {
   main();
 } catch (error) {
-  console.error(`\n✖ Failed to build Bible artifacts: ${(error as Error).message}\n`);
+  console.error(
+    `\n✖ Failed to build Bible artifacts: ${(error as Error).message}\n`
+  );
   process.exit(1);
 }
