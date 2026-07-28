@@ -231,9 +231,9 @@ Also monthly, and not automatable:
 - [ ] Confirm the preacher has published something recently and it appeared. (If
       he hasn't published in months, publish something yourself — a silently
       broken webhook is only discovered by publishing.)
-- [ ] **Once, after the first full month:** replace the assumed figures in §4.0
-      with the measured ones. Everything downstream of that table is reasoning
-      about free-tier headroom, and it should reason from real numbers.
+- [ ] Compare Speed Insights usage against the measured baseline recorded at the
+      top of §4.0 (121 data points on 2026-07-29). A sharp rise is good news; it
+      is also the only thing that would ever make `sampleRate` relevant.
 
 **Calendar reminder.** Import
 [`church-website-health-check.ics`](./church-website-health-check.ics) — a
@@ -302,11 +302,34 @@ hand (Better Stack).
 
 ### 4.0 Expected traffic profile — the baseline every limit below is judged against
 
-The figures here are **planning assumptions, not measurements** — the site had no
-analytics before this document was written. Their purpose is to turn *"the free
-tiers are sufficient"* from an opinion into a claim that can be checked.
-**Replace them with real numbers from Vercel → Analytics after the first full
-month** (it is already part of the §3 monthly check).
+> ### ⚠️ First real measurement — 2026-07-29
+>
+> **Speed Insights usage: 121 of 10,000 data points (1.2%) for the billing
+> cycle.** At Vercel's stated 3–6 data points per visit that is roughly **20–40
+> visits**, against the 4,000/month this section assumed.
+>
+> **The estimates below overstate real traffic by roughly two orders of
+> magnitude.** They are kept as the reasoning that was applied, and because they
+> still bound the *upper* case, but do not treat them as a description of this
+> site. Every conclusion about free-tier headroom is now far safer than modelled:
+> nothing is remotely close to any limit.
+>
+> One consequence is counter-intuitive and worth stating plainly: at this volume
+> **`sampleRate` must NOT be applied.** The advice further down assumes the cap
+> is being approached. Sampling 121 data points would reduce them to ~30 and make
+> the dashboard emptier, not healthier.
+>
+> The other consequence is the Hobby **7-day reporting window**: at a few dozen
+> visits a month, a device-specific view such as *mobile* will regularly read
+> "No data available" simply because nobody on a phone visited that week. That is
+> the expected behaviour of a quiet site, not a fault — the package, the
+> deployment, and the endpoints were all verified healthy when this was
+> investigated.
+
+The figures below were **planning assumptions, not measurements** — the site had
+no analytics when this document was written. Their purpose was to turn *"the free
+tiers are sufficient"* from an opinion into a claim that could be checked. The
+measurement above is that check, and it passed with room to spare.
 
 | | Conservative | Expected | Upper bound |
 |---|---|---|---|
@@ -478,12 +501,21 @@ data stays viewable. The 7-day reporting window means Hobby shows recent trends,
 not long-term history — fine for spotting a regression, not for year-over-year
 comparison.
 
-⚠️ **This is the one allowance the site is expected to exceed.** A Speed Insights
-event is a Web Vital data point, and Vercel collects 3–6 per visit, so the
-expected ~4,000 monthly visits produce roughly 18,000 events against a 10,000
-cap — see §4.0 for the arithmetic. Nothing breaks and nothing bills; recording
-simply pauses and resumes daily. The fix, if the partial-month view becomes
-annoying, is `<SpeedInsights sampleRate={0.25} />` — not a paid plan.
+**Measured 2026-07-29: 121 of 10,000 data points (1.2%).** The cap is not close
+and, at this traffic, will not be. An earlier revision predicted the opposite —
+~18,000 events against a 10,000 cap — from assumed traffic that turned out to be
+about a hundred times too high. See the measurement note at the top of §4.0.
+
+The practical symptom at this volume is the reverse of a cap: combined with the
+Hobby **7-day reporting window**, a device-specific view such as *mobile* will
+often read "No data available" because nobody on a phone visited that week.
+Verified on 2026-07-29 that this is not a fault — package on the latest version,
+injector present once in the deployed bundle, `/_vercel/speed-insights/script.js`
+serving 200, vitals endpoint live.
+
+⚠️ **Do not apply `sampleRate` while usage looks like this.** It only helps a site
+that is exhausting its allowance; here it would cut an already-sparse signal by
+three quarters.
 
 **Core Web Vitals, in plain terms**
 
