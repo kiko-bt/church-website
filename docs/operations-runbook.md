@@ -675,16 +675,44 @@ only if you run `tsc` inside the Studio repo, which has no typecheck script.
 Sanity code, not as a standalone task. Re-run `npm run typecheck` afterwards —
 the schema files are type-checked against this package.
 
-### 5.6 Vercel production branch
+### 5.6 Branch naming — ⚠️ do this before handover
 
-Production currently builds from **`feature/project-foundation`**, not `main`.
-This works, but is surprising to anyone inheriting the project — and the
-preacher's Bible workflow commits to `main`.
+**`main` does not exist.** Verified 2026-07-28: the only branch on the remote is
+`feature/project-foundation`, and it is also the repository's default branch.
+The local `master` branch is the untouched `Initial commit from Create Next App`
+and was never pushed.
 
-**Recommendation — worth doing before handover:** merge into `main` and switch
-Vercel's production branch to `main` (Settings → Git). Then the branch the
-content owner commits to is the branch that deploys, and the CI guard
-(`on: push: branches: [main]`) guards the branch that actually ships.
+Three things follow, and the second is the one that matters:
+
+1. Production builds from `feature/project-foundation`. This works, but is
+   surprising to anyone inheriting the project.
+2. **The Bible integrity guard has never run.**
+   `.github/workflows/bible-guard.yml` triggers on `push`/`pull_request` to
+   `main`. With no `main`, nothing matches, so the guard that is supposed to
+   stop a broken verse reaching production is inert. The `prebuild` validation
+   still fails the Vercel build, so bad data cannot actually ship — but the
+   earlier, cheaper safety net is not there.
+3. The documentation tells the content owner to commit to `main`
+   ([bible-editing-guide.md](./bible-editing-guide.md), §2 of
+   [bible-module.md](./bible-module.md)), which he cannot do.
+
+**Fix — rename, do not merge.** On GitHub: **Settings → Branches → rename**
+`feature/project-foundation` to `main`. A rename keeps all history, moves the
+default branch automatically, and GitHub prints the one command collaborators
+need for their local clones. Creating a separate `main` and merging would leave
+two branches and re-introduce the same confusion.
+
+Afterwards, in order:
+
+- [ ] Vercel → Settings → Git → set the production branch to **`main`**, then
+      redeploy once and confirm the site still serves.
+- [ ] Confirm `bible-guard.yml` now runs (push anything, check the Actions tab).
+- [ ] Confirm the monthly health check still appears under Actions — scheduled
+      and manually dispatched workflows only run from the **default** branch, so
+      this is the step that switches it on for real.
+- [ ] `git branch -m feature/project-foundation main` locally, then
+      `git fetch origin && git branch -u origin/main main`.
+- [ ] Delete the stale local `master`.
 
 ### 5.7 Studio auto-updates
 
