@@ -28,7 +28,7 @@ export async function ScriptureSection({ locale }: ScriptureSectionProps) {
         </p>
 
         <blockquote className="mt-6">
-          <p className="font-heading text-2xl font-medium italic leading-relaxed text-deep-dark sm:text-3xl">
+          <p className="font-heading text-2xl font-medium leading-relaxed text-deep-dark sm:text-3xl">
             &ldquo;{verse}&rdquo;
           </p>
           <footer className="mt-5">
