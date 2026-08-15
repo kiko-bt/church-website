@@ -14,12 +14,12 @@ export async function HeroSection({ locale }: HeroSectionProps) {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="bg-warm-bg py-20 sm:py-28 lg:py-32"
+      className="bg-warm-bg py-20 sm:py-28 lg:py-16"
     >
       <SectionContainer className="text-center">
         <h1
           id="hero-heading"
-          className="font-heading text-4xl font-bold leading-tight text-deep-dark sm:text-5xl lg:text-6xl"
+          className="font-heading text-4xl font-bold leading-tight text-deep-dark sm:text-5xl lg:text-5xl"
         >
           {t("title")}
         </h1>
