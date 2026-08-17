@@ -39,9 +39,9 @@ export async function BookCard({ book, locale }: BookCardProps) {
   // the design stays consistent across both states.
   const content = (
     <>
-      <div className="relative aspect-[3/4] overflow-hidden bg-warm-bg">
-        {book.coverImageUrl ? (
-          <Image
+<div className="relative mx-auto h-24 w-20 overflow-hidden rounded-md bg-warm-bg">
+{book.coverImageUrl ? (
+<Image
             src={book.coverImageUrl}
             alt={book.coverImageAlt ?? book.title}
             fill
