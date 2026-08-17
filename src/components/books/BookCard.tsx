@@ -82,7 +82,7 @@ export async function BookCard({ book, locale }: BookCardProps) {
   );
 
   // No PDF → non-interactive card (no navigation, no 404).
-  if (!book.pdfDownloadUrl) {
+  if (!book.pdfUrl) {
     return (
       <div className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background">
         {content}
@@ -94,8 +94,8 @@ export async function BookCard({ book, locale }: BookCardProps) {
   // attachment; same-tab keeps the browser on the listing.
   return (
     <a
-      href={book.pdfDownloadUrl}
-      download
+      href={book.pdfUrl}
+      
       aria-label={`${t("downloadPdf")}: ${book.title}`}
       className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
     >
