@@ -24,9 +24,9 @@ export function createBibleSearch(
 export function searchBible(
   fuse: Fuse<BibleSearchEntry>,
   query: string,
-  limit = 30
+  _limit = 30
 ): BibleSearchEntry[] {
-  const term = query.trim().toLowerCase();
+  void _limit;const term = query.trim().toLowerCase();
 
   if (!term) return [];
 
@@ -39,7 +39,7 @@ export function searchBible(
         .split(/[^0-9A-Za-z\u0400-\u04FF]+/)
         .includes(term)
     )
-    .slice(0, limit);
+  
 }
 
 
