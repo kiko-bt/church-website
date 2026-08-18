@@ -26,5 +26,20 @@ export function searchBible(
   query: string,
   limit = 30
 ): BibleSearchEntry[] {
-  return fuse.search(query, { limit }).map((result) => result.item);
+  const term = query.trim().toLowerCase();
+
+  if (!term) return [];
+
+  return fuse
+    .search(query)
+    .map((result) => result.item)
+    .filter((item) =>
+      (item.bookName + " " + item.text)
+        .toLowerCase()
+        .split(/[^0-9A-Za-z\u0400-\u04FF]+/)
+        .includes(term)
+    )
+    .slice(0, limit);
 }
+
+
