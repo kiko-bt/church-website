@@ -110,6 +110,16 @@ export default async function BookPage({ params }: BookPageProps) {
               </p>
             )}
 
+ {book.pdfUrl && (
+  <div className="mt-6 overflow-hidden rounded-md border">
+    <iframe
+      src={book.pdfUrl}
+      title={book.title}
+      className="h-[80vh] w-full"
+    />
+  </div>
+)}
+
             <div className="mt-6">
               {book.pdfDownloadUrl ? (
                 <Button
