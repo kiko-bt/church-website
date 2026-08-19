@@ -38,7 +38,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
           </Button>
         </div>
 
-        <div className="mx-auto mt-14 max-w-5xl overflow-hidden rounded-2xl ring-1 ring-soft-gold/20">
+        <div className="mx-auto mt-14 max-w-xl overflow-hidden rounded-2xl ring-1 ring-soft-gold/20">
           <Image
             src="/images/branding/hero-cross-mountain.png"
             width={1536}
@@ -52,7 +52,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
             fetchPriority="high"
             sizes="(min-width: 1536px) 1152px, (min-width: 1280px) 1024px, (min-width: 1024px) 896px, 100vw"
             alt=""
-            className="h-auto w-full object-cover"
+            className="h-auto w-full object-cover saturate-125 contrast-110 brightness-105"
           />
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
