@@ -60,10 +60,10 @@ export async function HeroSection({ locale }: HeroSectionProps) {
     href={"/" + locale + "/bible"}
     className="rounded-2xl border bg-amber-100 p-6 text-center !text-black shadow-sm flex min-h-32 flex-col items-center justify-center"
   >
-    <h2 className="text-xl font-bold">
+    <h2 className="text-4xl font-bold !text-black">
       {locale === "mk" ? "Библија" : "Bible"}
     </h2>
-    <p className="mt-2">
+    <p className="mt-3 text-2xl font-semibold !text-black">
       {locale === "mk" ? "Читај го Божјиот Збор" : "Read God's Word"}
     </p>
   </Link>
