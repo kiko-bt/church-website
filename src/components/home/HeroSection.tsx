@@ -72,7 +72,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
     href={"/" + locale + "/sermons"}
     className="rounded-2xl border bg-amber-100 p-6 text-center !text-black shadow-sm flex min-h-32 flex-col items-center justify-center"
   >
-    <h2 className="text-xl font-bold">
+    <h2 className="text-4xl font-bold !text-black">
       {locale === "mk" ? "Проповеди" : "Sermons"}
     </h2>
     <p className="mt-2">
@@ -84,7 +84,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
     href={"/" + locale + "/books"}
     className="rounded-2xl border bg-amber-100 p-6 text-center !text-black shadow-sm flex min-h-32 flex-col items-center justify-center"
   >
-    <h2 className="text-xl font-bold">
+    <h2 className="text-4xl font-bold !text-black">
       {locale === "mk" ? "Книги" : "Books"}
     </h2>
     <p className="mt-2">
