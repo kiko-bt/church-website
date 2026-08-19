@@ -13,18 +13,6 @@ export async function VerseList({ verses, ariaLabel }: VerseListProps) {
   const t = await getTranslations("bible");
 
   return (
-    <>
-    <nav className="mb-4 flex flex-wrap gap-2" aria-label="Verse navigation">
-  {verses.map((verse) => (
-    <a
-      key={verse.number}
-      href={"#v" + verse.number}
-      className="text-sm font-semibold text-accent-gold-strong hover:underline"
-    >
-      {verse.number}
-    </a>
-  ))}
-</nav>
     <ol className="bible-text space-y-4" aria-label={ariaLabel}>
       {verses.map((verse) => (
         <li
@@ -42,6 +30,5 @@ export async function VerseList({ verses, ariaLabel }: VerseListProps) {
         </li>
       ))}
     </ol>
-    </>
   );
 }
