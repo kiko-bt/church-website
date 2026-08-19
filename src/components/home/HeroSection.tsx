@@ -58,7 +58,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
   <Link
     href={"/" + locale + "/bible"}
-    className="rounded-2xl border bg-amber-100 p-5 text-left !text-black shadow-sm"
+    className="rounded-2xl border bg-amber-100 p-6 text-center !text-black shadow-sm flex min-h-32 flex-col items-center justify-center"
   >
     <h2 className="text-xl font-bold">
       {locale === "mk" ? "Библија" : "Bible"}
@@ -70,7 +70,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
 
   <Link
     href={"/" + locale + "/sermons"}
-    className="rounded-2xl border bg-amber-100 p-5 text-left !text-black shadow-sm"
+    className="rounded-2xl border bg-amber-100 p-6 text-center !text-black shadow-sm flex min-h-32 flex-col items-center justify-center"
   >
     <h2 className="text-xl font-bold">
       {locale === "mk" ? "Проповеди" : "Sermons"}
@@ -82,7 +82,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
 
   <Link
     href={"/" + locale + "/books"}
-    className="rounded-2xl border bg-amber-100 p-5 text-left !text-black shadow-sm"
+    className="rounded-2xl border bg-amber-100 p-6 text-center !text-black shadow-sm flex min-h-32 flex-col items-center justify-center"
   >
     <h2 className="text-xl font-bold">
       {locale === "mk" ? "Книги" : "Books"}
