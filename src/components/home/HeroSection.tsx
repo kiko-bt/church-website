@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/constants/locales";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +17,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
       aria-labelledby="hero-heading"
       className="bg-warm-bg py-20 sm:py-28 lg:py-16"
     >
-      <SectionContainer className="text-center">
+      <SectionContainer className="text-left">
         <h1
           id="hero-heading"
           className="font-heading text-4xl font-bold leading-tight text-deep-dark sm:text-5xl lg:text-5xl"
@@ -24,11 +25,11 @@ export async function HeroSection({ locale }: HeroSectionProps) {
           {t("title")}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-text-primary/80 sm:text-xl">
+        <p className="mt-6 max-w-2xl text-lg text-text-primary/80 sm:text-xl">
           {t("subtitle")}
         </p>
 
-        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+        <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:justify-start">
           <Button href={`/${locale}/bible`} variant="primary" size="lg">
             {t("ctaPrimary")}
           </Button>
@@ -37,7 +38,7 @@ export async function HeroSection({ locale }: HeroSectionProps) {
           </Button>
         </div>
 
-        <div className="mx-auto mt-14 max-w-xl overflow-hidden rounded-2xl ring-1 ring-soft-gold/20">
+        <div className="mx-auto mt-14 max-w-5xl overflow-hidden rounded-2xl ring-1 ring-soft-gold/20">
           <Image
             src="/images/branding/hero-cross-mountain.png"
             width={1536}
@@ -54,6 +55,43 @@ export async function HeroSection({ locale }: HeroSectionProps) {
             className="h-auto w-full object-cover"
           />
         </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+  <Link
+    href={"/" + locale + "/bible"}
+    className="rounded-2xl border bg-white p-5 text-left shadow-sm"
+  >
+    <h2 className="text-xl font-bold">
+      {locale === "mk" ? "Библија" : "Bible"}
+    </h2>
+    <p className="mt-2">
+      {locale === "mk" ? "Читај го Божјиот Збор" : "Read God's Word"}
+    </p>
+  </Link>
+
+  <Link
+    href={"/" + locale + "/sermons"}
+    className="rounded-2xl border bg-white p-5 text-left shadow-sm"
+  >
+    <h2 className="text-xl font-bold">
+      {locale === "mk" ? "Проповеди" : "Sermons"}
+    </h2>
+    <p className="mt-2">
+      {locale === "mk" ? "Библиски пораки" : "Bible messages"}
+    </p>
+  </Link>
+
+  <Link
+    href={"/" + locale + "/books"}
+    className="rounded-2xl border bg-white p-5 text-left shadow-sm"
+  >
+    <h2 className="text-xl font-bold">
+      {locale === "mk" ? "Книги" : "Books"}
+    </h2>
+    <p className="mt-2">
+      {locale === "mk" ? "Бесплатни христијански книги" : "Free Christian books"}
+    </p>
+  </Link>
+</div>
       </SectionContainer>
     </section>
   );
