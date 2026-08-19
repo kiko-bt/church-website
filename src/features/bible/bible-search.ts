@@ -13,6 +13,7 @@ const FUSE_OPTIONS: IFuseOptions<BibleSearchEntry> = {
   threshold: 0.3,
   ignoreLocation: true,
   minMatchCharLength: 2,
+  useExtendedSearch: true,
 };
 
 export function createBibleSearch(
@@ -31,7 +32,7 @@ export function searchBible(
   if (!term) return [];
 
   return fuse
-    .search(query)
+    .search("'" + query.trim())
     .map((result) => result.item)
     .filter((item) =>
       (item.bookName + " " + item.text)
