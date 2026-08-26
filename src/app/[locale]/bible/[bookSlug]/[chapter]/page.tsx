@@ -87,7 +87,6 @@ export default async function BibleChapterPage({
         </p>
       </header>
 
-<ChapterNav locale={locale} bookId={bookSlug} chapter={chapterNumber} />
       <VerseList verses={chapterData.verses} ariaLabel={`${name} ${chapter}`} />
 
       <ChapterNav locale={locale} bookId={bookSlug} chapter={chapterNumber} />

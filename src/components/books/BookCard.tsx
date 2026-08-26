@@ -39,9 +39,9 @@ export async function BookCard({ book, locale }: BookCardProps) {
   // the design stays consistent across both states.
   const content = (
     <>
-<div className="relative mx-auto h-24 w-20 overflow-hidden rounded-md bg-warm-bg">
-{book.coverImageUrl ? (
-<Image
+      <div className="relative aspect-[3/4] overflow-hidden bg-warm-bg">
+        {book.coverImageUrl ? (
+          <Image
             src={book.coverImageUrl}
             alt={book.coverImageAlt ?? book.title}
             fill
@@ -82,7 +82,7 @@ export async function BookCard({ book, locale }: BookCardProps) {
   );
 
   // No PDF → non-interactive card (no navigation, no 404).
-  if (!book.pdfUrl) {
+  if (!book.pdfDownloadUrl) {
     return (
       <div className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background">
         {content}
@@ -94,8 +94,8 @@ export async function BookCard({ book, locale }: BookCardProps) {
   // attachment; same-tab keeps the browser on the listing.
   return (
     <a
-      href={book.pdfUrl}
-      
+      href={book.pdfDownloadUrl}
+      download
       aria-label={`${t("downloadPdf")}: ${book.title}`}
       className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
     >
