@@ -37,14 +37,14 @@ export async function HeroSection({ locale }: HeroSectionProps) {
           </Button>
         </div>
 
-        <div className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-2xl ring-1 ring-soft-gold/20 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
+        <div className="mx-auto mt-14 max-w-4xl overflow-hidden rounded-2xl ring-1 ring-soft-gold/20 lg:max-w-6xl xl:max-w-7xl 2xl:max-w-7xl">
           <Image
             src="/images/branding/hero-cross-mountain.png"
             width={1536}
             height={406}
             priority
-            sizes="(min-width: 1536px) 1152px, (min-width: 1280px) 1024px, (min-width: 1024px) 896px, 100vw"
-            alt=""
+            sizes="(min-width: 1536px) 1400px, (min-width: 1400px) 1152px, (min-width: 1024px) 1024px, 100vw"
+            alt="Hero image"
             className="h-auto w-full object-cover"
           />
         </div>
