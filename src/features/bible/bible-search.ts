@@ -13,7 +13,6 @@ const FUSE_OPTIONS: IFuseOptions<BibleSearchEntry> = {
   threshold: 0.3,
   ignoreLocation: true,
   minMatchCharLength: 2,
-  useExtendedSearch: true,
 };
 
 export function createBibleSearch(
@@ -25,20 +24,7 @@ export function createBibleSearch(
 export function searchBible(
   fuse: Fuse<BibleSearchEntry>,
   query: string,
-  _limit = 30
+  limit = 30
 ): BibleSearchEntry[] {
-  void _limit;
-  const term = query.trim().toLowerCase();
-
-  if (!term) return [];
-
-  return fuse
-    .search("'" + query.trim())
-    .map((result) => result.item)
-    .filter((item) =>
-      (item.bookName + " " + item.text)
-        .toLowerCase()
-        .split(/[^0-9A-Za-z\u0400-\u04FF]+/)
-        .includes(term)
-    );
+  return fuse.search(query, { limit }).map((result) => result.item);
 }
