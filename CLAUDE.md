@@ -1,575 +1,228 @@
-# CLAUDE.md
+# Црква Евангелие Христово — Битола
 
-# Project Overview
+Content-driven church website, deployed at https://www.hristovoevangelie.org.
 
-Project Name:
-Црква Евангелие Христово - Битола
+The next owner of this repository is the preacher, not an engineer. He must be able
+to manage sermons, books, PDFs, gallery images, church settings and contact details
+through Sanity, and edit Bible verse text by hand, without developer assistance.
+Most rules below exist to keep that true.
 
-Project Type:
-Content-driven church website.
-
-Primary Goal:
-Build a stable, modern, responsive, low-maintenance church website where a non-technical preacher can easily manage sermons, books, PDFs, gallery images, church settings, and contact information without developer assistance.
-
-This project is:
-
-- production-grade
-- CMS-first
-- mobile-first
-- content-driven
-- low-maintenance
-- AI-assisted
-- performance-oriented
-- deterministic
-- SEO-friendly
+Priorities, in order: correctness · stability · predictability · maintainability.
 
 ---
 
-# Official Tech Stack
+# How project instructions load
 
-| Area                 | Technology                   |
-| -------------------- | ---------------------------- |
-| Runtime              | Node.js 22 LTS               |
-| Package Manager      | npm 10.9.2                   |
-| Framework            | Next.js 15 App Router        |
-| Language             | TypeScript Strict            |
-| Styling              | Tailwind CSS                 |
-| UI Components        | shadcn/ui                    |
-| CMS                  | Sanity                       |
-| Forms                | React Hook Form              |
-| Validation           | Zod                          |
-| Email Service        | Resend                       |
-| Internationalization | next-intl                    |
-| Theme System         | next-themes                  |
-| Search               | Fuse.js                      |
-| Analytics            | Vercel Analytics + Speed Insights |
-| Hosting              | Vercel                       |
-| Rendering Strategy   | Static Site Generation (SSG) |
-| Architecture Style   | Content-driven               |
-| AI Workflow          | Claude-driven                |
+Global execution policy lives in `~/.claude/CLAUDE.md` and is **not** repeated here.
 
----
+| Loaded | What |
+| --- | --- |
+| Every session | this file |
+| On demand, by path | `.claude/rules/bible.md` · `cms-sanity.md` · `ui-system.md` |
 
-# Core Engineering Principles
+Precedence, highest first: current instruction → this file → `.claude/rules/*` →
+repository evidence (code, config, tests) → official vendor documentation →
+assumption.
 
-ALWAYS:
+**Known limitation — Claude Code 2.1.280, upstream issue #95083.** A path-scoped
+rule loads only when a matching file is opened with the **Read** tool. Reaching the
+same file through Bash (`cat`, `head`, `sed -i`, a heredoc) does **not** load it,
+and nothing in the transcript shows that a rule was skipped. Verified by probe on
+2026-09-22; nested `CLAUDE.md` files behave the same way. Therefore: when working on
+Bible, CMS or UI code via Bash, open the matching `.claude/rules/*.md` explicitly —
+and everything that is dangerous to get wrong is duplicated in the Never list below,
+which is always resident.
 
-- follow deterministic architecture
-- prefer simplicity over abstraction
-- prioritize maintainability
-- prioritize readability
-- prioritize predictable rendering
-- prefer static generation
-- prefer reusable components
-- use strict typing
-- use production-safe patterns
-- keep architecture stable
-- follow CMS-first thinking
-- optimize for long-term maintenance
-
-NEVER:
-
-- invent architecture
-- invent APIs
-- invent package behavior
-- add new libraries without approval
-- create unnecessary abstractions
-- introduce backend complexity
-- introduce microservices
-- use Redux
-- use Firebase
-- use SQL databases
-- create custom admin dashboards
-- create custom authentication systems
-- refactor architecture without approval
+Human documentation, not auto-loaded — read when the task touches it:
+`docs/bible-module.md` · `docs/cms-architecture.md` · `docs/operations-runbook.md` ·
+`docs/deployment.md` · `docs/backup-restore.md` · `docs/bible-editing-guide.md`
 
 ---
 
-# AI Execution Modes
+# Never
 
-## SAFE MODE
+These survive a scoping failure. Violating any of them is a production incident.
 
-- Never change architecture without approval.
-- Never install additional libraries without approval.
-- Never refactor folder structures without approval.
-- Never modify rendering strategy without approval.
+## Bible data integrity
 
-## ZERO-HALLUCINATION MODE
+- NEVER move Bible verse data into Sanity. Verse text lives in
+  `src/data/bible/{mk,en}/<bookId>.json`, committed in this repository.
+- NEVER pass verse text through an LLM in either direction — not to translate,
+  reword, re-punctuate or "improve" it. Structural changes only.
+- NEVER change the order or the ids in `BIBLE_CANON`
+  (`src/features/bible/bible.constants.ts`).
+- NEVER hand-edit the derived artifacts `src/data/bible/manifest.json` or
+  `src/data/bible/search/<locale>.json` — regenerate with `npm run bible:build`.
+- NEVER add a `name` field to a book file. Display names exist only in
+  `src/features/bible/bible.display-names.ts`.
+- NEVER import a Bible JSON file outside `src/features/bible/bible.data.ts`.
+  (One deliberate exception exists — see `.claude/rules/bible.md`.)
 
-- Use official documentation only.
-- Validate imports before implementation.
-- Never assume package behavior.
-- Never invent unsupported APIs.
-- Follow existing architecture patterns only.
+## Architecture
 
-## STRICT IMPLEMENTATION MODE
+- NEVER place GROQ queries in `src/lib/`; they belong to the owning feature.
+- NEVER re-export a `"use client"` module from a feature `index.ts` barrel.
+- NEVER define or copy Sanity schemas outside `church-website/sanity/`.
+- NEVER introduce Redux, Zustand, Firebase, a SQL database, a custom backend,
+  a custom admin dashboard, or a custom authentication system.
+- NEVER refactor the folder structure or change the rendering strategy without
+  approval.
 
-- Follow exact folder structure.
-- Follow exact naming conventions.
-- Follow exact rendering strategy.
-- Follow exact stack decisions.
-- No spontaneous abstractions.
-- No hidden architecture decisions.
+## Dependencies and UI
 
-## SELF-REVIEW MODE
+This repository is **not** a shadcn/ui project and never was. See "UI architecture".
 
-After every implementation:
+- NEVER run `npx shadcn init`, and never add `@radix-ui/*`,
+  `class-variance-authority`, or `react-hook-form`. None is installed; none is wanted.
+- NEVER rename `src/components/ui/*` to kebab-case — the project uses PascalCase.
+- NEVER add any dependency without approval.
 
-- review TypeScript correctness
-- review accessibility
-- review responsiveness
-- review architecture consistency
-- review translations
-- review server/client boundaries
-- review rendering strategy
-- review CMS consistency
-
----
-
-# Official Architecture Rules
-
-## Rendering Strategy
-
-Preferred rendering:
-
-- SSG first
-- static rendering first
-- avoid unnecessary dynamic rendering
-
-Use:
-
-- generateStaticParams()
-- static pages
-- server components by default
-
-Avoid:
-
-- unnecessary runtime APIs
-- unnecessary client components
-- unnecessary useEffect
-- unnecessary useState
+Stale references to any of these in git history or superseded files are obsolete —
+the code and this file are the source of truth.
 
 ---
 
-# Next.js Rules
+# Stack
 
-Use:
+Authoritative versions are in `package.json`; do not restate them elsewhere.
+Node 22.x · Next.js 15 App Router · TypeScript strict · Tailwind CSS v4 ·
+Sanity · next-intl · next-themes · Zod · Fuse.js · Resend · Vercel.
 
-- App Router only
-- Server Components by default
-- Client Components only when necessary
-
-Never:
-
-- use Pages Router
-- overuse "use client"
-- create unnecessary API routes
-- fetch client-side when static rendering is possible
+Deliberate absences, so they are not "fixed" by a future session: no UI component
+library, no form library, no state library, no `tailwind.config.*`, no CSS modules.
 
 ---
 
-# TypeScript Rules
+# Architecture invariants
 
-TypeScript strict mode is REQUIRED.
+**Hybrid feature-based.** Feature-sliced domain modules under
+`src/features/<feature>/` over a shared, layer-based core (`app/` routing,
+`components/` UI, `lib/` infrastructure, shared `types/` and `constants/`).
 
-Always:
+Features: `bible · sermons · books · gallery · church-settings · contact · home-content`
 
-- prefer explicit typing
-- use typed route params
-- use typed CMS queries
-- validate external input with Zod
-- use readonly where appropriate
+| File | Responsibility |
+| --- | --- |
+| `<feature>.types.ts` | Domain types |
+| `<feature>.queries.ts` | GROQ queries (CMS-backed features only) |
+| `<feature>.mappers.ts` | Sanity document → domain object mapping |
+| `<feature>.data.ts` | Cached accessors (local JSON readers or CMS fetchers) |
+| `<feature>.constants.ts` | Feature constants |
+| `<feature>.schema.ts` | Zod schemas specific to the feature |
+| `index.ts` | The feature's public API — a server-safe barrel |
 
-Never:
+- Folder names are kebab-case (`church-settings`); files are prefixed with the
+  feature name, so an open editor tab is unambiguous.
+- Pages import a feature through its barrel: `import { getBook } from "@/features/bible"`.
+- `src/lib/` holds cross-cutting **infrastructure only** — Sanity read client,
+  Resend, i18n, SEO, `cn()`. Never domain queries, never feature logic.
+- Shared types and constants stay in `src/types` and `src/constants`.
+- Only create a `<feature>.data.ts` when there is a real consumer. No stub accessors.
+- A new content type is a new self-contained `features/<feature>/` folder, with no
+  cross-cutting edits.
 
-- use any
-- disable strict mode
-- bypass type safety
-- ignore TypeScript errors
-
----
-
-# Tailwind & UI Rules
-
-Use:
-
-- Tailwind CSS only
-- shadcn/ui only
-- semantic layouts
-- responsive-first design
-- accessible components
-- typography consistency
-
-Avoid:
-
-- random CSS systems
-- inline styles unless necessary
-- duplicated component patterns
-- inconsistent spacing systems
+**Bilingual field convention.** Any CMS-backed feature with bilingual fields follows
+the Bible convention: the base field name holds Macedonian (default), an `_en`
+suffix holds English — `welcomeTitle` / `welcomeTitle_en`. Rich text uses the shared
+`RichTextContent` type (`src/types/sanity.ts`), backed by `@portabletext/types`
+(`PortableTextBlock[]`). Do not invent a different rich-text shape.
 
 ---
 
-# UI Component Rules
+# Rendering
 
-## shadcn/ui Justification
+SSG first. Server Components by default. Client Components only for forms, search,
+interactive UI, theme toggle and controlled inputs — and then as small an island as
+possible, never by converting a whole parent component.
 
-The project uses **shadcn/ui** as the sole UI component library.
+Do not fetch at runtime what can be generated statically. Avoid unnecessary
+`useEffect` / `useState` / API routes.
 
-Why shadcn/ui:
-
-- Built on Radix UI – accessible, unstyled primitives
-- Tailwind CSS integration – matches our styling system
-- Copy-paste nature – no npm package lock-in, full control
-- Server Component compatible – works with Next.js 15 App Router
-- Lightweight – only components we actually use
-- No global state – avoids unnecessary complexity
-- Production-grade – used in thousands of production sites
-
-Claude MUST:
-
-- Use shadcn/ui components (Button, Card, Dialog, etc.)
-- Never introduce alternative UI libraries
-- Copy component source code into `src/components/ui/` as per shadcn/cli
-- Style components only via Tailwind classes or shadcn theming variables
+**Contact flow:** Contact form → **Server Action**
+(`src/features/contact/contact.action.ts`) → Zod validation → anti-spam → rate limit
+→ Resend → preacher's inbox. Server Actions are the approved transport; do not
+reintroduce a route handler for this.
 
 ---
 
-# Translation Rules
+# Translation policy
 
-Translate ONLY:
+Two locales, Macedonian default, routed as `/mk` and `/en` via next-intl.
+Message catalogues: `messages/mk.json`, `messages/en.json` — keys must match.
 
-- UI labels
-- navigation
-- buttons
-- forms
-- helper text
-- UI messages
+Translate: UI labels, navigation, buttons, forms, helper text, UI messages,
+`aria-label`s, and `generateMetadata()` titles and descriptions.
 
-DO NOT translate:
+Never translate: Bible books, Bible verses, sermons, books, uploaded PDFs, or any
+preacher-generated content. The Macedonian and English sites read two independent
+source Bibles, not translations of one another.
 
-- Bible books
-- Bible verses
-- uploaded PDFs
-- sermons content
-- books content
-- preacher-generated content
-
-Languages:
-
-- Macedonian (default)
-- English
-
-Routing structure:
-
-- /mk
-- /en
-
-Use:
-
-- next-intl
+No hardcoded user-facing strings in JSX — everything through `t()` /
+`getTranslations()`.
 
 ---
 
-# Bible System (CRITICAL)
+# UI architecture
 
-The Bible module is the most important module in the project.
+Hand-written Tailwind components. There is no component library.
 
-## Official Bible Architecture
+- `src/components/ui/` — shared primitives, **PascalCase** files
+  (`Button.tsx`, `SectionContainer.tsx`, `PageHeader.tsx`, …), composed with the
+  `cn()` helper (`src/lib/utils/cn.ts` = `clsx` + `tailwind-merge`).
+- Icons: **Lucide only** (`lucide-react`). Never mix icon systems.
+- Styling: Tailwind v4 CSS-first. Single source of truth is `src/app/globals.css`.
+- Mobile-first, Tailwind default breakpoints, no custom scale.
+- Design language: peaceful, warm, elegant, typography-focused, minimal.
+  Playfair Display (headings) + Inter (body), both with Cyrillic subsets.
 
-Bible verse data lives in the codebase.
-
-PDFs and metadata live in Sanity.
-
-This rule is STRICT and MUST NEVER be violated.
+Details, tokens and confirmed patterns: `.claude/rules/ui-system.md`.
 
 ---
 
-# Bible Data Rules
+# Accessibility
 
-Bible content is stored locally as structured JSON — one file per book, per
-locale. Book display names are NOT in these files; they live in
-`src/features/bible/bible.display-names.ts`.
+Semantic HTML · correct heading hierarchy · keyboard navigable · readable contrast ·
+screen-reader support · `aria-current="page"` on the active nav link.
 
-```txt
-src/data/bible/
-├── mk/<bookId>.json        hand-owned: Macedonian verse text
-├── en/<bookId>.json        hand-owned: English verse text
-├── manifest.json           derived — routing shape, no verse text
-└── search/<locale>.json    derived — Fuse.js index, one entry per verse
+---
+
+# Security
+
+Validate every external input with Zod. Rate-limit the contact form. Secrets only in
+environment variables, never in a Client Component. Never expose a Sanity write or
+management token — the website uses a read client only.
+
+---
+
+# Verification
+
+Prefer the narrowest check that proves the change.
+
+```
+npm run typecheck       # tsc --noEmit
+npm run lint
+npm test                # node --test
+npm run bible:validate  # Bible data integrity (read-only)
+npm run bible:build     # regenerates manifest + search indexes (writes files)
+npm run build           # runs bible:build via prebuild — writes artifacts
 ```
 
-The derived files are regenerated by `npm run bible:build`. Never hand-edit them.
+`npm run build` regenerates derived Bible artifacts. Do not run it as a casual check
+when the working tree must stay clean.
+
+CI: `.github/workflows/bible-guard.yml` runs Bible validation on every PR and push
+to `main`; `.github/workflows/monthly-health-check.yml` runs the scheduled health
+check.
 
 ---
 
-# Bible Search Rules
-
-Use:
-
-- Fuse.js
-- client-side search
-- generated local search indexes
-
-Never use:
-
-- Algolia
-- Elasticsearch
-- database search
-- vector databases
-
----
-
-# Bible Rendering Rules
-
-Bible pages MUST use:
-
-- SSG
-- generateStaticParams()
-
-Bible rendering flow:
-Local JSON
-→ generateStaticParams()
-→ static routes
-→ static HTML
-→ fast reading experience
-
----
-
-# Bible CMS Rules
-
-Sanity MUST NEVER store:
-
-- verse-level content
-- Bible chapters
-- searchable verses
-
-Sanity ONLY stores:
-
-- PDF assets
-- metadata
-- descriptions
-- download links
-
----
-
-# CMS Rules
-
-Sanity is the official CMS and admin dashboard.
-
-CMS UX MUST be:
-
-- preacher-friendly
-- simple
-- clean
-- grouped logically
-- easy to maintain
-
-Always:
-
-- use helper text
-- use validation rules
-- minimize unnecessary fields
-- keep editing experience simple
-
----
-
-# Search Rules
-
-Search strategy:
-
-- client-side Fuse.js
-
-Search targets:
-
-- Bible verses
-- Bible books
-- local JSON indexes
-
-Avoid:
-
-- external search engines
-- complex indexing systems
-- unnecessary backend search services
-
----
-
-# Security Rules
-
-Always:
-
-- validate forms with Zod
-- sanitize user input
-- use environment variables
-- use HTTPS via Vercel
-- protect secrets
-- use rate limiting for contact forms
-
-Never:
-
-- expose secrets in client components
-- hardcode credentials
-- trust unvalidated user input
-
----
-
-# Performance Rules
-
-Prioritize:
-
-- static rendering
-- lazy loading
-- minimal JavaScript bundles
-- image optimization
-- fast Lighthouse scores
-- mobile performance
-
-Avoid:
-
-- unnecessary dependencies
-- large client bundles
-- unnecessary hydration
-- unnecessary runtime fetches
-
----
-
-# Folder Structure Authority
-
-The official project structure is:
-
-src/
-├── app/
-├── components/
-├── features/
-├── lib/
-├── data/
-├── types/
-├── constants/
-└── styles/
-
-This structure MUST remain stable.
-
----
-
-# Official Design Direction
-
-Design style:
-
-- peaceful
-- elegant
-- warm
-- spiritual
-- minimal
-- modern
-- typography-focused
-
-Colors:
-
-- #FDFDFD
-- #F5F1E9
-- #E6D7A3
-- #C9A227
-- #2D2D2D
-- #0F172A
-
-Fonts:
-
-- Playfair Display (headings)
-- Inter (body)
-
----
-
-# Accessibility Rules
-
-Always:
-
-- use semantic HTML
-- maintain keyboard accessibility
-- maintain readable contrast
-- support screen readers
-- maintain proper heading hierarchy
-
----
-
-# Deployment Rules
-
-Hosting:
-
-- Vercel
-
-CMS:
-
-- Sanity
-
-Environment:
-
-- production-safe
-- HTTPS only
-
----
-
-# Final Engineering Rule
-
-This project prioritizes:
-
-- correctness over speed
-- stability over complexity
-- predictability over abstraction
-- maintainability over cleverness
-
-All implementations MUST follow:
-
-- official architecture
-- official stack
-- official rendering strategy
-- official CMS boundaries
-- official TypeScript rules
-- official translation rules
-
----
-
-# Source of Truth Rule
-
-If implementation uncertainty exists:
-
-1. architecture.rules.md overrides all implementation decisions
-2. official documentation overrides assumptions
-3. existing architecture overrides new abstractions
-
-No architectural deviations without approval.
-
----
-
-# Official Documentation References
-
-The following are the primary sources of truth for this project. Claude MUST reference these official resources when implementing features.
-
-- Fuse.js: https://www.fusejs.io/
-- Next.js SSG: https://nextjs.org/docs/pages/building-your-application/rendering/static-site-generation
-- Sanity Asset API: https://www.sanity.io/docs/http-reference/assets
-- Sanity JS Client: https://www.sanity.io/docs/js-client
-- Tailwind CSS (v4): https://tailwindcss.com/docs
-
-Claude MUST NOT invent API behavior or rely on outdated unofficial sources.
-
----
-
-# Supporting Project Documentation
-
-Additional project guidance, standards, and constraints are defined in:
-
-- .claude/architecture.rules.md
-- .claude/project.md
-- .claude/coding-standards.md
-- .claude/cms-modeling.md
-- .claude/ui-system.md
-- .claude/stack-decisions.md
-- .claude/security-rules.md
-- .claude/review-checklist.md
-- .claude/bible-module.md
-
-When implementing features, review all applicable project documentation before making architectural, UI, CMS, security, or code-generation decisions.
-
-The Bible module has additional binding rules in `.claude/bible-module.md`
-(its four sources of truth, the fixed book names and order, the data-access
-boundary, and build-time validation requirements). Review it before touching
-anything under `src/features/bible/`, `src/data/bible/`, or the Bible routes.
+# Official documentation
+
+- Next.js — https://nextjs.org/docs
+- Sanity JS client — https://www.sanity.io/docs/js-client
+- Sanity asset API — https://www.sanity.io/docs/http-reference/assets
+- Tailwind v4 — https://tailwindcss.com/docs
+- Fuse.js — https://www.fusejs.io/
+- next-intl — https://next-intl.dev/docs
+
+Never invent API behavior or rely on unofficial sources.
