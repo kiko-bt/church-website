@@ -49,6 +49,22 @@
 
   --font-heading: var(--font-playfair), Georgia, "Times New Roman", serif;
   --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
+
+  /* Temporary highlight of the verse targeted by a URL fragment (#verse-n).
+     The box-shadow spread pads the highlight without shifting the layout. */
+  --animate-verse-highlight: verse-highlight 3s ease-out;
+
+  @keyframes verse-highlight {
+    0%,
+    40% {
+      background-color: var(--soft-gold);
+      box-shadow: 0 0 0 0.375rem var(--soft-gold);
+    }
+    100% {
+      background-color: transparent;
+      box-shadow: 0 0 0 0.375rem transparent;
+    }
+  }
 }
 
 /* ── Base Reset ─────────────────────────────────────────────────────────────── */

@@ -110,18 +110,31 @@ export default async function BookPage({ params }: BookPageProps) {
               </p>
             )}
 
-            <div className="mt-6">
-              {book.pdfDownloadUrl ? (
-                <Button
-                  href={book.pdfDownloadUrl}
-                  external
-                  download
-                  variant="primary"
-                  size="lg"
-                >
-                  <Download size={18} aria-hidden="true" />
-                  {t("downloadPdf")}
-                </Button>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {book.pdfUrl && book.pdfDownloadUrl ? (
+                <>
+                  {/* Plain asset URL → served inline, read in the browser. */}
+                  <Button
+                    href={book.pdfUrl}
+                    external
+                    variant="primary"
+                    size="lg"
+                  >
+                    <BookOpen size={18} aria-hidden="true" />
+                    {t("readOnline")}
+                  </Button>
+                  {/* `?dl=` URL → saved as a file, only on explicit request. */}
+                  <Button
+                    href={book.pdfDownloadUrl}
+                    external
+                    download
+                    variant="outline"
+                    size="lg"
+                  >
+                    <Download size={18} aria-hidden="true" />
+                    {t("downloadPdf")}
+                  </Button>
+                </>
               ) : (
                 // Broken/missing PDF reference → disabled, never a dead link.
                 <Button variant="primary" size="lg" disabled>

@@ -25,6 +25,7 @@ export type Book = {
   readonly title: string;
   readonly author: string;
   readonly description?: string;
+  // Plain asset URL, served inline — the browser displays it ("read online").
   readonly pdfUrl: string | null;
   // Same asset URL with Sanity's `?dl=` download flag, so clicking it saves the
   // file (Content-Disposition: attachment) instead of opening it inline. `null`

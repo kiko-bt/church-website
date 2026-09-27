@@ -19,7 +19,7 @@ const VALUES = [
   { key: "word", icon: BookMarked },
 ] as const;
 
-const BELIEFS = ["item1", "item2", "item3", "item4"] as const;
+const BELIEFS = ["item1", "item2", "item3", "item4", "item5", "item6"] as const;
 
 export async function generateMetadata({
   params,

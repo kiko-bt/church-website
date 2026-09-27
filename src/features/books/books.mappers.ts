@@ -12,8 +12,8 @@ export function mapBook(doc: BookDocument): Book {
     description: doc.description,
     pdfUrl,
     // `?dl=<name>` makes Sanity serve the asset as an attachment (forces a
-    // download with a clean, slug-based filename) — the preferred "click →
-    // download" flow. Reused by the card and the detail-page button.
+    // download with a clean, slug-based filename). Used only by the explicit
+    // "Download PDF" button; reading online uses the plain `pdfUrl`.
     pdfDownloadUrl: pdfUrl ? `${pdfUrl}?dl=${slug}.pdf` : null,
     coverImageUrl: doc.coverImage?.url ?? undefined,
     coverImageAlt: doc.coverImage?.alt,

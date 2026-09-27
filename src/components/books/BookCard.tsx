@@ -13,10 +13,11 @@ type BookCardProps = {
  * Presentational card for a single book in the listing. `book` is a mapped
  * domain model from `getBooks()` (@/features/books).
  *
- * Books are downloadable resources, so the whole card acts as the download
- * trigger: clicking it saves the PDF directly (Sanity's `?dl=` attachment URL)
- * rather than navigating to an intermediate page. A book without a PDF renders
- * as a non-interactive card with a "coming soon" badge — never a broken link.
+ * The whole card opens the PDF for reading in a new tab (the plain asset URL,
+ * served inline, so the browser's built-in viewer displays it). Downloading is
+ * an explicit choice on the book detail page (`pdfDownloadUrl`). A book without
+ * a PDF renders as a non-interactive card with a "coming soon" badge — never a
+ * broken link.
  *
  * The cover is a resolved Sanity CDN URL (dereferenced in GROQ), rendered with
  * next/image inside a fixed 3:4 box (no CLS). Books without a cover fall back
@@ -67,7 +68,7 @@ export async function BookCard({ book, locale }: BookCardProps) {
         {formattedDate && (
           <p className="mt-1 text-xs text-text-primary/70">{formattedDate}</p>
         )}
-        {!book.pdfDownloadUrl && (
+        {!book.pdfUrl && (
           <p className="mt-3 inline-flex w-fit items-center rounded-sm bg-warm-bg px-2.5 py-1 text-xs font-medium text-text-primary/70">
             {t("comingSoon")}
           </p>
@@ -82,7 +83,7 @@ export async function BookCard({ book, locale }: BookCardProps) {
   );
 
   // No PDF → non-interactive card (no navigation, no 404).
-  if (!book.pdfDownloadUrl) {
+  if (!book.pdfUrl) {
     return (
       <div className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background">
         {content}
@@ -90,13 +91,13 @@ export async function BookCard({ book, locale }: BookCardProps) {
     );
   }
 
-  // Whole card downloads the PDF. `download` + Sanity's `?dl=` force an
-  // attachment; same-tab keeps the browser on the listing.
+  // Whole card opens the PDF inline in a new tab, keeping the listing open.
   return (
     <a
-      href={book.pdfDownloadUrl}
-      download
-      aria-label={`${t("downloadPdf")}: ${book.title}`}
+      href={book.pdfUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${t("readOnline")}: ${book.title}`}
       className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
     >
       {content}

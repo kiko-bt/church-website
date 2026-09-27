@@ -17,7 +17,7 @@
 // ahead of the server, silently dropping a genuine message. A same-clock delta
 // cannot be affected by skew or by a mid-session clock correction.
 //
-// A hit is handled by the server action as a SILENT success (logged, no email
+// A hit is handled by the server action as a generic error (logged, no email
 // sent) so bots gain no signal about the trap. Both signals are best-effort by
 // nature (a client can omit or forge the timing value), but together they
 // eliminate the bulk of drive-by spam without a store or a third-party service.

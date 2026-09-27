@@ -8,8 +8,16 @@ import type {
   BibleSearchEntry,
   BibleSearchIndex,
 } from "@/features/bible/bible.types";
-import { parseReference } from "@/features/bible/bible.reference";
-import { createBibleSearch, searchBible } from "@/features/bible/bible-search";
+import {
+  parseReference,
+  verseAnchorId,
+} from "@/features/bible/bible.reference";
+import {
+  createBibleSearch,
+  highlightWords,
+  queryWords,
+  searchBible,
+} from "@/features/bible/bible-search";
 
 type BibleSearchProps = {
   readonly locale: Locale;
@@ -21,6 +29,28 @@ type BibleSearchProps = {
 
 const MIN_QUERY_LENGTH = 2;
 const DEBOUNCE_MS = 200;
+
+// Renders `value` with the whole-word query matches wrapped in <mark>.
+function Highlighted({
+  value,
+  words,
+}: {
+  readonly value: string;
+  readonly words: readonly string[];
+}) {
+  return highlightWords(value, words).map((segment, index) =>
+    segment.match ? (
+      <mark
+        key={index}
+        className="rounded-sm bg-accent-gold/30 px-0.5 text-inherit"
+      >
+        {segment.text}
+      </mark>
+    ) : (
+      segment.text
+    )
+  );
+}
 
 // Client-side Bible search. The (large) per-locale index is loaded LAZILY — on
 // first focus or first keystroke — so it is never part of the initial page
@@ -39,6 +69,7 @@ export function BibleSearch({
   const inputId = useId();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<readonly BibleSearchEntry[]>([]);
+  const [matchedWords, setMatchedWords] = useState<readonly string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -99,6 +130,7 @@ export function BibleSearch({
         // Discard results if the query changed while the index was loading.
         if (latestQueryRef.current !== value) return;
         setResults(searchBible(fuse, trimmed));
+        setMatchedWords(queryWords(trimmed));
         setHasSearched(true);
         setHasError(false);
       } catch {
@@ -153,14 +185,15 @@ export function BibleSearch({
               return (
                 <li key={entry.reference}>
                   <Link
-                    href={`/${locale}/bible/${ref.bookId}/${ref.chapter}#v${ref.verse}`}
+                    href={`/${locale}/bible/${ref.bookId}/${ref.chapter}#${verseAnchorId(ref.verse)}`}
                     className="block px-4 py-3 transition-colors hover:bg-warm-bg focus-visible:bg-warm-bg focus-visible:outline-none"
                   >
                     <span className="text-sm font-semibold text-accent-gold-strong">
-                      {entry.bookName} {ref.chapter}:{ref.verse}
+                      <Highlighted value={entry.bookName} words={matchedWords} />{" "}
+                      {ref.chapter}:{ref.verse}
                     </span>
                     <span className="mt-1 block text-sm text-text-primary/80">
-                      {entry.text}
+                      <Highlighted value={entry.text} words={matchedWords} />
                     </span>
                   </Link>
                 </li>

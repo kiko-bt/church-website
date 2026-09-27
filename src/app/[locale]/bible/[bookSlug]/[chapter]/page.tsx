@@ -6,6 +6,8 @@ import { LayoutShell } from "@/components/layout/LayoutShell";
 import { BibleBreadcrumb } from "@/components/bible/BibleBreadcrumb";
 import { VerseList } from "@/components/bible/VerseList";
 import { ChapterNav } from "@/components/bible/ChapterNav";
+import { VerseJumpNav } from "@/components/bible/VerseJumpNav";
+import { ReadingPositionMemory } from "@/components/bible/ReadingPositionMemory";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbSchema } from "@/lib/seo/structured-data";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -85,11 +87,19 @@ export default async function BibleChapterPage({
         <p className="mt-2 text-lg text-text-primary/70">
           {t("chapter")} {chapter}
         </p>
+        <VerseJumpNav verses={chapterData.verses.map((verse) => verse.number)} />
       </header>
 
       <VerseList verses={chapterData.verses} ariaLabel={`${name} ${chapter}`} />
 
       <ChapterNav locale={locale} bookId={bookSlug} chapter={chapterNumber} />
+
+      <ReadingPositionMemory
+        locale={locale}
+        bookId={bookSlug}
+        chapter={chapterNumber}
+        verseCount={chapterData.verses.length}
+      />
     </LayoutShell>
   );
 }

@@ -1,6 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseReference } from "./bible.reference.ts";
+import {
+  legacyVerseAnchorId,
+  parseReference,
+  verseAnchorId,
+} from "./bible.reference.ts";
 
 test("parseReference reads the canonical form", () => {
   assert.deepEqual(parseReference("john.3.16"), {
@@ -39,5 +43,17 @@ test("parseReference rejects malformed input", () => {
   ];
   for (const value of invalid) {
     assert.equal(parseReference(value), null, `expected null for "${value}"`);
+  }
+});
+
+test("verseAnchorId produces the verse-<n> DOM id", () => {
+  assert.equal(verseAnchorId(1), "verse-1");
+  assert.equal(verseAnchorId(176), "verse-176");
+});
+
+test("legacyVerseAnchorId keeps the old v<n> id, distinct from the current one", () => {
+  assert.equal(legacyVerseAnchorId(15), "v15");
+  for (const verse of [1, 15, 176]) {
+    assert.notEqual(legacyVerseAnchorId(verse), verseAnchorId(verse));
   }
 });

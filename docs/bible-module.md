@@ -144,7 +144,9 @@ search index that is not exactly one entry per verse.
 The per-locale index is loaded lazily — on first focus or keystroke — so it is
 never in the initial page payload. Matching is in-memory via Fuse.js over
 `text` and `bookName`; there is no server round-trip. Results link to
-`/<locale>/bible/<book>/<chapter>#v<verse>`.
+`/<locale>/bible/<book>/<chapter>#verse-<verse>`. Each verse also keeps an empty
+legacy anchor `#v<verse>`, so links shared in the older form still land on the
+verse.
 
 The search component is remounted per locale (a `key` at the call site), so a
 language switch never reuses the wrong-language index. A failed load surfaces an

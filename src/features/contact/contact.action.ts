@@ -42,13 +42,16 @@ export async function submitContactForm(
     return { status: "server-error", message: SERVER_ERROR_KEY };
   }
 
-  // Silent anti-abuse gate (honeypot + submit timing). A hit is acknowledged as
-  // success — so a bot learns nothing about the trap — but no email is sent.
+  // Anti-abuse gate (honeypot + submit timing). A hit gets the generic server
+  // error, never "success": success is shown ONLY after Resend accepts the
+  // email, so a genuine sender caught by a false positive (e.g. browser autofill
+  // filling the honeypot) is told the message did not go through instead of
+  // being falsely reassured.
   if (isLikelySpam(input)) {
     console.warn(
       "[contact] Submission blocked by anti-spam gate (honeypot/timing). No email sent."
     );
-    return { status: "success" };
+    return { status: "server-error", message: SERVER_ERROR_KEY };
   }
 
   const parsed = contactFormSchema.safeParse(input);

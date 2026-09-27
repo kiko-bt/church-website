@@ -36,7 +36,7 @@
   },
   "home": {
     "hero": {
-      "title": "Welcome to Our Community",
+      "title": "Welcome",
       "subtitle": "A place of peace, prayer, and the Word of God",
       "ctaPrimary": "Read the Bible",
       "ctaSecondary": "Contact Us"
@@ -59,42 +59,44 @@
   },
   "about": {
     "title": "About Us",
-    "subtitle": "Learn about our community",
+    "subtitle": "Who We Are",
     "metaDescription": "Learn about the Church of the Gospel of Christ in Bitola — our story, mission, values, and faith.",
     "intro": {
       "heading": "Our Story",
-      "body": "The Church of the Gospel of Christ in Bitola is a community of believers who gather to worship God, study His Word, and support one another in faith and daily life.",
-      "body2": "For many years our doors have been open to everyone seeking peace, hope, and a deeper relationship with God. We welcome you to learn more about who we are."
+      "body": "The Church of the Gospel of Christ – Bitola is a Christian community of believers who gather to worship God, study His Word, grow in faith, and help one another in daily life.",
+      "body2": "Our doors are open to everyone who wants to know God, hear the message of the Gospel, and find hope, peace, and spiritual fellowship in Jesus Christ."
     },
     "mission": {
       "heading": "Our Mission",
-      "body": "Our mission is to share the Gospel of Jesus Christ, to nurture a warm and welcoming community, and to encourage every person to grow in faith through the study of Scripture and a life of prayer."
+      "body": "Our mission is to proclaim the Gospel of Jesus Christ, to teach people God's Word, and to encourage them to grow in faith, prayer, and obedience to the Lord. We are a community where people find spiritual support, sincere fellowship, and encouragement to live for the glory of God."
     },
     "values": {
       "heading": "Our Values",
       "love": {
         "title": "Love",
-        "body": "We strive to reflect the love of Christ in how we treat one another and everyone who walks through our doors."
+        "body": "We strive to let the love of Christ be seen in our lives — toward others and toward everyone who comes among us."
       },
       "community": {
-        "title": "Community",
-        "body": "We believe faith grows best in fellowship, where people support, encourage, and pray for each other."
+        "title": "Fellowship",
+        "body": "We believe the Christian life is not meant to be lived in isolation. We encourage, help, and pray for one another so that we may grow in faith."
       },
       "word": {
         "title": "The Word",
-        "body": "Scripture is the foundation of our life and worship, guiding our decisions and shaping our hearts."
+        "body": "The Bible is the foundation of our faith, teaching, and life. Through it we come to know God, understand His will, and learn how to live in obedience to Him."
       }
     },
     "beliefs": {
       "heading": "What We Believe",
-      "item1": "We believe in one God, the Father, the Son, and the Holy Spirit.",
+      "item1": "We believe in one God: the Father, the Son, and the Holy Spirit.",
       "item2": "We believe the Bible is the inspired Word of God.",
-      "item3": "We believe salvation is a gift of grace through faith in Jesus Christ.",
-      "item4": "We believe the Church is a community called to love and serve."
+      "item3": "We believe salvation is God's gift by grace, through faith in Jesus Christ.",
+      "item4": "We believe Jesus Christ died for our sins, rose from the dead, and is the only way to salvation.",
+      "item5": "We believe everyone who has believed in Christ is called to live in holiness, love, and obedience to God's Word.",
+      "item6": "We believe the Church is a community of believers called to glorify God, care for one another, and proclaim the Gospel."
     },
     "visit": {
       "heading": "Come Visit Us",
-      "body": "We would love to meet you. Reach out with any questions or simply join us for a service.",
+      "body": "We will gladly welcome you to our services. Whether you are already a Christian, want to get to know the Bible better, or simply have questions about the faith, you are welcome at the Church of the Gospel of Christ – Bitola.",
       "cta": "Contact Us"
     }
   },
@@ -123,7 +125,8 @@
       "chapters": "Book chapters",
       "breadcrumb": "Breadcrumb navigation",
       "chapterNav": "Chapter navigation",
-      "search": "Search the Bible"
+      "search": "Search the Bible",
+      "verseNav": "Jump to verse"
     }
   },
   "sermons": {
@@ -144,6 +147,7 @@
     "title": "Books",
     "subtitle": "Read and download books from our library",
     "metaDescription": "Browse and download books from the Church of the Gospel of Christ in Bitola.",
+    "readOnline": "Read online",
     "downloadPdf": "Download PDF",
     "comingSoon": "Coming soon",
     "by": "Author",
@@ -167,6 +171,7 @@
     "subtitle": "We would love to hear from you",
     "metaDescription": "Get in touch with the Church of the Gospel of Christ in Bitola.",
     "intro": "Whether you have a question, would like to learn more, or simply wish to visit, you are always welcome.",
+    "honeypotLabel": "Leave this field empty",
     "info": {
       "heading": "Get in Touch",
       "addressLabel": "Address",

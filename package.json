@@ -14,6 +14,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node --test --disable-warning=MODULE_TYPELESS_PACKAGE_JSON \"src/**/*.test.ts\" \"sanity/**/*.test.ts\"",
     "typecheck:test": "tsc -p tsconfig.test.json",
+    "test:responsive": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-chapter-nav-responsive.ts",
+    "test:responsive:books": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-books-responsive.ts",
     "bible:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-bible-artifacts.ts && npm run --silent bible:validate",
     "bible:validate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/validate-bible.ts",
     "health-check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/health-check.ts"

@@ -142,6 +142,9 @@ do, not just what is wrong.
 
 - SSG + Server Components. **Zero client JavaScript on the reading path**; search is
   confined to the landing page.
+  - Sole exception: `ReadingPositionMemory` (chapter page) — a render-nothing client
+    island that saves/restores the per-chapter scroll position in `localStorage`.
+    It must stay render-nothing; do not add other client code on the reading path.
 - Routing reads the manifest only — `generateStaticParams` must never load verse
   text.
 - `dynamicParams = false` on the book and chapter routes, so non-canonical URLs

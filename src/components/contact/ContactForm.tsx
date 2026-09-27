@@ -137,7 +137,10 @@ export function ContactForm() {
       <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-5">
         {/* Honeypot: hidden from users and assistive tech, out of the tab order,
             and not autofilled. A real submission always leaves it empty; any
-            value marks the sender as a bot (see contact.antispam.ts). */}
+            value marks the sender as a bot (see contact.antispam.ts). The label
+            must NOT resemble a real field ("Name", "Email", …): browser autofill
+            classifies fields by label text and ignores autocomplete="off", so a
+            "Name" label got the visitor's name autofilled into the trap. */}
         <div
           aria-hidden="true"
           style={{
@@ -149,7 +152,7 @@ export function ContactForm() {
           }}
         >
           <label htmlFor={`${baseId}-${ANTISPAM.honeypotField}`}>
-            {t("name")}
+            {t("honeypotLabel")}
           </label>
           <input
             id={`${baseId}-${ANTISPAM.honeypotField}`}
