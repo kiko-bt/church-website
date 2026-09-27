@@ -24,10 +24,6 @@ export async function HeroSection({ locale }: HeroSectionProps) {
           {t("title")}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-text-primary/80 sm:text-xl">
-          {t("subtitle")}
-        </p>
-
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Button href={`/${locale}/bible`} variant="primary" size="lg">
             {t("ctaPrimary")}
