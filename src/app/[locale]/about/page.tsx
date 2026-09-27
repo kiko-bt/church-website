@@ -42,7 +42,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
       <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
       <div className="space-y-16 pb-12">
-        <ContentSection heading={t("intro.heading")} headingId="about-intro">
+        <ContentSection>
           <p>{t("intro.body")}</p>
           <p>{t("intro.body2")}</p>
         </ContentSection>
