@@ -78,8 +78,8 @@ export async function generateBaseMetadata(
       : [
           {
             url: "/images/branding/church-logo.png",
-            width: 1184,
-            height: 864,
+            width: 480,
+            height: 480,
             alt: brandName,
           },
         ];
