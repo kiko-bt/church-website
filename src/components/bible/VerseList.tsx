@@ -16,8 +16,10 @@ type VerseListProps = {
 // `v1`, `v2`, … ids working for links shared before the rename.
 //
 // The targeted verse (from the jump bar, a search result or a shared link) is
-// highlighted with CSS `:target` only: a soft-gold flash that fades out, or a
-// static background under reduced motion.
+// highlighted with CSS `:target`: a soft-gold flash that fades out, or a
+// static background under reduced motion. Client-side navigations do not set
+// `:target`; ReadingPositionMemory applies the same classes in that case and
+// when it restores a remembered reading position.
 export async function VerseList({ verses, ariaLabel }: VerseListProps) {
   const t = await getTranslations("bible");
 

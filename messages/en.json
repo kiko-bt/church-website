@@ -115,6 +115,7 @@
     "searchError": "Search is temporarily unavailable. Please try again.",
     "selectBook": "Select a book",
     "selectChapter": "Select a chapter",
+    "continueReading": "Continue reading",
     "notFound": {
       "book": "Book not found.",
       "chapter": "Chapter not found."

@@ -132,6 +132,7 @@ export function MobileNav({ locale }: MobileNavProps) {
                     <NavLink
                       href={`/${locale}${item.path}`}
                       exact={item.path === ""}
+                      resumeBible={item.key === "bible" ? locale : undefined}
                       onClick={() => setIsOpen(false)}
                       className="flex min-h-11 items-center px-4 py-3 text-lg font-medium"
                     >

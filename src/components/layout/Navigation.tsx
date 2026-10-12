@@ -18,6 +18,7 @@ export async function Navigation({ locale }: NavigationProps) {
             <NavLink
               href={`/${locale}${item.path}`}
               exact={item.path === ""}
+              resumeBible={item.key === "bible" ? locale : undefined}
               className="whitespace-nowrap px-2 py-1.5 text-sm font-medium xl:px-3"
             >
               {t(item.key)}

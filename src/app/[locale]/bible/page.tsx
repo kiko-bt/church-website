@@ -6,6 +6,7 @@ import { LayoutShell } from "@/components/layout/LayoutShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TestamentSection } from "@/components/bible/TestamentSection";
 import { BibleSearch } from "@/components/bible/BibleSearch";
+import { ContinueReading } from "@/components/bible/ContinueReading";
 import { getAllBookMeta, getDisplayName } from "@/features/bible";
 
 type BiblePageProps = {
@@ -41,6 +42,11 @@ export default async function BiblePage({ params }: BiblePageProps) {
   return (
     <LayoutShell>
       <PageHeader title={t("title")} />
+      <ContinueReading
+        locale={locale}
+        books={books}
+        label={t("continueReading")}
+      />
       <BibleSearch
         // Remount on locale change so a client-side language switch never
         // reuses the previously loaded (wrong-language) search index or results.
