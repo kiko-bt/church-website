@@ -1,4 +1,11 @@
-import { Mail, MapPin, CalendarDays, Phone, Share2 } from "lucide-react";
+import {
+  Mail,
+  MapPin,
+  CalendarDays,
+  Phone,
+  Share2,
+  Heart,
+} from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { Locale } from "@/constants/locales";
 import { siteConfig } from "@/constants/site";
@@ -152,6 +159,26 @@ export async function ContactInfo() {
           </div>
         )}
       </dl>
+
+      {/* Short donation message — asks supporters to use the contact details above. */}
+      <div className="mt-8 flex items-start gap-3 rounded-md border-l-4 border-accent-gold bg-soft-gold/20 p-4 sm:p-5">
+        <Heart
+          size={20}
+          className="mt-1 shrink-0 text-accent-gold"
+          aria-hidden="true"
+        />
+        <div>
+          <h3 className="font-heading text-lg font-semibold text-deep-dark sm:text-xl">
+            {t("supportTitle")}
+          </h3>
+          <p className="mt-1.5 text-base leading-relaxed text-text-primary/85">
+            {t("supportBody")}
+          </p>
+          <p className="mt-2 text-sm italic text-text-primary/70">
+            {t("supportThanks")}
+          </p>
+        </div>
+      </div>
     </section>
   );
 }

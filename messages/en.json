@@ -178,7 +178,10 @@
       "scheduleValue": "Every Sunday at 10:00",
       "phoneLabel": "Phone",
       "followLabel": "Follow Us",
-      "emailCta": "Send us an email"
+      "emailCta": "Send us an email",
+      "supportTitle": "Support the ministry.",
+      "supportBody": "Your support helps us spread the Gospel and serve people.",
+      "supportThanks": "Thank you for being part of this work."
     },
     "formHeading": "Send a Message",
     "name": "Your Name",
