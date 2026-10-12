@@ -59,6 +59,9 @@ const DOMAIN_FAIL_DAYS = 30;
 const TLS_WARN_DAYS = 30;
 const TLS_FAIL_DAYS = 14;
 
+// Appended whenever the domain lookup cannot give an answer.
+const CHECK_REGISTRAR = "Check the expiry date at the registrar.";
+
 // The Bible alone generates well over a thousand sitemap entries, so a sudden
 // collapse means pages stopped being generated, not that content was tidied.
 const SITEMAP_WARN_URLS = 500;
@@ -112,6 +115,14 @@ function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+// A remaining time in plain words, for readers who do not think in days.
+// Empty under two weeks, where the day count already says it.
+function timeLeft(days: number): string {
+  if (days < 14) return "";
+  if (days < 60) return `about ${Math.round(days / 7)} weeks`;
+  return `about ${Math.round(days / 30)} months`;
+}
+
 function describe(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -140,15 +151,23 @@ async function checkDomain(): Promise<CheckResult> {
   const name = "Domain registration";
   try {
     const res = await fetch(`https://rdap.org/domain/${REGISTRABLE_DOMAIN}`, {
-      headers: { accept: "application/rdap+json" },
+      // rdap.org answers 403 to requests with no User-Agent, which is what
+      // Node's fetch sends by default — so identify this script.
+      headers: {
+        accept: "application/rdap+json",
+        "user-agent": `church-website-health-check (+${SITE_URL.origin})`,
+      },
       redirect: "follow",
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     if (!res.ok) {
+      // Yellow, not red: a refused lookup says nothing about the domain itself.
       return {
         name,
-        status: "fail",
-        detail: `RDAP lookup: HTTP ${res.status}`,
+        status: "warn",
+        detail:
+          `RDAP lookup unavailable (HTTP ${res.status}) — the lookup service ` +
+          `refused the request, not a domain problem. ${CHECK_REGISTRAR}`,
       };
     }
     const body: unknown = await res.json();
@@ -157,21 +176,47 @@ async function checkDomain(): Promise<CheckResult> {
         ? (body as { events?: unknown }).events
         : undefined;
     if (!isRdapEventArray(events)) {
-      return { name, status: "warn", detail: "RDAP returned no events" };
+      return {
+        name,
+        status: "warn",
+        detail: `RDAP returned no events. ${CHECK_REGISTRAR}`,
+      };
     }
     const expiry = events.find((e) => e.eventAction === "expiration");
     if (!expiry) {
-      return { name, status: "warn", detail: "RDAP returned no expiry date" };
+      return {
+        name,
+        status: "warn",
+        detail: `RDAP returned no expiry date. ${CHECK_REGISTRAR}`,
+      };
     }
     const date = new Date(expiry.eventDate);
+    if (Number.isNaN(date.getTime())) {
+      return {
+        name,
+        status: "warn",
+        detail: `RDAP returned an unreadable expiry date. ${CHECK_REGISTRAR}`,
+      };
+    }
     const days = daysUntil(date);
+    const status = byThreshold(days, DOMAIN_WARN_DAYS, DOMAIN_FAIL_DAYS);
+    const advice =
+      status === "fail"
+        ? " — **renew now**"
+        : status === "warn"
+          ? " — renew soon (runbook §1)"
+          : "";
     return {
       name,
-      status: byThreshold(days, DOMAIN_WARN_DAYS, DOMAIN_FAIL_DAYS),
-      detail: `expires ${isoDate(date)} — **${days} days** remaining`,
+      status,
+      detail: `expires ${isoDate(date)} — **${days} days**${timeLeft(days) && ` (${timeLeft(days)})`} remaining${advice}`,
     };
   } catch (error) {
-    return { name, status: "fail", detail: `RDAP lookup: ${describe(error)}` };
+    return {
+      name,
+      status: "warn",
+      detail: `RDAP lookup unavailable (${describe(error)}). ${CHECK_REGISTRAR}`,
+    };
   }
 }
 
