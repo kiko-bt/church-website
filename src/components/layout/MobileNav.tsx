@@ -34,11 +34,15 @@ export function MobileNav({ locale }: MobileNavProps) {
     setIsOpen(false);
   }, [pathname]);
 
-  // Lock body scroll while the menu is open.
+  // Lock page scroll while the menu is open. Set on <html>, not <body>:
+  // globals.css gives <html> `overflow-x: hidden`, so `overflow: hidden` on
+  // <body> would turn the body into the sticky header's scroll container and
+  // the header (with this close button) would scroll off-screen.
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    const root = document.documentElement;
+    root.style.overflow = isOpen ? "hidden" : "";
     return () => {
-      document.body.style.overflow = "";
+      root.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -123,7 +127,9 @@ export function MobileNav({ locale }: MobileNavProps) {
             aria-modal="true"
             aria-label={t("mobileNavLabel")}
             onKeyDown={handlePanelKeyDown}
-            className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto bg-background px-4 pb-8 pt-4 lg:hidden"
+            // Sized to the large viewport (lvh), not `bottom-0`, so the panel
+            // also covers the area behind mobile browser toolbars (iOS Safari).
+            className="fixed inset-x-0 top-16 z-40 h-[calc(100lvh-4rem)] overflow-y-auto bg-background px-4 pb-8 pt-4 lg:hidden"
           >
             <nav aria-label={t("mobileNavLinks")}>
               <ul className="space-y-1">
