@@ -259,11 +259,13 @@ export function PdfReader({
       eventBus.on("scalechanging", ({ scale: next }: { scale: number }) => setScale(next));
 
       // Re-fit on width changes (rotation, window resize) while at the
-      // automatic zoom, keeping the place.
+      // automatic zoom, keeping the place. A last notification can arrive
+      // after React has removed the reader (width 0) — re-fitting a detached
+      // viewer makes pdf.js log "offsetParent is not set -- cannot scroll".
       let lastWidth = container.clientWidth;
       const resizeObserver = new ResizeObserver(() => {
         const width = container.clientWidth;
-        if (width === lastWidth || !restored) return;
+        if (width === lastWidth || !restored || !isLaidOut()) return;
         lastWidth = width;
         if (viewer.currentScaleValue === "auto") {
           keepPlace(() => {
