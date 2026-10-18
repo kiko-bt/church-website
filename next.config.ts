@@ -76,7 +76,18 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // Never cache the PDF proxy on Vercel's CDN. Its cache key ignores the
+      // Range header, so the first partial (206) response cached for a file
+      // would be served for every later range — pdf.js then cannot read the
+      // book. Sanity's own CDN still caches the files.
+      // https://vercel.com/docs/routing/rewrites#disabling-caching-for-rewrites-to-external-origins
+      {
+        source: "/pdf/:file*",
+        headers: [{ key: "x-vercel-enable-rewrite-caching", value: "0" }],
+      },
+    ];
   },
   async rewrites() {
     return pdfRewrites;
