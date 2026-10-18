@@ -31,6 +31,15 @@ export type Book = {
   // file (Content-Disposition: attachment) instead of opening it inline. `null`
   // whenever `pdfUrl` is (a book with no PDF yet). See books.mappers.ts.
   readonly pdfDownloadUrl: string | null;
+  // The PDF's Sanity asset hash — identifies this exact file, so a remembered
+  // reading position is dropped when the PDF is replaced. `null` when the URL
+  // is not a Sanity PDF asset URL.
+  readonly pdfFileId: string | null;
+  // Same-origin path of the PDF for the in-site reader (`/pdf/<hash>.pdf`,
+  // proxied to the Sanity CDN by a rewrite in next.config.ts — the CDN refuses
+  // cross-origin browser requests). `null` exactly when `pdfFileId` is; the
+  // book page then links to `pdfUrl` directly, as before.
+  readonly pdfReaderUrl: string | null;
   readonly coverImageUrl?: string;
   readonly coverImageAlt?: string;
   readonly publishedAt?: string;

@@ -7,6 +7,11 @@ import type { Book, BookDocument } from "./books.types";
 
 // Server-side data accessors, cached under the "book" tag. Fall back to empty
 // content when Sanity is not configured.
+//
+// The cache persists across deployments (Vercel Data Cache) and its key is the
+// function source + arguments + key parts — not the mapper. Bump the `:vN`
+// suffix whenever the cached `Book` shape changes, or a deploy keeps serving
+// objects mapped by the previous code (v2: pdfFileId / pdfReaderUrl).
 
 export const getBooks = unstable_cache(
   async (): Promise<readonly Book[]> => {
@@ -14,7 +19,7 @@ export const getBooks = unstable_cache(
     const docs = await sanityClient.fetch<readonly BookDocument[]>(bookListQuery);
     return mapBooks(docs);
   },
-  ["books:list"],
+  ["books:list:v2"],
   { tags: [SANITY_TAGS.book] }
 );
 
@@ -26,6 +31,6 @@ export const getBookBySlug = unstable_cache(
     });
     return doc ? mapBook(doc) : null;
   },
-  ["books:by-slug"],
+  ["books:by-slug:v2"],
   { tags: [SANITY_TAGS.book] }
 );

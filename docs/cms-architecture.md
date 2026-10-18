@@ -154,6 +154,31 @@ performance:
 | Published perspective only | `perspective: "published"` in `client.ts` | Drafts could leak to the public site |
 | Secret in the header, not the URL | `route.ts` ignores `?secret=` in production | Secret leaks into access logs |
 | Dataset is public | Sanity project settings | CDN reads fail without a token → empty site |
+| Cached object shapes are versioned | `:vN` suffix in `unstable_cache` key parts (e.g. `books:list:v2`) | The Data Cache survives deploys and keys on the function source, not the mapper → a deploy keeps serving the old shape |
+
+## Book PDFs and the in-site reader
+
+"Прочитај онлајн" opens `/[locale]/books/[slug]/read`: the PDF is rendered on the
+page by pdf.js (`pdfjs-dist`, legacy build) in `src/components/books/PdfReader.tsx`,
+loaded only on that route.
+
+- **How the PDF is fetched.** The Sanity CDN refuses cross-origin browser requests
+  (`403 CORS Origin not allowed`), so the reader loads `/pdf/<sha1>.pdf` from the
+  site itself; a `rewrites()` entry in `next.config.ts` proxies that to this
+  project's file assets. The pattern admits only a 40-hex asset hash + `.pdf`.
+  **No Sanity CORS settings are needed.** The domain fields `pdfFileId` /
+  `pdfReaderUrl` come from `books.mappers.ts`.
+- **Where the reading place lives.** In the visitor's browser (`localStorage`),
+  one key per book: `books:reading-position:v1:<slug>` →
+  `{ file, page, ratio }` (`books.reading-position.ts`). `ratio` is how far down
+  the page the view starts, so the place survives zoom, screen size and
+  rotation. `file` is the PDF's asset hash: **replacing a book's PDF in Sanity
+  resets readers of that book to page 1** instead of jumping to a wrong page of
+  the new edition.
+- **Fallbacks.** "Отвори PDF" and "Преземи PDF" are always in the reader's
+  toolbar; if the reader cannot load (very old browser, network), they are shown
+  in its place. A book whose PDF URL is not a Sanity file asset keeps the direct
+  link on the book page.
 
 ## Adding a new content type to the pipeline
 

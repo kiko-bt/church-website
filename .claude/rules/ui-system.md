@@ -159,7 +159,8 @@ Animation: subtle transitions only. No large motion systems, no distracting moti
 
 The highest UI priority: long-form readability, excellent typography, clear chapter
 navigation, verse anchors, searchable landing page, minimal distractions. Zero
-client JavaScript on the reading path.
+client JavaScript on the reading path, except the two render-nothing islands listed
+in `.claude/rules/bible.md` §8 (`ReadingPositionMemory`, `VerseSelection`).
 
 ---
 

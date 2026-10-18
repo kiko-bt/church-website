@@ -56,6 +56,13 @@ export default async function BiblePage({ params }: BiblePageProps) {
         ariaLabel={t("aria.search")}
         noResults={t("noResults")}
         errorLabel={t("searchError")}
+        copyMessages={{
+          copy: t("verseCopy.copy"),
+          copied: t("verseCopy.copied"),
+          failed: t("verseCopy.failed"),
+          copyLabel: String(t.raw("verseCopy.copyLabel")),
+          citation: String(t.raw("verseCopy.citation")),
+        }}
       />
       <TestamentSection
         locale={locale}

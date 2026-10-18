@@ -8,6 +8,7 @@ import { VerseList } from "@/components/bible/VerseList";
 import { ChapterNav } from "@/components/bible/ChapterNav";
 import { VerseJumpNav } from "@/components/bible/VerseJumpNav";
 import { ReadingPositionMemory } from "@/components/bible/ReadingPositionMemory";
+import { VerseSelection } from "@/components/bible/VerseSelection";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbSchema } from "@/lib/seo/structured-data";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -90,7 +91,12 @@ export default async function BibleChapterPage({
         <VerseJumpNav verses={chapterData.verses.map((verse) => verse.number)} />
       </header>
 
-      <VerseList verses={chapterData.verses} ariaLabel={`${name} ${chapter}`} />
+      <VerseList
+        verses={chapterData.verses}
+        bookName={name}
+        chapter={chapterNumber}
+        ariaLabel={`${name} ${chapter}`}
+      />
 
       <ChapterNav locale={locale} bookId={bookSlug} chapter={chapterNumber} />
 
@@ -99,6 +105,11 @@ export default async function BibleChapterPage({
         bookId={bookSlug}
         chapter={chapterNumber}
         verseCount={chapterData.verses.length}
+      />
+
+      <VerseSelection
+        copiedMessage={t("verseCopy.copied")}
+        failedMessage={t("verseCopy.failed")}
       />
     </LayoutShell>
   );

@@ -51,6 +51,7 @@ src/
 │   ├── bible.schema.ts        Zod schemas + cross-file validation rules
 │   ├── bible.data.ts          the ONLY reader of the JSON (accessors + cache)
 │   ├── bible.reference.ts     parses "john.3.16" (used by search results)
+│   ├── bible.citation.ts      the copied "verse (reference)" text
 │   ├── bible-search.ts        Fuse.js wrapper (client-only)
 │   └── index.ts               server-safe public API
 ├── components/bible/       server components + BibleSearch (client)
@@ -117,8 +118,13 @@ reviewed diff to one of those two files.
 - **`dynamicParams = false`** on the book and chapter routes, so an unknown book
   or a non-canonical chapter form (`/john/03`, `/john/9999`) is a real 404, not
   a soft 200 with duplicate content.
-- **Reading pages ship no page-specific JavaScript.** Search lives only on the
-  landing page.
+- **Reading pages stay server-rendered.** Search lives only on the landing page.
+  The chapter page adds two small render-nothing scripts: `ReadingPositionMemory`
+  (remembers where the reader stopped) and `VerseSelection` (verse sharing — a
+  click on a verse number selects the verse with its reference, and **Copy**
+  copies it as `„text“ (Ефесјаните 1:21)`; the quotation marks and the order come
+  from `bible.verseCopy.citation` in `messages/{mk,en}.json`). Search results
+  have the same Copy button (`CopyVerseButton`).
 - Previous/next navigation crosses book boundaries and is computed from the
   manifest, so it loads no verse text.
 

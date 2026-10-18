@@ -113,16 +113,29 @@ export default async function BookPage({ params }: BookPageProps) {
             <div className="mt-6 flex flex-wrap gap-3">
               {book.pdfUrl && book.pdfDownloadUrl ? (
                 <>
-                  {/* Plain asset URL → served inline, read in the browser. */}
-                  <Button
-                    href={book.pdfUrl}
-                    external
-                    variant="primary"
-                    size="lg"
-                  >
-                    <BookOpen size={18} aria-hidden="true" />
-                    {t("readOnline")}
-                  </Button>
+                  {book.pdfReaderUrl ? (
+                    // In-site reader: remembers the reader's place per book.
+                    <Button
+                      href={`/${locale}/books/${book.slug}/read`}
+                      variant="primary"
+                      size="lg"
+                    >
+                      <BookOpen size={18} aria-hidden="true" />
+                      {t("readOnline")}
+                    </Button>
+                  ) : (
+                    // Not a Sanity PDF asset → the plain URL, read in the
+                    // browser's own viewer (the previous behavior).
+                    <Button
+                      href={book.pdfUrl}
+                      external
+                      variant="primary"
+                      size="lg"
+                    >
+                      <BookOpen size={18} aria-hidden="true" />
+                      {t("readOnline")}
+                    </Button>
+                  )}
                   {/* `?dl=` URL → saved as a file, only on explicit request. */}
                   <Button
                     href={book.pdfDownloadUrl}

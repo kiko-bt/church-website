@@ -106,7 +106,6 @@
     "oldTestament": "Old Testament",
     "newTestament": "New Testament",
     "chapter": "Chapter",
-    "verse": "Verse",
     "prevChapter": "Previous chapter",
     "nextChapter": "Next chapter",
     "breadcrumb": "Bible",
@@ -116,6 +115,14 @@
     "selectBook": "Select a book",
     "selectChapter": "Select a chapter",
     "continueReading": "Continue reading",
+    "verseCopy": {
+      "select": "Select verse {number}",
+      "copy": "Copy",
+      "copyLabel": "Copy verse {reference}",
+      "copied": "Copied",
+      "failed": "Copy failed",
+      "citation": "\"{text}\" ({reference})"
+    },
     "notFound": {
       "book": "Book not found.",
       "chapter": "Chapter not found."
@@ -149,6 +156,23 @@
     "readOnline": "Read online",
     "downloadPdf": "Download PDF",
     "comingSoon": "Coming soon",
+    "reader": {
+      "metaTitle": "{title} — reading",
+      "back": "Back to the book",
+      "toolbar": "Reading tools",
+      "document": "Book content",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "pageNumber": "Page number",
+      "pageOf": "of {total}",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "openPdf": "Open PDF",
+      "download": "Download PDF",
+      "loading": "Loading the book…",
+      "loadingProgress": "Loading the book… {percent}%",
+      "error": "The book can’t be shown in this browser. Open or download it as a PDF."
+    },
     "by": "Author",
     "empty": {
       "title": "No books yet",

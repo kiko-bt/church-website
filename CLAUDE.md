@@ -86,7 +86,8 @@ the code and this file are the source of truth.
 
 Authoritative versions are in `package.json`; do not restate them elsewhere.
 Node 22.x · Next.js 15 App Router · TypeScript strict · Tailwind CSS v4 ·
-Sanity · next-intl · next-themes · Zod · Fuse.js · Resend · Vercel.
+Sanity · next-intl · next-themes · Zod · Fuse.js · pdf.js (`pdfjs-dist`, book
+reader only) · Resend · Vercel.
 
 Deliberate absences, so they are not "fixed" by a future session: no UI component
 library, no form library, no state library, no `tailwind.config.*`, no CSS modules.

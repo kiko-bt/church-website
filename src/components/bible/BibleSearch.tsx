@@ -18,6 +18,9 @@ import {
   queryWords,
   searchBible,
 } from "@/features/bible/bible-search";
+import { verseReference } from "@/features/bible/bible.citation";
+import { CopyVerseButton } from "@/components/bible/CopyVerseButton";
+import type { VerseCopyMessages } from "@/components/bible/VerseCopyLabel";
 
 type BibleSearchProps = {
   readonly locale: Locale;
@@ -25,6 +28,7 @@ type BibleSearchProps = {
   readonly ariaLabel: string;
   readonly noResults: string;
   readonly errorLabel: string;
+  readonly copyMessages: VerseCopyMessages;
 };
 
 const MIN_QUERY_LENGTH = 2;
@@ -65,6 +69,7 @@ export function BibleSearch({
   ariaLabel,
   noResults,
   errorLabel,
+  copyMessages,
 }: BibleSearchProps) {
   const inputId = useId();
   const [query, setQuery] = useState("");
@@ -183,10 +188,10 @@ export function BibleSearch({
               const ref = parseReference(entry.reference);
               if (!ref) return null;
               return (
-                <li key={entry.reference}>
+                <li key={entry.reference} className="flex items-start">
                   <Link
                     href={`/${locale}/bible/${ref.bookId}/${ref.chapter}#${verseAnchorId(ref.verse)}`}
-                    className="block px-4 py-3 transition-colors hover:bg-warm-bg focus-visible:bg-warm-bg focus-visible:outline-none"
+                    className="block min-w-0 flex-1 px-4 py-3 transition-colors hover:bg-warm-bg focus-visible:bg-warm-bg focus-visible:outline-none"
                   >
                     <span className="text-sm font-semibold text-accent-gold-strong">
                       <Highlighted value={entry.bookName} words={matchedWords} />{" "}
@@ -196,6 +201,13 @@ export function BibleSearch({
                       <Highlighted value={entry.text} words={matchedWords} />
                     </span>
                   </Link>
+                  {/* A sibling of the link — never a button inside an <a>. */}
+                  <CopyVerseButton
+                    text={entry.text}
+                    reference={verseReference(entry.bookName, ref.chapter, ref.verse)}
+                    messages={copyMessages}
+                    className="my-3 mr-3"
+                  />
                 </li>
               );
             })}

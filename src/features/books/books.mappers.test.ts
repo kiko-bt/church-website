@@ -33,3 +33,29 @@ test("flattens the slug and defaults featured to false", () => {
   assert.equal(book.slug, "pilgrims-progress");
   assert.equal(book.featured, false);
 });
+
+test("derives the PDF file id and the same-origin reader URL", () => {
+  const hash = "30193d9acea49c510ec401baddb40f08f0a999fc";
+  const book = mapBook({
+    ...base,
+    pdfUrl: `https://cdn.sanity.io/files/9nwz9xmi/production/${hash}.pdf`,
+  });
+  assert.equal(book.pdfFileId, hash);
+  assert.equal(book.pdfReaderUrl, `/pdf/${hash}.pdf`);
+  // The existing URLs are unchanged.
+  assert.equal(book.pdfUrl, `https://cdn.sanity.io/files/9nwz9xmi/production/${hash}.pdf`);
+});
+
+test("no reader URL for a missing or non-Sanity PDF URL", () => {
+  for (const pdfUrl of [
+    null,
+    "https://cdn.sanity.io/files/p/d/abc123.pdf",
+    "https://example.com/files/p/d/30193d9acea49c510ec401baddb40f08f0a999fc.pdf",
+    "https://cdn.sanity.io/files/p/d/30193d9acea49c510ec401baddb40f08f0a999fc.png",
+    "https://cdn.sanity.io/files/p/d/30193d9acea49c510ec401baddb40f08f0a999fc.pdf?dl=x",
+  ]) {
+    const book = mapBook({ ...base, pdfUrl });
+    assert.equal(book.pdfFileId, null, String(pdfUrl));
+    assert.equal(book.pdfReaderUrl, null, String(pdfUrl));
+  }
+});

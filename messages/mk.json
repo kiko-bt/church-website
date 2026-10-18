@@ -106,7 +106,6 @@
     "oldTestament": "Стар Завет",
     "newTestament": "Нов Завет",
     "chapter": "Глава",
-    "verse": "Стих",
     "prevChapter": "Претходна глава",
     "nextChapter": "Следна глава",
     "breadcrumb": "Библија",
@@ -116,6 +115,14 @@
     "selectBook": "Изберете книга",
     "selectChapter": "Изберете глава",
     "continueReading": "Продолжете со читање",
+    "verseCopy": {
+      "select": "Изберете го стихот {number}",
+      "copy": "Копирај",
+      "copyLabel": "Копирај го стихот {reference}",
+      "copied": "Копирано",
+      "failed": "Копирањето не успеа",
+      "citation": "„{text}“ ({reference})"
+    },
     "notFound": {
       "book": "Книгата не е пронајдена.",
       "chapter": "Главата не е пронајдена."
@@ -149,6 +156,23 @@
     "readOnline": "Прочитај онлајн",
     "downloadPdf": "Преземи PDF",
     "comingSoon": "Наскоро",
+    "reader": {
+      "metaTitle": "{title} — читање",
+      "back": "Назад кон книгата",
+      "toolbar": "Алатки за читање",
+      "document": "Содржина на книгата",
+      "previousPage": "Претходна страница",
+      "nextPage": "Следна страница",
+      "pageNumber": "Број на страница",
+      "pageOf": "од {total}",
+      "zoomIn": "Зголеми",
+      "zoomOut": "Намали",
+      "openPdf": "Отвори PDF",
+      "download": "Преземи PDF",
+      "loading": "Книгата се вчитува…",
+      "loadingProgress": "Книгата се вчитува… {percent}%",
+      "error": "Книгата не може да се прикаже во овој прелистувач. Отворете ја или преземете ја како PDF."
+    },
     "by": "Автор",
     "empty": {
       "title": "Сè уште нема книги",

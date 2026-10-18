@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import type { Locale } from "@/constants/locales";
 import { locales } from "@/constants/locales";
+import { notFound } from "next/navigation";
 import { inter, playfairDisplay } from "@/styles/fonts";
 import { generateBaseMetadata } from "@/lib/seo/metadata";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -13,8 +14,8 @@ import { Footer } from "@/components/layout/Footer";
 import "@/app/globals.css";
 
 // Next.js 15 dynamic route params are typed as `string` at the framework level.
-// We cast to `Locale` after reading, which is safe because the middleware
-// only routes valid locales to this layout.
+// Any first path segment can arrive here as its "locale" (no middleware
+// filters requests before this layout), so it is checked below.
 type LocaleLayoutProps = {
   children: ReactNode;
   params: Promise<{ locale: string }>;
@@ -36,6 +37,9 @@ export default async function LocaleLayout({
   params,
 }: LocaleLayoutProps) {
   const { locale: rawLocale } = await params;
+  // An unknown segment (`/foo.pdf`, `/wp-login.php`) is a 404 — never a page
+  // rendered under a made-up locale, nor a soft 404 that copies the home page.
+  if (!locales.includes(rawLocale as Locale)) notFound();
   const locale = rawLocale as Locale;
 
   // Enable static rendering: without this, next-intl cannot resolve the active

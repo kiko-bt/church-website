@@ -40,6 +40,28 @@ const securityHeaders = [
   },
 ];
 
+// Same-origin path for the book PDFs, used by the in-site PDF reader
+// (`/[locale]/books/[slug]/read`). The Sanity CDN answers cross-origin browser
+// requests with "403 CORS Origin not allowed", and pdf.js has to fetch the file
+// itself, so `/pdf/<sha1>.pdf` is proxied to this project's file assets. The
+// pattern only admits a 40-hex asset hash + `.pdf`, so the rewrite can serve
+// this project's PDFs and nothing else. The path contains a dot, so the i18n
+// middleware (see its matcher) never sees it. Omitted when Sanity is not
+// configured — the reader is then never linked (no PDFs).
+const sanityProjectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const sanityDataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
+const pdfRewrites =
+  sanityProjectId &&
+  /^[a-z0-9-]+$/i.test(sanityProjectId) &&
+  /^[a-z0-9_-]+$/i.test(sanityDataset)
+    ? [
+        {
+          source: "/pdf/:file([a-f0-9]{40}\\.pdf)",
+          destination: `https://cdn.sanity.io/files/${sanityProjectId}/${sanityDataset}/:file`,
+        },
+      ]
+    : [];
+
 const nextConfig: NextConfig = {
   images: {
     // Serve AVIF first (smaller than WebP), falling back to WebP — both are
@@ -55,6 +77,9 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
+  },
+  async rewrites() {
+    return pdfRewrites;
   },
 };
 

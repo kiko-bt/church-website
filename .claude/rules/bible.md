@@ -142,7 +142,8 @@ do, not just what is wrong.
 
 - SSG + Server Components. **Zero client JavaScript on the reading path**; search is
   confined to the landing page.
-  - Sole exception: `ReadingPositionMemory` (chapter page) — a render-nothing client
+  - Two exceptions, both render-nothing islands on the chapter page.
+  - `ReadingPositionMemory` — a render-nothing client
     island that saves/restores the per-chapter scroll position in `localStorage`,
     and records the locale's last-read chapter (read by the "Bible" `NavLink` and
     `ContinueReading` on the landing page). The verse the reader selects
@@ -150,8 +151,15 @@ do, not just what is wrong.
     until scrolled out of view — it is never re-derived from the scroll position
     (`createReadingTracker`). It also applies the verse-highlight
     classes to a restored verse and to a `#verse-n` reached by client-side
-    navigation (which does not set `:target`). It must stay render-nothing; do not
-    add other client code on the reading path.
+    navigation (which does not set `:target`). It must stay render-nothing.
+  - `VerseSelection` — one-click verse sharing. A click on a verse number (a
+    server-rendered button in `VerseList`) marks the verse `data-selected`, which
+    reveals its reference and Copy button, and selects "text (Reference)". Copy —
+    and Ctrl+C / mobile "Copy" on that exact selection — yields the
+    `bible.verseCopy.citation` format (`bible.citation.ts`). It only reads verse
+    text, never changes it, and must stay render-nothing (delegated document
+    listeners: click, copy, keydown).
+  - Do not add other client code on the reading path.
 - Routing reads the manifest only — `generateStaticParams` must never load verse
   text.
 - `dynamicParams = false` on the book and chapter routes, so non-canonical URLs
