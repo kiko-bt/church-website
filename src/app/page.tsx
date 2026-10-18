@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { defaultLocale } from "@/constants/locales";
 
 // Redirect bare "/" to the default locale.
-// The next-intl middleware handles this at the edge once installed.
+// src/middleware.ts normally redirects first; this is the fallback.
 export default function RootPage() {
   redirect(`/${defaultLocale}`);
 }

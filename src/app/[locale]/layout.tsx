@@ -14,8 +14,9 @@ import { Footer } from "@/components/layout/Footer";
 import "@/app/globals.css";
 
 // Next.js 15 dynamic route params are typed as `string` at the framework level.
-// Any first path segment can arrive here as its "locale" (no middleware
-// filters requests before this layout), so it is checked below.
+// src/middleware.ts redirects paths without a locale, but it skips file-like
+// paths (`/foo.pdf`), which can arrive here with any segment as their
+// "locale" — so it is checked below.
 type LocaleLayoutProps = {
   children: ReactNode;
   params: Promise<{ locale: string }>;
