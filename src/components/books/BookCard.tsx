@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/constants/locales";
@@ -13,11 +14,11 @@ type BookCardProps = {
  * Presentational card for a single book in the listing. `book` is a mapped
  * domain model from `getBooks()` (@/features/books).
  *
- * The whole card opens the PDF for reading in a new tab (the plain asset URL,
- * served inline, so the browser's built-in viewer displays it). Downloading is
- * an explicit choice on the book detail page (`pdfDownloadUrl`). A book without
- * a PDF renders as a non-interactive card with a "coming soon" badge — never a
- * broken link.
+ * The whole card opens the book in the in-site reader
+ * (`/books/<slug>/read`), or — for a PDF that is not a Sanity asset — the
+ * plain PDF in a new tab. Downloading is an explicit choice on the book detail
+ * page (`pdfDownloadUrl`). A book without a PDF renders as a non-interactive
+ * card with a "coming soon" badge — never a broken link.
  *
  * The cover is a resolved Sanity CDN URL (dereferenced in GROQ), rendered with
  * next/image inside a fixed 3:4 box (no CLS). Books without a cover fall back
@@ -91,14 +92,32 @@ export async function BookCard({ book, locale }: BookCardProps) {
     );
   }
 
-  // Whole card opens the PDF inline in a new tab, keeping the listing open.
+  const cardClassName =
+    "group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold";
+
+  // Whole card opens the in-site reader, which remembers the reader's place
+  // per book — the same rule as the book page's "Read online" button.
+  if (book.pdfReaderUrl) {
+    return (
+      <Link
+        href={`/${locale}/books/${book.slug}/read`}
+        aria-label={`${t("readOnline")}: ${book.title}`}
+        className={cardClassName}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  // Not a Sanity PDF asset → the plain PDF in a new tab, read in the
+  // browser's own viewer, keeping the listing open.
   return (
     <a
       href={book.pdfUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${t("readOnline")}: ${book.title}`}
-      className="group flex flex-col overflow-hidden rounded-md border border-soft-gold/40 bg-background transition-colors hover:border-accent-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+      className={cardClassName}
     >
       {content}
     </a>
