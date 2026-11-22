@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+# The content owner publishes with `git add .`; keep local archives/backups
+# (e.g. a zipped copy of the Bible folder) out of the public repository.
+*.zip
 
 # debug
 npm-debug.log*
