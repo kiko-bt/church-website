@@ -7,7 +7,7 @@ import { createClient, type SanityClient } from "@sanity/client";
 // and local development without Sanity credentials still succeed — the feature
 // data accessors detect a `null` client and fall back to empty content.
 //
-// Public dataset reads go through the CDN and need no token. NEVER place a
+// Public dataset reads need no token (origin API, not the CDN — see below). NEVER place a
 // write or management token here (see .claude/security-rules.md).
 //
 // `perspective: "published"` is explicit (not relied upon implicitly): only
@@ -23,7 +23,12 @@ export const sanityClient: SanityClient | null = projectId
       projectId,
       dataset,
       apiVersion: "2024-01-01",
-      useCdn: true,
+      // NOT the CDN: the publish webhook revalidates within ~1s, while the API
+      // CDN may serve the previous version for up to ~75s (max-age=60 +
+      // stale-while-revalidate=15). A rebuild in that window would re-cache
+      // stale content until the next publish. Next.js already caches every
+      // read under a tag, so origin traffic stays minimal.
+      useCdn: false,
       perspective: "published",
     })
   : null;
