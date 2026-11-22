@@ -34,10 +34,9 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files
-.env
-.env.local
-.env.*.local
+.env*
 # .env.example is intentionally committed
+!.env.example
 
 # vercel
 .vercel
